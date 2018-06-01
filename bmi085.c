@@ -39,21 +39,20 @@
  * No license is granted by implication or otherwise under any patent or
  * patent rights of the copyright holder.
  *
- * @file        bmi088.c
+ * @file        bmi085.c
  * @date        27 May 2018
  * @version     1.1.0
  *
  */
 
-/*! \file bmi088.c
+/*! \file bmi085.c
  \brief Sensor Driver for BMI085 family of sensors */
 /****************************************************************************/
 /**\name        Header files
  ****************************************************************************/
 #include "bmi08x.h"
-#include "bmi088.h"
-
-#if BMI08X_FEATURE_BMI088 == 1
+#include "bmi085.h"
+#if BMI08X_FEATURE_BMI085 == 1
 /****************************************************************************/
 /** \name       Macros
  ****************************************************************************/
@@ -76,6 +75,11 @@
  */
 static int8_t null_ptr_check(const struct bmi08x_dev *dev);
 
+/****************************************************************************/
+/**\name        Extern Declarations
+ ****************************************************************************/
+
+/****************************************************************************/
 /**\name        Globals
  ****************************************************************************/
 
@@ -83,28 +87,30 @@ static int8_t null_ptr_check(const struct bmi08x_dev *dev);
 /**\name        Function definitions
  ****************************************************************************/
 /*!
- *  @brief This API is the entry point for bmi088 sensors.
+ *  @brief This API is the entry point for bmi085 sensors.
  *  It performs the selection of I2C/SPI read mechanism according to the
  *  selected interface and reads the chip-id of accel & gyro sensors.
+ *  Additionally the bmi085 config file is loaded onto the device.
  */
-int8_t bmi088_init(struct bmi08x_dev *dev)
+int8_t bmi085_init(struct bmi08x_dev *dev)
 {
 	int8_t rslt;
-	/*initialize bmi088 accel sensor*/
+	/*initialize bmi085 accel sensor*/
 	rslt = bmi08a_init(dev);
 
 	if (rslt == BMI08X_OK) {
-		/*initialize bmi088 gyro sensor*/
+		/*default read write length for config stream*/
+		//dev->read_write_len = 2;
+		/*initialize bmi085 accel sensor*/
 		rslt = bmi08g_init(dev);
 	}
-
 	return rslt;
 }
 
 /*!
- *  @brief This API uploads the bmi088 config file onto the device.
+ *  @brief This API uploads the bmi085 config file onto the device.
  */
-int8_t bmi088_apply_config_file(struct bmi08x_dev *dev)
+int8_t bmi085_apply_config_file(struct bmi08x_dev *dev)
 {
 	int8_t rslt;
 	/* Check for null pointer in the device structure */
@@ -124,7 +130,7 @@ int8_t bmi088_apply_config_file(struct bmi08x_dev *dev)
  *  @brief This API is used to enable/disable and configure the data synchronization
  *  feature.
  */
-int8_t bmi088_configure_data_synchronization(struct bmi08x_data_sync_cfg sync_cfg, struct bmi08x_dev *dev)
+int8_t bmi085_configure_data_synchronization(struct bmi08x_data_sync_cfg sync_cfg, struct bmi08x_dev *dev)
 {
 	int8_t rslt;
 	uint16_t data[BMI08X_ACCEL_DATA_SYNC_LEN];
@@ -179,7 +185,7 @@ int8_t bmi088_configure_data_synchronization(struct bmi08x_data_sync_cfg sync_cf
  *  @brief This API is used to enable/disable and configure the anymotion
  *  feature.
  */
-int8_t bmi088_configure_anymotion(struct bmi08x_anymotion_cfg anymotion_cfg, struct bmi08x_dev *dev)
+int8_t bmi085_configure_anymotion(struct bmi08x_anymotion_cfg anymotion_cfg, struct bmi08x_dev *dev)
 {
 	int8_t rslt;
 	uint16_t data[BMI08X_ACCEL_ANYMOTION_LEN];
@@ -204,7 +210,7 @@ int8_t bmi088_configure_anymotion(struct bmi08x_anymotion_cfg anymotion_cfg, str
  *  @brief This API is used to enable/disable and configure the fast temperature update
  *  feature.
  */
-int8_t bmi088_configure_fast_temp(struct bmi08x_fast_temp_cfg fast_temp_cfg, struct bmi08x_dev *dev)
+int8_t bmi085_configure_fast_temp(struct bmi08x_fast_temp_cfg fast_temp_cfg, struct bmi08x_dev *dev)
 {
 	int8_t rslt;
 	uint16_t data[BMI08X_ACCEL_FAST_TEMP_LEN];
@@ -221,44 +227,11 @@ int8_t bmi088_configure_fast_temp(struct bmi08x_fast_temp_cfg fast_temp_cfg, str
 }
 
 /*!
- *  @brief This API is used to enable/disable and configure the vre filter
- *  feature.
- */
-int8_t bmi088_configure_vre_filter(struct bmi088_vre_filter_cfg vre_filter_cfg, struct bmi08x_dev *dev)
-{
-	int8_t rslt;
-	uint16_t data[BMI08X_ACCEL_VRE_FILTER_LEN];
-	/* Check for null pointer in the device structure */
-	rslt = null_ptr_check(dev);
-	/* Proceed if null check is fine */
-	if (rslt == BMI08X_OK) {
-		/* Enable data synchronization */
-		data[0] = ((vre_filter_cfg.enable << BMI08X_ACCEL_VRE_FILTER_ENABLE_SHIFT) & BMI08X_ACCEL_VRE_FILTER_ENABLE_MASK);
-		data[0] |= ((vre_filter_cfg.filter_coef.filter_order << BMI08X_ACCEL_VRE_FILTER_FILTER_ORDER_SHIFT) & BMI08X_ACCEL_VRE_FILTER_FILTER_ORDER_MASK);
-		data[1] = ((vre_filter_cfg.filter_coef.iir_a_coef[0] << BMI08X_ACCEL_VRE_FILTER_COEF_SHIFT) & BMI08X_ACCEL_VRE_FILTER_COEF_MASK);
-		data[2] = ((vre_filter_cfg.filter_coef.iir_a_coef[1] << BMI08X_ACCEL_VRE_FILTER_COEF_SHIFT) & BMI08X_ACCEL_VRE_FILTER_COEF_MASK);
-		data[3] = ((vre_filter_cfg.filter_coef.iir_a_coef[2] << BMI08X_ACCEL_VRE_FILTER_COEF_SHIFT) & BMI08X_ACCEL_VRE_FILTER_COEF_MASK);
-		data[4] = ((vre_filter_cfg.filter_coef.iir_b_coef[0] << BMI08X_ACCEL_VRE_FILTER_COEF_SHIFT) & BMI08X_ACCEL_VRE_FILTER_COEF_MASK);
-		data[5] = ((vre_filter_cfg.filter_coef.iir_b_coef[1] << BMI08X_ACCEL_VRE_FILTER_COEF_SHIFT) & BMI08X_ACCEL_VRE_FILTER_COEF_MASK);
-		data[6] = ((vre_filter_cfg.filter_coef.iir_b_coef[2] << BMI08X_ACCEL_VRE_FILTER_COEF_SHIFT) & BMI08X_ACCEL_VRE_FILTER_COEF_MASK);
-		data[7] = ((vre_filter_cfg.filter_coef.iir_a_scale[0] << BMI08X_ACCEL_VRE_FILTER_COEF_SHIFT) & BMI08X_ACCEL_VRE_FILTER_COEF_MASK);
-		data[8] = ((vre_filter_cfg.filter_coef.iir_a_scale[1] << BMI08X_ACCEL_VRE_FILTER_COEF_SHIFT) & BMI08X_ACCEL_VRE_FILTER_COEF_MASK);
-		data[9] = ((vre_filter_cfg.filter_coef.iir_a_scale[2] << BMI08X_ACCEL_VRE_FILTER_COEF_SHIFT) & BMI08X_ACCEL_VRE_FILTER_COEF_MASK);
-		data[10] = ((vre_filter_cfg.filter_coef.iir_b_scale[0] << BMI08X_ACCEL_VRE_FILTER_COEF_SHIFT) & BMI08X_ACCEL_VRE_FILTER_COEF_MASK);
-		data[11] = ((vre_filter_cfg.filter_coef.iir_b_scale[1] << BMI08X_ACCEL_VRE_FILTER_COEF_SHIFT) & BMI08X_ACCEL_VRE_FILTER_COEF_MASK);
-		data[12] = ((vre_filter_cfg.filter_coef.iir_b_scale[2] << BMI08X_ACCEL_VRE_FILTER_COEF_SHIFT) & BMI08X_ACCEL_VRE_FILTER_COEF_MASK);
-		bmi08a_write_feature_config(BMI08X_ACCEL_VRE_FILTER_ADR, &data[0], BMI08X_ACCEL_VRE_FILTER_LEN, dev);
-	}
-
-	return rslt;
-}
-
-/*!
  *  @brief This API reads the synchronized accel & gyro data from the sensor,
  *  store it in the bmi08x_sensor_data structure instance
  *  passed by the user.
  */
-int8_t bmi088_get_synchronized_data(struct bmi08x_sensor_data *accel, struct bmi08x_sensor_data *gyro,
+int8_t bmi085_get_synchronized_data(struct bmi08x_sensor_data *accel, struct bmi08x_sensor_data *gyro,
 		const struct bmi08x_dev *dev)
 {
 	int8_t rslt;
@@ -311,7 +284,7 @@ int8_t bmi088_get_synchronized_data(struct bmi08x_sensor_data *accel, struct bmi
  *  store it in the bmi08x_sensor_data structure instance
  *  passed by the user.
  */
-int8_t bmi088_get_synchronized_data_filtered(struct bmi08x_sensor_data *accel, struct bmi08x_sensor_data *gyro, struct bmi08x_iir_filter *iir_acc, struct bmi08x_iir_filter *iir_gyr, const struct bmi08x_dev *dev)
+int8_t bmi085_get_synchronized_data_filtered(struct bmi08x_sensor_data *accel, struct bmi08x_sensor_data *gyro, struct bmi08x_iir_filter *iir_acc, struct bmi08x_iir_filter *iir_gyr, const struct bmi08x_dev *dev)
 {
 	int8_t rslt;
 	uint8_t reg_addr, data[6];
@@ -372,7 +345,7 @@ int8_t bmi088_get_synchronized_data_filtered(struct bmi08x_sensor_data *accel, s
  *  based on the user settings in the bmi08x_int_cfg
  *  structure instance.
  */
-int8_t bmi088_set_data_sync_int_config(const struct bmi08x_int_cfg *int_config,
+int8_t bmi085_set_data_sync_int_config(const struct bmi08x_int_cfg *int_config,
 	const struct bmi08x_dev *dev)
 {
 	int8_t rslt;

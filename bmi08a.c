@@ -40,8 +40,8 @@
  * patent rights of the copyright holder.
  *
  * @file        bmi08a.c
- * @date        02 Feb 2018
- * @version     1.0.0
+ * @date        27 May 2018
+ * @version     1.1.0
  *
  */
 /*! \file bmi08a.c
@@ -128,31 +128,51 @@ static int8_t set_regs(uint8_t reg_addr, uint8_t *reg_data, uint16_t len, const 
  * @return Result of API execution status
  * @retval zero -> Success / -ve value -> Error
  */
-static int8_t set_int_pin_config(const struct bmi08x_int_cfg *int_config, const struct bmi08x_dev *dev);
+static int8_t set_int_pin_config(const struct bmi08x_accel_int_channel_cfg *int_config, const struct bmi08x_dev *dev);
 
 /*!
  * @brief This API sets the data ready interrupt for accel sensor
  *
- * @param[in] int_config  : Structure instance of bmi08x_int_cfg.
+ * @param[in] int_config  : Structure instance of bmi08x_accel_int_channel_cfg.
  * @param[in] dev         : Structure instance of bmi08x_dev.
  *
  * @return Result of API execution status
  * @retval zero -> Success / -ve value -> Error
  */
-static int8_t set_accel_data_ready_int(const struct bmi08x_int_cfg *int_config, const struct bmi08x_dev *dev);
+static int8_t set_accel_data_ready_int(const struct bmi08x_accel_int_channel_cfg *int_config, const struct bmi08x_dev *dev);
 
-#if BMI08X_FEATURE_BMI085 == 1
 /*!
  * @brief This API sets the synchronized data ready interrupt for accel sensor
  *
- * @param[in] int_config  : Structure instance of bmi08x_int_cfg.
+ * @param[in] int_config  : Structure instance of bmi08x_accel_int_channel_cfg.
  * @param[in] dev         : Structure instance of bmi08x_dev.
  *
  * @return Result of API execution status
  * @retval zero -> Success / -ve value -> Error
  */
-static int8_t set_accel_sync_data_ready_int(const struct bmi08x_int_cfg *int_config, const struct bmi08x_dev *dev);
-#endif
+static int8_t set_accel_sync_data_ready_int(const struct bmi08x_accel_int_channel_cfg *int_config, const struct bmi08x_dev *dev);
+
+/*!
+ * @brief This API configures the given interrupt channel as input for accel sensor
+ *
+ * @param[in] int_config  : Structure instance of bmi08x_accel_int_channel_cfg.
+ * @param[in] dev         : Structure instance of bmi08x_dev.
+ *
+ * @return Result of API execution status
+ * @retval zero -> Success / -ve value -> Error
+ */
+static int8_t set_accel_sync_input(const struct bmi08x_accel_int_channel_cfg *int_config, const struct bmi08x_dev *dev);
+
+/*!
+ * @brief This API sets the anymotion interrupt for accel sensor
+ *
+ * @param[in] int_config  : Structure instance of bmi08x_accel_int_channel_cfg.
+ * @param[in] dev         : Structure instance of bmi08x_dev.
+ *
+ * @return Result of API execution status
+ * @retval zero -> Success / -ve value -> Error
+ */
+static int8_t set_accel_anymotion_int(const struct bmi08x_accel_int_channel_cfg *int_config, const struct bmi08x_dev *dev);
 
 /*!
  * @brief This API writes the config stream data in memory using burst mode
@@ -287,15 +307,29 @@ int8_t bmi08a_write_config_file(const struct bmi08x_dev *dev)
 	int8_t rslt;
 	/* Config loading disable*/
 	uint8_t config_load = BMI08X_DISABLE;
+	uint8_t current_acc_pwr_ctrl = 0;
 	uint16_t index = 0;
-
+	
 	/* Check for null pointer in the device structure */
 	rslt = null_ptr_check(dev);
-
 	/* Check if config file pointer is not null */
 	if ((rslt == BMI08X_OK) && (dev->config_file_ptr != NULL)) {
+		
 		/* Check whether the read/write length is valid */
 		if (dev->read_write_len > 0) {
+			/* deactivate accel, otherwise post processing can not be enabled safely */
+			rslt = get_regs(BMI08X_ACCEL_PWR_CTRL_REG, &current_acc_pwr_ctrl, 1, dev);
+			if (rslt != BMI08X_OK) {
+				return rslt;
+			}
+			rslt = set_regs(BMI08X_ACCEL_PWR_CTRL_REG, &config_load, 1, dev);
+			if (rslt == BMI08X_OK) {
+				/*delay required to switch power modes*/
+				dev->delay_ms(BMI08X_POWER_CONFIG_DELAY);
+			} else {
+				return rslt;
+			}
+			
 			/* Disable config loading*/
 			rslt = set_regs(BMI08X_ACCEL_INIT_CTRL_REG, &config_load, 1, dev);
 
@@ -306,7 +340,6 @@ int8_t bmi08a_write_config_file(const struct bmi08x_dev *dev)
 					rslt = stream_transfer_write((dev->config_file_ptr + index),
 							index, dev);
 				}
-
 				if (rslt == BMI08X_OK) {
 					/* Enable config loading and FIFO mode */
 					config_load = BMI08X_ENABLE;
@@ -316,6 +349,24 @@ int8_t bmi08a_write_config_file(const struct bmi08x_dev *dev)
 					/* Wait till ASIC is initialized. Refer the data-sheet
 					 * for more information */
 					dev->delay_ms(BMI08X_ASIC_INIT_TIME_MS);
+					
+					/* Check for config initialization status (1 = OK)*/
+					uint8_t reg_data = 0;
+					rslt = get_regs(BMI08X_ACCEL_INTERNAL_STAT_REG, &reg_data, 1, dev);
+
+					if(rslt == BMI08X_OK && reg_data != 1)
+					{
+						rslt = BMI08X_E_CONFIG_STREAM_ERROR;
+					}
+					else
+					{
+						/* reactivate accel */
+						rslt = set_regs(BMI08X_ACCEL_PWR_CTRL_REG, &current_acc_pwr_ctrl, 1, dev);
+						if (rslt == BMI08X_OK) {
+							/*delay required to switch power modes*/
+							dev->delay_ms(BMI08X_POWER_CONFIG_DELAY);
+						}
+					}
 				}
 			}
 		} else {
@@ -323,6 +374,41 @@ int8_t bmi08a_write_config_file(const struct bmi08x_dev *dev)
 		}
 	} else {
 		rslt = BMI08X_E_NULL_PTR;
+	}
+
+	return rslt;
+}
+
+/*!
+ *  @brief This API writes the feature configuration to the accel sensor.
+ */
+int8_t bmi08a_write_feature_config(uint8_t reg_addr, uint16_t *reg_data, uint8_t len, const struct bmi08x_dev *dev)
+{
+	int8_t rslt;
+	/* Check for null pointer in the device structure*/
+	rslt = null_ptr_check(dev);
+
+	uint16_t read_length = (reg_addr*2) + (len*2);
+	uint8_t feature_data[read_length];
+
+	/* Proceed if null check is fine */
+	if (rslt == BMI08X_OK) {
+		/* Read feature space up to the given feature position */		
+		rslt = bmi08a_get_regs(BMI08X_ACCEL_FEATURE_CFG_REG, &feature_data[0], read_length, dev);
+		
+		if(rslt == BMI08X_OK)
+		{	
+			/* Apply the given feature config. */
+			for(int i = 0; i < len; ++i)
+			{
+				/* Be careful: the feature config space is 16bit aligned! */
+				feature_data[(reg_addr*2) + (i*2)] = reg_data[i]&0xFF;
+				feature_data[(reg_addr*2) + (i*2) + 1] = reg_data[i]>>8;
+			}
+			
+			/* Write back updated feature space */
+			rslt = bmi08a_set_regs(BMI08X_ACCEL_FEATURE_CFG_REG, &feature_data[0], read_length, dev);
+		}
 	}
 
 	return rslt;
@@ -681,7 +767,7 @@ int8_t bmi08a_get_data(struct bmi08x_sensor_data *accel, const struct bmi08x_dev
  * based on the user settings in the bmi08x_int_cfg
  * structure instance.
  */
-int8_t bmi08a_set_int_config(const struct bmi08x_int_cfg *int_config, const struct bmi08x_dev *dev)
+int8_t bmi08a_set_int_config(const struct bmi08x_accel_int_channel_cfg *int_config, const struct bmi08x_dev *dev)
 {
 	int8_t rslt;
 
@@ -689,19 +775,23 @@ int8_t bmi08a_set_int_config(const struct bmi08x_int_cfg *int_config, const stru
 	rslt = null_ptr_check(dev);
 	/* Proceed if null check is fine */
 	if ((rslt == BMI08X_OK) && (int_config != NULL)) {
-		switch (int_config->accel_int_type) {
-		case BMI08X_ACCEL_DATA_RDY_INT: {
+		switch (int_config->int_type) {
+		case BMI08X_ACCEL_DATA_RDY_INT:
 			/* Data ready interrupt */
 			rslt = set_accel_data_ready_int(int_config, dev);
-		}
 			break;
-			/*feature supports only BMI085 not BMI088*/
-#if BMI08X_FEATURE_BMI085 == 1
 		case BMI08X_ACCEL_SYNC_DATA_RDY_INT:
-			/*synchronized data ready interrupt*/
+			/* synchronized data ready interrupt */
 			rslt = set_accel_sync_data_ready_int(int_config, dev);
 			break;
-#endif
+		case BMI08X_ACCEL_SYNC_INPUT:
+			/* input for synchronization on accel */
+			rslt = set_accel_sync_input(int_config, dev);
+			break;
+		case BMI08X_ACCEL_ANYMOTION_INT:
+			/* Anymotion interrupt */
+			rslt = set_accel_anymotion_int(int_config, dev);
+			break;
 		default:
 			rslt = BMI08X_E_INVALID_CONFIG;
 			break;
@@ -787,6 +877,66 @@ int8_t bmi08a_get_sensor_time(const struct bmi08x_dev *dev, uint32_t *sensor_tim
 
 	return rslt;
 }
+
+/*!
+ * @brief This API applies the passed IIR filter to the passed sensor data.
+ */
+struct bmi08x_sensor_data bmi08a_apply_iir_filter(struct bmi08x_sensor_data accel, struct bmi08x_iir_filter *iir)
+{
+	uint8_t indx;
+
+	/* update internal states --> shift by 1*/
+	for (indx = iir->filter_coef.filter_order; indx > 0; indx--)
+	{
+		iir->out[indx] = iir->out[indx - 1];
+		iir->in[indx] = iir->in[indx - 1];
+	}
+	/* copy input value */
+	iir->in[0].x = accel.x;
+	iir->in[0].y = accel.y;
+	iir->in[0].z = accel.z;
+
+	/* calculate first sample */
+	iir->out[0].x = iir->filter_coef.iir_b_coef[0]*iir->in[0].x;
+	iir->out[0].y = iir->filter_coef.iir_b_coef[0]*iir->in[0].y;
+	iir->out[0].z = iir->filter_coef.iir_b_coef[0]*iir->in[0].z;
+
+	/*run iir algorithms for all samples*/
+	for (indx = 1; indx <= iir->filter_coef.filter_order; indx++)
+	{
+		iir->out[0].x += iir->filter_coef.iir_b_coef[indx] * iir->in[indx].x - iir->filter_coef.iir_a_coef[indx] * iir->out[indx].x;
+		iir->out[0].y += iir->filter_coef.iir_b_coef[indx] * iir->in[indx].y - iir->filter_coef.iir_a_coef[indx] * iir->out[indx].y;
+		iir->out[0].z += iir->filter_coef.iir_b_coef[indx] * iir->in[indx].z - iir->filter_coef.iir_a_coef[indx] * iir->out[indx].z;
+	}
+	
+	/*perform saturation*/
+	iir->out[0].x = (iir->out[0].x > 32767.0) ? 32767.0 : ((iir->out[0].x < -32768.0) ? -32768.0 : iir->out[0].x);
+	iir->out[0].y = (iir->out[0].y > 32767.0) ? 32767.0 : ((iir->out[0].y < -32768.0) ? -32768.0 : iir->out[0].y);
+	iir->out[0].z = (iir->out[0].z > 32767.0) ? 32767.0 : ((iir->out[0].z < -32768.0) ? -32768.0 : iir->out[0].z);
+
+	/*map to 16bit integer output*/
+	struct bmi08x_sensor_data out;
+	out.x = iir->out[0].x;
+	out.y = iir->out[0].y;
+	out.z = iir->out[0].z;
+
+	return out;
+}
+
+int8_t bmi08a_init_iir_filter(struct bmi08x_iir_filter *iir)
+{
+	for(int indx = 0; indx <= iir->filter_coef.filter_order; ++indx)
+	{
+		iir->in[indx].x = 0;
+		iir->in[indx].y = 0;
+		iir->in[indx].z = 0;
+		iir->out[indx].x = 0;
+		iir->out[indx].y = 0;
+		iir->out[indx].z = 0;
+	}
+	
+	return BMI08X_OK;
+}	
 
 /*!
  *  @brief This API checks whether the self test functionality of the sensor
@@ -912,12 +1062,12 @@ static int8_t set_regs(uint8_t reg_addr, uint8_t *reg_data, uint16_t len, const 
  * @brief This API configures the pins which fire the
  * interrupt signal when any interrupt occurs.
  */
-static int8_t set_int_pin_config(const struct bmi08x_int_cfg *int_config, const struct bmi08x_dev *dev)
+static int8_t set_int_pin_config(const struct bmi08x_accel_int_channel_cfg *int_config, const struct bmi08x_dev *dev)
 {
 	int8_t rslt;
 	uint8_t reg_addr = 0, data, is_channel_invalid = FALSE;
 
-	switch (int_config->accel_int_channel) {
+	switch (int_config->int_channel) {
 	case BMI08X_INT_CHANNEL_1:
 		/* update reg_addr based on channel inputs */
 		reg_addr = BMI08X_ACCEL_INT1_IO_CONF_REG;
@@ -939,9 +1089,20 @@ static int8_t set_int_pin_config(const struct bmi08x_int_cfg *int_config, const 
 
 		if (rslt == BMI08X_OK) {
 			/* Update data with user configured bmi08x_int_cfg structure */
-			data = BMI08X_SET_BITS(data, BMI08X_ACCEL_INT_LVL, int_config->accel_int_pin_cfg.lvl);
-			data = BMI08X_SET_BITS(data, BMI08X_ACCEL_INT_OD, int_config->accel_int_pin_cfg.output_mode);
-			data = BMI08X_SET_BITS(data, BMI08X_ACCEL_INT_IO, int_config->accel_int_pin_cfg.enable_int_pin);
+			data = BMI08X_SET_BITS(data, BMI08X_ACCEL_INT_LVL, int_config->int_pin_cfg.lvl);
+			data = BMI08X_SET_BITS(data, BMI08X_ACCEL_INT_OD, int_config->int_pin_cfg.output_mode);
+
+			if(int_config->int_type == BMI08X_ACCEL_SYNC_INPUT)
+			{
+				data = BMI08X_SET_BITS(data, BMI08X_ACCEL_INT_EDGE, BMI08X_ENABLE);
+				data = BMI08X_SET_BITS(data, BMI08X_ACCEL_INT_IN, int_config->int_pin_cfg.enable_int_pin);
+				data = BMI08X_SET_BITS(data, BMI08X_ACCEL_INT_IO, BMI08X_DISABLE);
+			}
+			else
+			{
+				data = BMI08X_SET_BITS(data, BMI08X_ACCEL_INT_IO, int_config->int_pin_cfg.enable_int_pin);
+				data = BMI08X_SET_BITS(data, BMI08X_ACCEL_INT_IN, BMI08X_DISABLE);
+			}
 
 			/* Write to interrupt pin configuration register */
 			rslt = set_regs(reg_addr, &data, 1, dev);
@@ -956,7 +1117,7 @@ static int8_t set_int_pin_config(const struct bmi08x_int_cfg *int_config, const 
 /*!
  * @brief This API sets the data ready interrupt for accel sensor.
  */
-static int8_t set_accel_data_ready_int(const struct bmi08x_int_cfg *int_config, const struct bmi08x_dev *dev)
+static int8_t set_accel_data_ready_int(const struct bmi08x_accel_int_channel_cfg *int_config, const struct bmi08x_dev *dev)
 {
 	int8_t rslt;
 	uint8_t data = 0, conf;
@@ -965,9 +1126,9 @@ static int8_t set_accel_data_ready_int(const struct bmi08x_int_cfg *int_config, 
 	rslt = get_regs(BMI08X_ACCEL_INT1_INT2_MAP_DATA_REG, &data, 1, dev);
 
 	if (rslt == BMI08X_OK) {
-		conf = int_config->accel_int_pin_cfg.enable_int_pin;
+		conf = int_config->int_pin_cfg.enable_int_pin;
 
-		switch (int_config->accel_int_channel) {
+		switch (int_config->int_channel) {
 		case BMI08X_INT_CHANNEL_1:
 			/* Updating the data */
 			data = BMI08X_SET_BITS(data, BMI08X_ACCEL_INT1_DRDY, conf);
@@ -997,11 +1158,10 @@ static int8_t set_accel_data_ready_int(const struct bmi08x_int_cfg *int_config, 
 	return rslt;
 }
 
-#if BMI08X_FEATURE_BMI085 == 1
 /*!
  * @brief This API sets the synchronized data ready interrupt for accel sensor
  */
-static int8_t set_accel_sync_data_ready_int(const struct bmi08x_int_cfg *int_config, const struct bmi08x_dev *dev)
+static int8_t set_accel_sync_data_ready_int(const struct bmi08x_accel_int_channel_cfg *int_config, const struct bmi08x_dev *dev)
 {
 	int8_t rslt;
 	uint8_t data, reg_addr = 0;
@@ -1012,7 +1172,7 @@ static int8_t set_accel_sync_data_ready_int(const struct bmi08x_int_cfg *int_con
 
 		data = BMI08X_ACCEL_INTA_DISABLE;
 
-		switch (int_config->accel_int_channel) {
+		switch (int_config->int_channel) {
 		case BMI08X_INT_CHANNEL_1:
 			reg_addr = BMI08X_ACCEL_INT1_MAP_REG;
 			break;
@@ -1027,7 +1187,7 @@ static int8_t set_accel_sync_data_ready_int(const struct bmi08x_int_cfg *int_con
 		}
 
 		if (rslt == BMI08X_OK) {
-			if (int_config->accel_int_pin_cfg.enable_int_pin == BMI08X_ENABLE) {
+			if (int_config->int_pin_cfg.enable_int_pin == BMI08X_ENABLE) {
 				/*interrupt A mapped to INT1/INT2 */
 				data = BMI08X_ACCEL_INTA_ENABLE;
 			}
@@ -1043,7 +1203,70 @@ static int8_t set_accel_sync_data_ready_int(const struct bmi08x_int_cfg *int_con
 
 	return rslt;
 }
-#endif
+
+/*!
+ * @brief This API configures the given interrupt channel as input for accel sensor
+ */
+static int8_t set_accel_sync_input(const struct bmi08x_accel_int_channel_cfg *int_config, const struct bmi08x_dev *dev)
+{
+	int8_t rslt;
+	/* Check for null pointer in the device structure*/
+	rslt = null_ptr_check(dev);
+
+	if (rslt == BMI08X_OK) {
+		/*set input interrupt configuration*/
+		rslt = set_int_pin_config(int_config, dev);
+	}
+
+	return rslt;
+}
+
+/*!
+ * @brief This API sets the anymotion interrupt for accel sensor
+ */
+static int8_t set_accel_anymotion_int(const struct bmi08x_accel_int_channel_cfg *int_config, const struct bmi08x_dev *dev)
+{
+	int8_t rslt;
+	uint8_t data, reg_addr = 0;
+	/* Check for null pointer in the device structure*/
+	rslt = null_ptr_check(dev);
+
+	if (rslt == BMI08X_OK) {
+
+		data = BMI08X_ACCEL_INTB_DISABLE;
+
+		switch (int_config->int_channel) {
+		case BMI08X_INT_CHANNEL_1:
+			reg_addr = BMI08X_ACCEL_INT1_MAP_REG;
+			break;
+
+		case BMI08X_INT_CHANNEL_2:
+			reg_addr = BMI08X_ACCEL_INT2_MAP_REG;
+			break;
+
+		default:
+			rslt = BMI08X_E_INVALID_INPUT;
+			break;
+		}
+
+		if (rslt == BMI08X_OK) {
+			if (int_config->int_pin_cfg.enable_int_pin == BMI08X_ENABLE) {
+				/*interrupt B mapped to INT1/INT2 */
+				data = BMI08X_ACCEL_INTB_ENABLE;
+			}
+			/* Write to interrupt map register */
+			rslt = set_regs(reg_addr, &data, 1, dev);
+
+			if (rslt == BMI08X_OK) {
+				/*set input interrupt configuration*/
+				rslt = set_int_pin_config(int_config, dev);
+			}
+		}
+	}
+
+	return rslt;
+}
+
 
 /*!
  *  @brief This API writes the config stream data in memory using burst mode.

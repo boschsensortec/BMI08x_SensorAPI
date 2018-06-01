@@ -41,7 +41,7 @@
  *
  * @file		bmi08x_defs.h
  * @date		02 Feb 2017
- * @version		1.0.0
+ * @version		1.1.0
  *
  */
 
@@ -295,8 +295,10 @@
 #define BMI08X_ACCEL_POWER_ENABLE                   UINT8_C(0x04)
 
 /**\name	Accel internal interrupt pin mapping */
-#define BMI08X_ACCEL_INTA_DISABLE                   UINT8_C(0x01)
+#define BMI08X_ACCEL_INTA_DISABLE                   UINT8_C(0x00)
 #define BMI08X_ACCEL_INTA_ENABLE                    UINT8_C(0x01)
+#define BMI08X_ACCEL_INTB_DISABLE                   UINT8_C(0x00)
+#define BMI08X_ACCEL_INTB_ENABLE                    UINT8_C(0x02)
 
 /**\name	Accel Soft reset delay */
 #define BMI08X_ACCEL_SOFTRESET_DELAY_MS             UINT8_C(1)
@@ -324,14 +326,18 @@
 #define BMI08X_ACCEL_BW_POS                         UINT8_C(4)
 
 /**\name    Mask definitions for INT1_IO_CONF register */
+#define BMI08X_ACCEL_INT_EDGE_MASK                  UINT8_C(0x01)
 #define BMI08X_ACCEL_INT_LVL_MASK                   UINT8_C(0x02)
 #define BMI08X_ACCEL_INT_OD_MASK                    UINT8_C(0x04)
 #define BMI08X_ACCEL_INT_IO_MASK                    UINT8_C(0x08)
+#define BMI08X_ACCEL_INT_IN_MASK                    UINT8_C(0x10)
 
 /**\name    Position definitions for INT1_IO_CONF register */
+#define BMI08X_ACCEL_INT_EDGE_POS                   UINT8_C(0)
 #define BMI08X_ACCEL_INT_LVL_POS                    UINT8_C(1)
 #define BMI08X_ACCEL_INT_OD_POS                     UINT8_C(2)
 #define BMI08X_ACCEL_INT_IO_POS                     UINT8_C(3)
+#define BMI08X_ACCEL_INT_IN_POS                     UINT8_C(4)
 
 /**\name    Mask definitions for INT1/INT2 mapping register */
 #define BMI08X_ACCEL_MAP_INTA_MASK                  UINT8_C(0x01)
@@ -634,6 +640,36 @@ struct bmi08x_sensor_data {
 };
 
 /*!
+ *  @brief Sensor XYZ data structure in float representation
+ */
+struct bmi08x_sensor_data_f {
+	/*! X-axis sensor data */
+	float x;
+	/*! Y-axis sensor data */
+	float y;
+	/*! Z-axis sensor data */
+	float z;
+};
+
+/*!
+ *  @brief iir filter coefficients data structure
+ */
+struct bmi08x_iir_filter_coef {
+	uint8_t filter_order;
+	float iir_a_coef[5];
+	float iir_b_coef[5];
+};
+
+/*!
+ *  @brief iir filter data structure
+ */
+struct bmi08x_iir_filter {
+	struct bmi08x_iir_filter_coef filter_coef;
+	struct bmi08x_sensor_data_f in[5];
+	struct bmi08x_sensor_data_f out[5];
+};
+
+/*!
  *  @brief Sensor configuration structure
  */
 struct bmi08x_cfg {
@@ -657,6 +693,105 @@ struct bmi08x_err_reg {
 	uint8_t err_code;
 };
 
+#define BMI08X_ACCEL_ANYMOTION_ADR 0x00
+#define BMI08X_ACCEL_ANYMOTION_LEN 2
+#define BMI08X_ACCEL_ANYMOTION_THRESHOLD_MASK 0x07FF
+#define BMI08X_ACCEL_ANYMOTION_THRESHOLD_SHIFT 0
+#define BMI08X_ACCEL_ANYMOTION_NOMOTION_SEL_MASK 0x0800
+#define BMI08X_ACCEL_ANYMOTION_NOMOTION_SEL_SHIFT 11
+#define BMI08X_ACCEL_ANYMOTION_DURATION_MASK 0x1FFF
+#define BMI08X_ACCEL_ANYMOTION_DURATION_SHIFT 0
+#define BMI08X_ACCEL_ANYMOTION_X_EN_MASK 0x2000
+#define BMI08X_ACCEL_ANYMOTION_X_EN_SHIFT 13
+#define BMI08X_ACCEL_ANYMOTION_Y_EN_MASK 0x4000
+#define BMI08X_ACCEL_ANYMOTION_Y_EN_SHIFT 14
+#define BMI08X_ACCEL_ANYMOTION_Z_EN_MASK 0x8000
+#define BMI08X_ACCEL_ANYMOTION_Z_EN_SHIFT 15
+
+/*!
+ *  @brief Anymotion config structure
+ */
+struct bmi08x_anymotion_cfg {
+	/* 11 bit threshold of anymotion detection (threshold = X mg * 2,048 (5.11 format)) */
+	uint16_t threshold;
+	/* 1 bit select between any- and nomotion behavior */
+	uint16_t nomotion_sel;
+	/* 13 bit set the duration for any- and nomotion (time = duration * 20ms (@50Hz)) */
+	uint16_t duration;
+	/* enable anymotion detection for x axis */
+	uint16_t x_en;
+	/* enable anymotion detection for y axis */
+	uint16_t y_en;
+	/* enable anymotion detection for z axis */
+	uint16_t z_en;
+};
+
+#define BMI08X_ACCEL_DATA_SYNC_ADR 0x02
+#define BMI08X_ACCEL_DATA_SYNC_LEN 1
+#define BMI08X_ACCEL_DATA_SYNC_MODE_MASK 0x0003
+#define BMI08X_ACCEL_DATA_SYNC_MODE_SHIFT 0
+
+#define BMI08X_ACCEL_DATA_SYNC_MODE_OFF 0x00
+#define BMI08X_ACCEL_DATA_SYNC_MODE_400HZ 0x01
+#define BMI08X_ACCEL_DATA_SYNC_MODE_1000HZ 0x02
+#define BMI08X_ACCEL_DATA_SYNC_MODE_2000HZ 0x03
+
+/*!
+ *  @brief Data Sync config structure
+ */
+struct bmi08x_data_sync_cfg {
+	/*! Mode (0 = off, 1 = 400Hz, 2 = 1kHz, 3 = 2kHz) */
+	uint8_t mode;
+};
+
+#define BMI08X_ACCEL_FAST_TEMP_ADR 0x03
+#define BMI08X_ACCEL_FAST_TEMP_LEN 1
+#define BMI08X_ACCEL_FAST_TEMP_ENABLE_MASK 0x0001
+#define BMI08X_ACCEL_FAST_TEMP_ENABLE_SHIFT 0
+
+/*!
+ *  @brief Fast temp config structure
+ */
+struct bmi08x_fast_temp_cfg {
+	/*! Enable (0 = Off, 1 = On) */
+	uint8_t enable;
+};
+
+#if BMI08X_FEATURE_BMI088 == 1
+
+#define BMI08X_ACCEL_VRE_FILTER_FILTER_ORDER_MAX 2
+/*!
+ *  @brief iir filter coefficients data structure for accel vre feature
+ */
+struct bmi08x_vre_filter_coef {
+	uint8_t filter_order;
+	int16_t iir_a_coef[BMI08X_ACCEL_VRE_FILTER_FILTER_ORDER_MAX + 1];
+	int16_t iir_b_coef[BMI08X_ACCEL_VRE_FILTER_FILTER_ORDER_MAX + 1];
+	int16_t iir_a_scale[BMI08X_ACCEL_VRE_FILTER_FILTER_ORDER_MAX + 1];
+	int16_t iir_b_scale[BMI08X_ACCEL_VRE_FILTER_FILTER_ORDER_MAX + 1];
+};
+
+#define BMI08X_ACCEL_VRE_FILTER_ADR 0x04
+#define BMI08X_ACCEL_VRE_FILTER_LEN 13
+#define BMI08X_ACCEL_VRE_FILTER_ENABLE_MASK 0x0001
+#define BMI08X_ACCEL_VRE_FILTER_ENABLE_SHIFT 0
+#define BMI08X_ACCEL_VRE_FILTER_FILTER_ORDER_MASK 0x0006
+#define BMI08X_ACCEL_VRE_FILTER_FILTER_ORDER_SHIFT 1
+#define BMI08X_ACCEL_VRE_FILTER_COEF_MASK 0xFFFF
+#define BMI08X_ACCEL_VRE_FILTER_COEF_SHIFT 0
+#define BMI08X_ACCEL_VRE_FILTER_SCALE_MASK 0xFFFF
+#define BMI08X_ACCEL_VRE_FILTER_SCALE_SHIFT 0
+
+/*!
+ *  @brief vre filter config structure
+ */
+struct bmi088_vre_filter_cfg {
+
+	uint16_t enable;
+	struct bmi08x_vre_filter_coef filter_coef;
+};
+#endif
+
 /*!
  *  @brief Enum to select accelerometer Interrupt pins
  */
@@ -678,10 +813,9 @@ enum bmi08x_gyro_int_channel {
  */
 enum bmi08x_accel_int_types {
 	BMI08X_ACCEL_DATA_RDY_INT,		/* Accel data ready interrupt */
-#if BMI08X_FEATURE_BMI085 == 1
-	BMI08X_ACCEL_SYNC_DATA_RDY_INT	/* Accel synchronized data ready interrupt
-	 for BMI085*/
-#endif
+	BMI08X_ACCEL_SYNC_DATA_RDY_INT,	/* Accel synchronized data ready interrupt */
+	BMI08X_ACCEL_SYNC_INPUT,		/* Accel synchronized data ready input*/
+	BMI08X_ACCEL_ANYMOTION_INT		/* Accel anymotion interrupt for BMI085 */
 };
 
 /*!
@@ -710,28 +844,48 @@ struct bmi08x_int_pin_cfg {
 
 	/*! Enable interrupt pin
 	 * Assignable Macros :
-	 *   - BMA400_ENABLE
-	 *   - BMA400_DISABLE
+	 *   - BMI08X_ENABLE
+	 *   - BMI08X_DISABLE
 	 */
 	uint8_t enable_int_pin :1;
+};
+
+/*!
+ *  @brief Interrupt channel structure for accel
+ */
+struct bmi08x_accel_int_channel_cfg {
+	/*! Accel Interrupt channel*/
+	enum bmi08x_accel_int_channel int_channel;
+	/*! Select Accel Interrupt type*/
+	enum bmi08x_accel_int_types int_type;
+	/*! Structure to configure accel interrupt pins*/
+	struct bmi08x_int_pin_cfg int_pin_cfg;
+};
+
+/*!
+ *  @brief Interrupt channel structure for gyro
+ */
+struct bmi08x_gyro_int_channel_cfg {
+	/*! Gyro Interrupt channel*/
+	enum bmi08x_gyro_int_channel int_channel;
+	/*! Select Gyro Interrupt type*/
+	enum bmi08x_gyro_int_types int_type;
+	/*! Structure to configure gyro interrupt pins*/
+	struct bmi08x_int_pin_cfg int_pin_cfg;
 };
 
 /*!
  *  @brief Interrupt Configuration structure
  */
 struct bmi08x_int_cfg {
-	/*! Accel Interrupt channel */
-	enum bmi08x_accel_int_channel accel_int_channel;
-	/*! Gyro Interrupt channel */
-	enum bmi08x_gyro_int_channel gyro_int_channel;
-	/*! Select Accel Interrupt */
-	enum bmi08x_accel_int_types accel_int_type;
-	/*! Select Gyro Interrupt */
-	enum bmi08x_gyro_int_types gyro_int_type;
-	/*! Structure to configure accel interrupt pins */
-	struct bmi08x_int_pin_cfg accel_int_pin_cfg;
-	/*! Structure to configure gyro interrupt pin 3 */
-	struct bmi08x_int_pin_cfg gyro_int_pin_cfg;
+	/*! Configuration of first accel interrupt channel */
+	struct bmi08x_accel_int_channel_cfg accel_int_config_1;
+	/*! Configuration of second accel interrupt channel */
+	struct bmi08x_accel_int_channel_cfg accel_int_config_2;
+	/*! Configuration of first gyro interrupt channel */
+	struct bmi08x_gyro_int_channel_cfg gyro_int_config_1;
+	/*! Configuration of second gyro interrupt channel */
+	struct bmi08x_gyro_int_channel_cfg gyro_int_config_2;
 };
 /*!
  *  @brief

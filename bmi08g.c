@@ -40,8 +40,8 @@
  * patent rights of the copyright holder.
  *
  * @file		bmi08g.c
- * @date		02 Feb 2018
- * @version		1.0.0
+ * @date		27 May 2018
+ * @version		1.1.0
  *
  */
 
@@ -100,25 +100,25 @@ static int8_t set_regs(uint8_t reg_addr, uint8_t *reg_data, uint16_t len, const 
 /*!
  * @brief This API sets the data ready interrupt for gyro sensor.
  *
- * @param[in] int_config  : Structure instance of bmi08x_int_cfg.
+ * @param[in] int_config  : Structure instance of bmi08x_gyro_int_channel_cfg.
  * @param[in] dev         : Structure instance of bmi08x_dev.
  *
  * @return Result of API execution status
  * @retval zero -> Success / -ve value -> Error
  */
-static int8_t set_gyro_data_ready_int(const struct bmi08x_int_cfg *int_config, const struct bmi08x_dev *dev);
+static int8_t set_gyro_data_ready_int(const struct bmi08x_gyro_int_channel_cfg *int_config, const struct bmi08x_dev *dev);
 
 /*!
  * @brief This API configures the pins which fire the
  * interrupt signal when any interrupt occurs.
  *
- * @param[in] int_config  : Structure instance of bmi08x_int_cfg.
+ * @param[in] int_config  : Structure instance of bmi08x_gyro_int_channel_cfg.
  * @param[in] dev         : Structure instance of bmi08x_dev.
  *
  * @return Result of API execution status
  * @retval zero -> Success / -ve value -> Error
  */
-static int8_t set_int_pin_config(const struct bmi08x_int_cfg *int_config, const struct bmi08x_dev *dev);
+static int8_t set_int_pin_config(const struct bmi08x_gyro_int_channel_cfg *int_config, const struct bmi08x_dev *dev);
 
 /*!
  *  @brief This API enables or disables the Gyro Self test feature in the
@@ -470,7 +470,7 @@ int8_t bmi08g_get_data(struct bmi08x_sensor_data *gyro, const struct bmi08x_dev 
  * based on the user settings in the bmi08x_int_cfg
  * structure instance.
  */
-int8_t bmi08g_set_int_config(const struct bmi08x_int_cfg *int_config, const struct bmi08x_dev *dev)
+int8_t bmi08g_set_int_config(const struct bmi08x_gyro_int_channel_cfg *int_config, const struct bmi08x_dev *dev)
 {
 	int8_t rslt;
 	/* Check for null pointer in the device structure*/
@@ -478,7 +478,7 @@ int8_t bmi08g_set_int_config(const struct bmi08x_int_cfg *int_config, const stru
 	/* Proceed if null check is fine */
 	if ((rslt == BMI08X_OK) && (int_config != NULL)) {
 
-		switch (int_config->gyro_int_type) {
+		switch (int_config->int_type) {
 		case BMI08X_GYRO_DATA_RDY_INT: {
 			/* Data ready interrupt */
 			rslt = set_gyro_data_ready_int(int_config, dev);
@@ -496,6 +496,66 @@ int8_t bmi08g_set_int_config(const struct bmi08x_int_cfg *int_config, const stru
 
 	return rslt;
 }
+
+/*!
+ * @brief This API applies the passed IIR filter to the passed sensor data.
+ */
+struct bmi08x_sensor_data bmi08g_apply_iir_filter(struct bmi08x_sensor_data gyro, struct bmi08x_iir_filter *iir)
+{
+	uint8_t indx;
+
+	/* update internal states --> shift by 1*/
+	for (indx = iir->filter_coef.filter_order; indx > 0; indx--)
+	{
+		iir->out[indx] = iir->out[indx - 1];
+		iir->in[indx] = iir->in[indx - 1];
+	}
+	/* copy input value */
+	iir->in[0].x = gyro.x;
+	iir->in[0].y = gyro.y;
+	iir->in[0].z = gyro.z;
+
+	/* calculate first sample */
+	iir->out[0].x = iir->filter_coef.iir_b_coef[0]*iir->in[0].x;
+	iir->out[0].y = iir->filter_coef.iir_b_coef[0]*iir->in[0].y;
+	iir->out[0].z = iir->filter_coef.iir_b_coef[0]*iir->in[0].z;
+
+	/*run iir algorithms for all samples*/
+	for (indx = 1; indx <= iir->filter_coef.filter_order; indx++)
+	{
+		iir->out[0].x += iir->filter_coef.iir_b_coef[indx] * iir->in[indx].x - iir->filter_coef.iir_a_coef[indx] * iir->out[indx].x;
+		iir->out[0].y += iir->filter_coef.iir_b_coef[indx] * iir->in[indx].y - iir->filter_coef.iir_a_coef[indx] * iir->out[indx].y;
+		iir->out[0].z += iir->filter_coef.iir_b_coef[indx] * iir->in[indx].z - iir->filter_coef.iir_a_coef[indx] * iir->out[indx].z;
+	}
+	
+	/*perform saturation*/
+	iir->out[0].x = (iir->out[0].x > 32767.0) ? 32767.0 : ((iir->out[0].x < -32768.0) ? -32768.0 : iir->out[0].x);
+	iir->out[0].y = (iir->out[0].y > 32767.0) ? 32767.0 : ((iir->out[0].y < -32768.0) ? -32768.0 : iir->out[0].y);
+	iir->out[0].z = (iir->out[0].z > 32767.0) ? 32767.0 : ((iir->out[0].z < -32768.0) ? -32768.0 : iir->out[0].z);
+
+	/*map to 16bit integer output*/
+	struct bmi08x_sensor_data out;
+	out.x = iir->out[0].x;
+	out.y = iir->out[0].y;
+	out.z = iir->out[0].z;
+
+	return out;
+}
+
+int8_t bmi08g_init_iir_filter(struct bmi08x_iir_filter *iir)
+{
+	for(int indx = 0; indx <= iir->filter_coef.filter_order; ++indx)
+	{
+		iir->in[indx].x = 0;
+		iir->in[indx].y = 0;
+		iir->in[indx].z = 0;
+		iir->out[indx].x = 0;
+		iir->out[indx].y = 0;
+		iir->out[indx].z = 0;
+	}
+	
+	return BMI08X_OK;
+}	
 
 /*!
  *  @brief This API checks whether the self test functionality of the
@@ -624,7 +684,7 @@ static int8_t set_regs(uint8_t reg_addr, uint8_t *reg_data, uint16_t len, const 
 /*!
  * @brief This API sets the data ready interrupt for gyro sensor.
  */
-static int8_t set_gyro_data_ready_int(const struct bmi08x_int_cfg *int_config, const struct bmi08x_dev *dev)
+static int8_t set_gyro_data_ready_int(const struct bmi08x_gyro_int_channel_cfg *int_config, const struct bmi08x_dev *dev)
 {
 	int8_t rslt;
 	uint8_t conf, data[2] = { 0 };
@@ -633,9 +693,9 @@ static int8_t set_gyro_data_ready_int(const struct bmi08x_int_cfg *int_config, c
 	rslt = get_regs(BMI08X_GYRO_INT3_INT4_IO_MAP_REG, &data[0], 1, dev);
 
 	if (rslt == BMI08X_OK) {
-		conf = int_config->gyro_int_pin_cfg.enable_int_pin;
+		conf = int_config->int_pin_cfg.enable_int_pin;
 
-		switch (int_config->gyro_int_channel) {
+		switch (int_config->int_channel) {
 		case BMI08X_INT_CHANNEL_3:
 			/* Data to enable new data ready interrupt */
 			data[0] = BMI08X_SET_BITS_POS_0(data[0], BMI08X_GYRO_INT3_MAP, conf);
@@ -686,7 +746,7 @@ static int8_t set_gyro_data_ready_int(const struct bmi08x_int_cfg *int_config, c
  * @brief This API configures the pins which fire the
  * interrupt signal when any interrupt occurs.
  */
-static int8_t set_int_pin_config(const struct bmi08x_int_cfg *int_config, const struct bmi08x_dev *dev)
+static int8_t set_int_pin_config(const struct bmi08x_gyro_int_channel_cfg *int_config, const struct bmi08x_dev *dev)
 {
 	int8_t rslt;
 	uint8_t data;
@@ -695,22 +755,22 @@ static int8_t set_int_pin_config(const struct bmi08x_int_cfg *int_config, const 
 	rslt = get_regs(BMI08X_GYRO_INT3_INT4_IO_CONF_REG, &data, 1, dev);
 
 	if (rslt == BMI08X_OK) {
-		switch (int_config->gyro_int_channel) {
+		switch (int_config->int_channel) {
 		/* Interrupt pin or channel 3 */
 		case BMI08X_INT_CHANNEL_3:
 			/* Update data with user configured bmi08x_int_cfg structure */
 			data = BMI08X_SET_BITS_POS_0(data, BMI08X_GYRO_INT3_LVL,
-					int_config->gyro_int_pin_cfg.lvl);
+					int_config->int_pin_cfg.lvl);
 			data = BMI08X_SET_BITS(data, BMI08X_GYRO_INT3_OD,
-					int_config->gyro_int_pin_cfg.output_mode);
+					int_config->int_pin_cfg.output_mode);
 			break;
 
 		case BMI08X_INT_CHANNEL_4:
 			/* Update data with user configured bmi08x_int_cfg structure */
 			data = BMI08X_SET_BITS(data, BMI08X_GYRO_INT4_LVL,
-					int_config->gyro_int_pin_cfg.lvl);
+					int_config->int_pin_cfg.lvl);
 			data = BMI08X_SET_BITS(data, BMI08X_GYRO_INT4_OD,
-					int_config->gyro_int_pin_cfg.output_mode);
+					int_config->int_pin_cfg.output_mode);
 			break;
 
 		default:

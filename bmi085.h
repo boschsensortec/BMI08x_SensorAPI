@@ -40,8 +40,8 @@
  * patent rights of the copyright holder.
  *
  * @file       bmi085.h
- * @date       27 May 2018
- * @version    1.1.0
+ * @date       24 Aug 2018
+ * @version    1.2.0
  *
  */
 
@@ -114,20 +114,7 @@ int8_t bmi085_configure_data_synchronization(struct bmi08x_data_sync_cfg sync_cf
  *  @return Result of API execution status
  *  @retval zero -> Success / -ve value -> Error
  */
-int8_t bmi085_configure_anymotion(struct bmi08x_anymotion_cfg anymotion_cfg, struct bmi08x_dev *dev);
-
-/*!
- *  @brief This API is used to enable/disable and configure the fast temperature update
- *  feature.
- *
- *  @param[in] fast_temp_cfg : configure fast temp feature
- *  @param[in] dev : Structure instance of bmi08x_dev.
- *
- *  @return Result of API execution status
- *  @retval zero -> Success / -ve value -> Error
- */
-int8_t bmi085_configure_fast_temp(struct bmi08x_fast_temp_cfg fast_temp_cfg, struct bmi08x_dev *dev);
-
+int8_t bmi085_configure_anymotion(struct bmi08x_anymotion_cfg anymotion_cfg, const struct bmi08x_dev *dev);
 /*!
  *  @brief This API reads the synchronized accel & gyro data from the sensor,
  *  store it in the bmi085_sensor_data structure instance
@@ -143,23 +130,6 @@ int8_t bmi085_configure_fast_temp(struct bmi08x_fast_temp_cfg fast_temp_cfg, str
  */
 int8_t bmi085_get_synchronized_data(struct bmi08x_sensor_data *accel, struct bmi08x_sensor_data *gyro,
 		const struct bmi08x_dev *dev);
-
-/*!
- *  @brief This API reads the synchronized accel & gyro data from the sensor, applies the passed iir filter and
- *  store it in the bmi08x_sensor_data structure instance
- *  passed by the user.
- *
- *  @param[out] accel  : Structure pointer to store accel data
- *  @param[out] gyro   : Structure pointer to store gyro data
- *  @param[in/out] iir   : Structure pointer to read/store iir filter data
- *  @param[in]  dev    : Structure instance of bmi08x_dev.
- *
- *
- *  @return Result of API execution status
- *  @retval zero -> Success / -ve value -> Error
- */
-int8_t bmi085_get_synchronized_data_filtered(struct bmi08x_sensor_data *accel, struct bmi08x_sensor_data *gyro, struct bmi08x_iir_filter *iir_acc, struct bmi08x_iir_filter *iir_gyr, const struct bmi08x_dev *dev);
-
 /*!
  *  @brief This API configures the synchronization interrupt
  *  based on the user settings in the bmi08x_int_cfg
@@ -172,7 +142,7 @@ int8_t bmi085_get_synchronized_data_filtered(struct bmi08x_sensor_data *accel, s
  *  @return Result of API execution status
  *  @retval zero -> Success / -ve value -> Error
  */
-int8_t bmi085_set_data_sync_int_config(const struct bmi08x_int_cfg *int_config,	const struct bmi08x_dev *dev);
+int8_t bmi085_set_data_sync_int_config(const struct bmi08x_int_cfg *int_config, const struct bmi08x_dev *dev);
 
 #endif
 #ifdef __cplusplus

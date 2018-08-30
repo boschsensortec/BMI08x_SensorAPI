@@ -39,9 +39,9 @@
  * No license is granted by implication or otherwise under any patent or
  * patent rights of the copyright holder.
  *
- * @file		bmi08g.c
- * @date		27 May 2018
- * @version		1.1.0
+ * @file        bmi08g.c
+ * @date        24 Aug 2018
+ * @version     1.2.0
  *
  */
 
@@ -106,7 +106,8 @@ static int8_t set_regs(uint8_t reg_addr, uint8_t *reg_data, uint16_t len, const 
  * @return Result of API execution status
  * @retval zero -> Success / -ve value -> Error
  */
-static int8_t set_gyro_data_ready_int(const struct bmi08x_gyro_int_channel_cfg *int_config, const struct bmi08x_dev *dev);
+static int8_t set_gyro_data_ready_int(const struct bmi08x_gyro_int_channel_cfg *int_config,
+	const struct bmi08x_dev *dev);
 
 /*!
  * @brief This API configures the pins which fire the
@@ -496,67 +497,6 @@ int8_t bmi08g_set_int_config(const struct bmi08x_gyro_int_channel_cfg *int_confi
 
 	return rslt;
 }
-
-/*!
- * @brief This API applies the passed IIR filter to the passed sensor data.
- */
-struct bmi08x_sensor_data bmi08g_apply_iir_filter(struct bmi08x_sensor_data gyro, struct bmi08x_iir_filter *iir)
-{
-	uint8_t indx;
-
-	/* update internal states --> shift by 1*/
-	for (indx = iir->filter_coef.filter_order; indx > 0; indx--)
-	{
-		iir->out[indx] = iir->out[indx - 1];
-		iir->in[indx] = iir->in[indx - 1];
-	}
-	/* copy input value */
-	iir->in[0].x = gyro.x;
-	iir->in[0].y = gyro.y;
-	iir->in[0].z = gyro.z;
-
-	/* calculate first sample */
-	iir->out[0].x = iir->filter_coef.iir_b_coef[0]*iir->in[0].x;
-	iir->out[0].y = iir->filter_coef.iir_b_coef[0]*iir->in[0].y;
-	iir->out[0].z = iir->filter_coef.iir_b_coef[0]*iir->in[0].z;
-
-	/*run iir algorithms for all samples*/
-	for (indx = 1; indx <= iir->filter_coef.filter_order; indx++)
-	{
-		iir->out[0].x += iir->filter_coef.iir_b_coef[indx] * iir->in[indx].x - iir->filter_coef.iir_a_coef[indx] * iir->out[indx].x;
-		iir->out[0].y += iir->filter_coef.iir_b_coef[indx] * iir->in[indx].y - iir->filter_coef.iir_a_coef[indx] * iir->out[indx].y;
-		iir->out[0].z += iir->filter_coef.iir_b_coef[indx] * iir->in[indx].z - iir->filter_coef.iir_a_coef[indx] * iir->out[indx].z;
-	}
-	
-	/*perform saturation*/
-	iir->out[0].x = (iir->out[0].x > 32767.0) ? 32767.0 : ((iir->out[0].x < -32768.0) ? -32768.0 : iir->out[0].x);
-	iir->out[0].y = (iir->out[0].y > 32767.0) ? 32767.0 : ((iir->out[0].y < -32768.0) ? -32768.0 : iir->out[0].y);
-	iir->out[0].z = (iir->out[0].z > 32767.0) ? 32767.0 : ((iir->out[0].z < -32768.0) ? -32768.0 : iir->out[0].z);
-
-	/*map to 16bit integer output*/
-	struct bmi08x_sensor_data out;
-	out.x = iir->out[0].x;
-	out.y = iir->out[0].y;
-	out.z = iir->out[0].z;
-
-	return out;
-}
-
-int8_t bmi08g_init_iir_filter(struct bmi08x_iir_filter *iir)
-{
-	for(int indx = 0; indx <= iir->filter_coef.filter_order; ++indx)
-	{
-		iir->in[indx].x = 0;
-		iir->in[indx].y = 0;
-		iir->in[indx].z = 0;
-		iir->out[indx].x = 0;
-		iir->out[indx].y = 0;
-		iir->out[indx].z = 0;
-	}
-	
-	return BMI08X_OK;
-}	
-
 /*!
  *  @brief This API checks whether the self test functionality of the
  *  gyro sensor is working or not.
@@ -684,7 +624,8 @@ static int8_t set_regs(uint8_t reg_addr, uint8_t *reg_data, uint16_t len, const 
 /*!
  * @brief This API sets the data ready interrupt for gyro sensor.
  */
-static int8_t set_gyro_data_ready_int(const struct bmi08x_gyro_int_channel_cfg *int_config, const struct bmi08x_dev *dev)
+static int8_t set_gyro_data_ready_int(const struct bmi08x_gyro_int_channel_cfg *int_config,
+	const struct bmi08x_dev *dev)
 {
 	int8_t rslt;
 	uint8_t conf, data[2] = { 0 };

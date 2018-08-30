@@ -39,9 +39,9 @@
  * No license is granted by implication or otherwise under any patent or
  * patent rights of the copyright holder.
  *
- * @file		bmi08x_defs.h
- * @date		02 Feb 2017
- * @version		1.1.0
+ * @file        bmi08x_defs.h
+ * @date        24 Aug 2018
+ * @version     1.2.0
  *
  */
 
@@ -65,7 +65,7 @@
 #endif
 
 /*********************************************************************/
-/** \name		Common macros					*/
+/** \name       Common macros                   */
 /*********************************************************************/
 
 #if !defined(UINT8_C) && !defined(INT8_C)
@@ -134,55 +134,55 @@
 /** Register map */
 /* Accel registers */
 
-/**\name	Accel Chip Id register */
+/**\name    Accel Chip Id register */
 #define BMI08X_ACCEL_CHIP_ID_REG                    UINT8_C(0x00)
 
-/**\name	Accel Error condition register */
+/**\name    Accel Error condition register */
 #define BMI08X_ACCEL_ERR_REG                        UINT8_C(0x02)
 
-/**\name	Accel Status flag register */
+/**\name    Accel Status flag register */
 #define BMI08X_ACCEL_STATUS_REG                     UINT8_C(0x03)
 
-/**\name	Accel X LSB data register */
+/**\name    Accel X LSB data register */
 #define BMI08X_ACCEL_X_LSB_REG                      UINT8_C(0x12)
 
-/**\name	Accel X MSB data register */
+/**\name    Accel X MSB data register */
 #define BMI08X_ACCEL_X_MSB_REG                      UINT8_C(0x13)
 
-/**\name	Accel Y LSB data register */
+/**\name    Accel Y LSB data register */
 #define BMI08X_ACCEL_Y_LSB_REG                      UINT8_C(0x14)
 
-/**\name	Accel Y MSB data register */
+/**\name    Accel Y MSB data register */
 #define BMI08X_ACCEL_Y_MSB_REG                      UINT8_C(0x15)
 
-/**\name	Accel Z LSB data register */
+/**\name    Accel Z LSB data register */
 #define BMI08X_ACCEL_Z_LSB_REG                      UINT8_C(0x16)
 
-/**\name	Accel Z MSB data register */
+/**\name    Accel Z MSB data register */
 #define BMI08X_ACCEL_Z_MSB_REG                      UINT8_C(0x17)
 
-/**\name	Sensor time byte 0 register */
+/**\name    Sensor time byte 0 register */
 #define BMI08X_ACCEL_SENSORTIME_0_REG               UINT8_C(0x18)
 
-/**\name	Sensor time byte 1 register */
+/**\name    Sensor time byte 1 register */
 #define BMI08X_ACCEL_SENSORTIME_1_REG               UINT8_C(0x19)
 
-/**\name	Sensor time byte 2 register */
+/**\name    Sensor time byte 2 register */
 #define BMI08X_ACCEL_SENSORTIME_2_REG               UINT8_C(0x1A)
 
-/**\name	Accel Interrupt status0 register */
+/**\name    Accel Interrupt status0 register */
 #define BMI08X_ACCEL_INT_STAT_0_REG                 UINT8_C(0x1C)
 
-/**\name	Accel Interrupt status1 register */
+/**\name    Accel Interrupt status1 register */
 #define BMI08X_ACCEL_INT_STAT_1_REG                 UINT8_C(0x1D)
 
 /**\name    Accel general purpose register 0*/
 #define BMI08X_ACCEL_GP_0_REG                       UINT8_C(0x1E)
 
-/**\name	Sensor temperature MSB data register */
+/**\name    Sensor temperature MSB data register */
 #define BMI08X_TEMP_MSB_REG                         UINT8_C(0x22)
 
-/**\name	Sensor temperature LSB data register */
+/**\name    Sensor temperature LSB data register */
 #define BMI08X_TEMP_LSB_REG                         UINT8_C(0x23)
 
 /**\name    Accel general purpose register 4*/
@@ -191,54 +191,54 @@
 /**\name    Accel Internal status register */
 #define BMI08X_ACCEL_INTERNAL_STAT_REG              UINT8_C(0x2A)
 
-/**\name	Accel configuration register */
+/**\name    Accel configuration register */
 #define BMI08X_ACCEL_CONF_REG                       UINT8_C(0x40)
 
-/**\name	Accel range setting register */
+/**\name    Accel range setting register */
 #define BMI08X_ACCEL_RANGE_REG                      UINT8_C(0x41)
 
-/**\name	Accel Interrupt pin 1 configuration register */
+/**\name    Accel Interrupt pin 1 configuration register */
 #define BMI08X_ACCEL_INT1_IO_CONF_REG               UINT8_C(0x53)
 
-/**\name	Accel Interrupt pin 2 configuration register */
+/**\name    Accel Interrupt pin 2 configuration register */
 #define BMI08X_ACCEL_INT2_IO_CONF_REG               UINT8_C(0x54)
 
-/**\name	Accel Interrupt latch configuration register */
+/**\name    Accel Interrupt latch configuration register */
 #define BMI08X_ACCEL_INT_LATCH_CONF_REG             UINT8_C(0x55)
 
-/**\name	Accel Interrupt pin1 mapping register */
+/**\name    Accel Interrupt pin1 mapping register */
 #define BMI08X_ACCEL_INT1_MAP_REG                   UINT8_C(0x56)
 
-/**\name	Accel Interrupt pin2 mapping register */
+/**\name    Accel Interrupt pin2 mapping register */
 #define BMI08X_ACCEL_INT2_MAP_REG                   UINT8_C(0x57)
 
-/**\name	Accel Interrupt map register */
+/**\name    Accel Interrupt map register */
 #define BMI08X_ACCEL_INT1_INT2_MAP_DATA_REG         UINT8_C(0x58)
 
 /**\name    Accel Init control register */
 #define BMI08X_ACCEL_INIT_CTRL_REG                  UINT8_C(0x59)
 
-/**\name	Accel Self test register */
+/**\name    Accel Self test register */
 #define BMI08X_ACCEL_SELF_TEST_REG                  UINT8_C(0x6D)
 
-/**\name	Accel Power mode configuration register */
+/**\name    Accel Power mode configuration register */
 #define BMI08X_ACCEL_PWR_CONF_REG                   UINT8_C(0x7C)
 
-/**\name	Accel Power control (switch on or off ) register */
+/**\name    Accel Power control (switch on or off ) register */
 #define BMI08X_ACCEL_PWR_CTRL_REG                   UINT8_C(0x7D)
 
-/**\name	Accel Soft reset register */
+/**\name    Accel Soft reset register */
 #define BMI08X_ACCEL_SOFTRESET_REG                  UINT8_C(0x7E)
 
 #if BMI08X_FEATURE_BMI085 == 1
-/**\name	BMI085 Accel unique chip identifier */
+/**\name    BMI085 Accel unique chip identifier */
 #define BMI08X_ACCEL_CHIP_ID                        UINT8_C(0x1F)
 #elif BMI08X_FEATURE_BMI088 == 1
-/**\name	BMI088 Accel unique chip identifier */
+/**\name    BMI088 Accel unique chip identifier */
 #define BMI08X_ACCEL_CHIP_ID                        UINT8_C(0x1E)
 #endif
 
-/**\name	Accel I2C slave address */
+/**\name    Accel I2C slave address */
 #define BMI08X_ACCEL_I2C_ADDR_PRIMARY               UINT8_C(0x18)
 #define BMI08X_ACCEL_I2C_ADDR_SECONDARY             UINT8_C(0x19)
 
@@ -250,7 +250,7 @@
 /**\name    Interrupt masks */
 #define BMI08X_ACCEL_DATA_READY_INT                 UINT8_C(0x80)
 
-/**\name	Accel Bandwidth */
+/**\name    Accel Bandwidth */
 #define BMI08X_ACCEL_BW_OSR4                        UINT8_C(0x00)
 #define BMI08X_ACCEL_BW_OSR2                        UINT8_C(0x01)
 #define BMI08X_ACCEL_BW_NORMAL                      UINT8_C(0x02)
@@ -271,7 +271,7 @@
 #define BMI088_ACCEL_RANGE_24G                      UINT8_C(0x03)
 #endif
 
-/**\name	Accel Output data rate */
+/**\name    Accel Output data rate */
 #define BMI08X_ACCEL_ODR_12_5_HZ                    UINT8_C(0x05)
 #define BMI08X_ACCEL_ODR_25_HZ                      UINT8_C(0x06)
 #define BMI08X_ACCEL_ODR_50_HZ                      UINT8_C(0x07)
@@ -286,21 +286,21 @@
 #define BMI08X_ACCEL_POSITIVE_SELF_TEST             UINT8_C(0x0D)
 #define BMI08X_ACCEL_NEGATIVE_SELF_TEST             UINT8_C(0x09)
 
-/**\name	Accel Power mode */
+/**\name    Accel Power mode */
 #define BMI08X_ACCEL_PM_ACTIVE                      UINT8_C(0x00)
 #define BMI08X_ACCEL_PM_SUSPEND                     UINT8_C(0x03)
 
-/**\name	Accel Power control settings */
+/**\name    Accel Power control settings */
 #define BMI08X_ACCEL_POWER_DISABLE                  UINT8_C(0x00)
 #define BMI08X_ACCEL_POWER_ENABLE                   UINT8_C(0x04)
 
-/**\name	Accel internal interrupt pin mapping */
+/**\name    Accel internal interrupt pin mapping */
 #define BMI08X_ACCEL_INTA_DISABLE                   UINT8_C(0x00)
 #define BMI08X_ACCEL_INTA_ENABLE                    UINT8_C(0x01)
 #define BMI08X_ACCEL_INTB_DISABLE                   UINT8_C(0x00)
 #define BMI08X_ACCEL_INTB_ENABLE                    UINT8_C(0x02)
 
-/**\name	Accel Soft reset delay */
+/**\name    Accel Soft reset delay */
 #define BMI08X_ACCEL_SOFTRESET_DELAY_MS             UINT8_C(1)
 
 /**\name    Mask definitions for ACCEL_ERR_REG register */
@@ -408,21 +408,21 @@
 /**\name    Gyro Self test register */
 #define BMI08X_GYRO_SELF_TEST_REG                   UINT8_C(0x3C)
 
-/**\name	Gyro unique chip identifier */
+/**\name    Gyro unique chip identifier */
 #define BMI08X_GYRO_CHIP_ID                         UINT8_C(0x0F)
 
-/**\name	Gyro I2C slave address */
+/**\name    Gyro I2C slave address */
 #define BMI08X_GYRO_I2C_ADDR_PRIMARY                UINT8_C(0x68)
 #define BMI08X_GYRO_I2C_ADDR_SECONDARY              UINT8_C(0x69)
 
-/**\name	Gyro Range */
+/**\name    Gyro Range */
 #define BMI08X_GYRO_RANGE_2000_DPS                  UINT8_C(0x00)
 #define BMI08X_GYRO_RANGE_1000_DPS                  UINT8_C(0x01)
 #define BMI08X_GYRO_RANGE_500_DPS                   UINT8_C(0x02)
 #define BMI08X_GYRO_RANGE_250_DPS                   UINT8_C(0x03)
 #define BMI08X_GYRO_RANGE_125_DPS                   UINT8_C(0x04)
 
-/**\name	Gyro Output data rate and bandwidth */
+/**\name    Gyro Output data rate and bandwidth */
 #define BMI08X_GYRO_BW_532_ODR_2000_HZ              UINT8_C(0x00)
 #define BMI08X_GYRO_BW_230_ODR_2000_HZ              UINT8_C(0x01)
 #define BMI08X_GYRO_BW_116_ODR_1000_HZ              UINT8_C(0x02)
@@ -433,21 +433,21 @@
 #define BMI08X_GYRO_BW_32_ODR_100_HZ                UINT8_C(0x07)
 #define BMI08X_GYRO_ODR_RESET_VAL                   UINT8_C(0x80)
 
-/**\name	Gyro Power mode */
+/**\name    Gyro Power mode */
 #define BMI08X_GYRO_PM_NORMAL                       UINT8_C(0x00)
 #define BMI08X_GYRO_PM_DEEP_SUSPEND                 UINT8_C(0x20)
 #define BMI08X_GYRO_PM_SUSPEND                      UINT8_C(0x80)
 
-/**\name	Gyro data ready interrupt enable value */
+/**\name    Gyro data ready interrupt enable value */
 #define BMI08X_GYRO_DRDY_INT_DISABLE_VAL            UINT8_C(0x00)
 #define BMI08X_GYRO_DRDY_INT_ENABLE_VAL             UINT8_C(0x80)
 
-/**\name	Gyro data ready map values */
+/**\name    Gyro data ready map values */
 #define BMI08X_GYRO_MAP_DRDY_TO_INT3                UINT8_C(0x01)
 #define BMI08X_GYRO_MAP_DRDY_TO_INT4                UINT8_C(0x80)
 #define BMI08X_GYRO_MAP_DRDY_TO_BOTH_INT3_INT4      UINT8_C(0x81)
 
-/**\name	Gyro Soft reset delay */
+/**\name    Gyro Soft reset delay */
 #define BMI08X_GYRO_SOFTRESET_DELAY                 UINT8_C(30)
 /**\name    Gyro power mode config delay */
 #define BMI08X_GYRO_POWER_MODE_CONFIG_DELAY         UINT8_C(30)
@@ -515,30 +515,30 @@
 #define BMI08X_SPI_WR_MASK                          UINT8_C(0x7F)
 
 /**\name API success code */
-#define BMI08X_OK				                    INT8_C(0)
+#define BMI08X_OK                                   INT8_C(0)
 
 /**\name API error codes */
-#define BMI08X_E_NULL_PTR			     INT8_C(-1)
-#define BMI08X_E_COM_FAIL			     INT8_C(-2)
-#define BMI08X_E_DEV_NOT_FOUND			     INT8_C(-3)
-#define BMI08X_E_OUT_OF_RANGE			     INT8_C(-4)
-#define BMI08X_E_INVALID_INPUT			     INT8_C(-5)
-#define BMI08X_E_CONFIG_STREAM_ERROR		     INT8_C(-6)
-#define BMI08X_E_RD_WR_LENGTH_INVALID		     INT8_C(-7)
-#define BMI08X_E_INVALID_CONFIG			     INT8_C(-8)
+#define BMI08X_E_NULL_PTR                INT8_C(-1)
+#define BMI08X_E_COM_FAIL                INT8_C(-2)
+#define BMI08X_E_DEV_NOT_FOUND               INT8_C(-3)
+#define BMI08X_E_OUT_OF_RANGE                INT8_C(-4)
+#define BMI08X_E_INVALID_INPUT               INT8_C(-5)
+#define BMI08X_E_CONFIG_STREAM_ERROR             INT8_C(-6)
+#define BMI08X_E_RD_WR_LENGTH_INVALID            INT8_C(-7)
+#define BMI08X_E_INVALID_CONFIG              INT8_C(-8)
 #define BMI08X_E_FEATURE_NOT_SUPPORTED               INT8_C(-9)
 
 /**\name API warning codes */
-#define BMI08X_W_SELF_TEST_FAIL			     INT8_C(1)
+#define BMI08X_W_SELF_TEST_FAIL              INT8_C(1)
 
 /***\name    Soft reset Value */
 #define BMI08X_SOFT_RESET_CMD                       UINT8_C(0xB6)
 
-/**\name	Enable/disable macros */
+/**\name    Enable/disable macros */
 #define BMI08X_DISABLE                              UINT8_C(0)
 #define BMI08X_ENABLE                               UINT8_C(1)
 
-/**\name	Constant values macros */
+/**\name    Constant values macros */
 #define BMI08X_SENSOR_DATA_SYNC_TIME_MS             UINT8_C(1)
 #define BMI08X_DELAY_BETWEEN_WRITES_MS              UINT8_C(1)
 #define BMI08X_SELF_TEST_DELAY_MS                   UINT8_C(3)
@@ -577,11 +577,11 @@
 
 /**\name Macro to SET and GET BITS of a register*/
 #define BMI08X_SET_BITS(reg_var, bitname, val) \
-					((reg_var & ~(bitname##_MASK)) | \
-					((val << bitname##_POS) & bitname##_MASK))
+			((reg_var & ~(bitname##_MASK)) | \
+			((val << bitname##_POS) & bitname##_MASK))
 
 #define BMI08X_GET_BITS(reg_var, bitname)  ((reg_var & (bitname##_MASK)) >> \
-								(bitname##_POS))
+											(bitname##_POS))
 
 #define BMI08X_SET_BITS_POS_0(reg_var, bitname, val) \
 					((reg_var & ~(bitname##_MASK)) | \
@@ -592,23 +592,23 @@
 #define BMI08X_SET_BIT_VAL_0(reg_var, bitname)      (reg_var & ~(bitname##_MASK))
 
 /**\name     Macro definition for difference between 2 values */
-#define BMI08X_GET_DIFF(x, y)		((x) - (y))
+#define BMI08X_GET_DIFF(x, y)       ((x) - (y))
 
 /**\name     Macro definition to get LSB of 16 bit variable */
-#define BMI08X_GET_LSB(var)			(uint8_t)(var & BMI08X_SET_LOW_BYTE)
+#define BMI08X_GET_LSB(var)         (uint8_t)(var & BMI08X_SET_LOW_BYTE)
 
 /**\name     Macro definition to get MSB of 16 bit variable */
-#define BMI08X_GET_MSB(var)			(uint8_t)((var & BMI08X_SET_HIGH_BYTE) >> 8)
+#define BMI08X_GET_MSB(var)         (uint8_t)((var & BMI08X_SET_HIGH_BYTE) >> 8)
 
 /*************************************************************************/
 /*!
  * @brief Interface selection enums
  */
 enum bmi08x_intf {
-	/*! I2C interface */
-	BMI08X_I2C_INTF,
-	/*! SPI interface */
-	BMI08X_SPI_INTF
+/*! I2C interface */
+BMI08X_I2C_INTF,
+/*! SPI interface */
+BMI08X_SPI_INTF
 };
 /*************************** Data structures *****************************/
 
@@ -618,7 +618,7 @@ enum bmi08x_intf {
  * the platform specific read and write functions of the user
  *
  *  @note : dev_addr is used for I2C read/write operations only.
- *			For SPI read/write operations this is dummy variable.
+ *          For SPI read/write operations this is dummy variable.
  */
 typedef int8_t (*bmi08x_com_fptr_t)(uint8_t dev_addr, uint8_t reg_addr, uint8_t *data, uint16_t len);
 
@@ -631,66 +631,47 @@ typedef void (*bmi08x_delay_fptr_t)(uint32_t period);
  *  @brief Sensor XYZ data structure
  */
 struct bmi08x_sensor_data {
-	/*! X-axis sensor data */
-	int16_t x;
-	/*! Y-axis sensor data */
-	int16_t y;
-	/*! Z-axis sensor data */
-	int16_t z;
+/*! X-axis sensor data */
+int16_t x;
+/*! Y-axis sensor data */
+int16_t y;
+/*! Z-axis sensor data */
+int16_t z;
 };
 
 /*!
  *  @brief Sensor XYZ data structure in float representation
  */
 struct bmi08x_sensor_data_f {
-	/*! X-axis sensor data */
-	float x;
-	/*! Y-axis sensor data */
-	float y;
-	/*! Z-axis sensor data */
-	float z;
+/*! X-axis sensor data */
+float x;
+/*! Y-axis sensor data */
+float y;
+/*! Z-axis sensor data */
+float z;
 };
-
-/*!
- *  @brief iir filter coefficients data structure
- */
-struct bmi08x_iir_filter_coef {
-	uint8_t filter_order;
-	float iir_a_coef[5];
-	float iir_b_coef[5];
-};
-
-/*!
- *  @brief iir filter data structure
- */
-struct bmi08x_iir_filter {
-	struct bmi08x_iir_filter_coef filter_coef;
-	struct bmi08x_sensor_data_f in[5];
-	struct bmi08x_sensor_data_f out[5];
-};
-
 /*!
  *  @brief Sensor configuration structure
  */
 struct bmi08x_cfg {
-	/*! power mode */
-	uint8_t power;
-	/*! range */
-	uint8_t range;
-	/*! bandwidth */
-	uint8_t bw;
-	/*! output data rate */
-	uint8_t odr;
+/*! power mode */
+uint8_t power;
+/*! range */
+uint8_t range;
+/*! bandwidth */
+uint8_t bw;
+/*! output data rate */
+uint8_t odr;
 };
 
 /*!
  *  @brief Error Status structure
  */
 struct bmi08x_err_reg {
-	/*! Indicates fatal error */
-	uint8_t fatal_err;
-	/*! Indicates error code */
-	uint8_t err_code;
+/*! Indicates fatal error */
+uint8_t fatal_err;
+/*! Indicates error code */
+uint8_t err_code;
 };
 
 #define BMI08X_ACCEL_ANYMOTION_ADR 0x00
@@ -712,18 +693,18 @@ struct bmi08x_err_reg {
  *  @brief Anymotion config structure
  */
 struct bmi08x_anymotion_cfg {
-	/* 11 bit threshold of anymotion detection (threshold = X mg * 2,048 (5.11 format)) */
-	uint16_t threshold;
-	/* 1 bit select between any- and nomotion behavior */
-	uint16_t nomotion_sel;
-	/* 13 bit set the duration for any- and nomotion (time = duration * 20ms (@50Hz)) */
-	uint16_t duration;
-	/* enable anymotion detection for x axis */
-	uint16_t x_en;
-	/* enable anymotion detection for y axis */
-	uint16_t y_en;
-	/* enable anymotion detection for z axis */
-	uint16_t z_en;
+/* 11 bit threshold of anymotion detection (threshold = X mg * 2,048 (5.11 format)) */
+uint16_t threshold;
+/* 1 bit select between any- and nomotion behavior */
+uint16_t nomotion_sel;
+/* 13 bit set the duration for any- and nomotion (time = duration * 20ms (@50Hz)) */
+uint16_t duration;
+/* enable anymotion detection for x axis */
+uint16_t x_en;
+/* enable anymotion detection for y axis */
+uint16_t y_en;
+/* enable anymotion detection for z axis */
+uint16_t z_en;
 };
 
 #define BMI08X_ACCEL_DATA_SYNC_ADR 0x02
@@ -740,89 +721,41 @@ struct bmi08x_anymotion_cfg {
  *  @brief Data Sync config structure
  */
 struct bmi08x_data_sync_cfg {
-	/*! Mode (0 = off, 1 = 400Hz, 2 = 1kHz, 3 = 2kHz) */
-	uint8_t mode;
+/*! Mode (0 = off, 1 = 400Hz, 2 = 1kHz, 3 = 2kHz) */
+uint8_t mode;
 };
-
-#define BMI08X_ACCEL_FAST_TEMP_ADR 0x03
-#define BMI08X_ACCEL_FAST_TEMP_LEN 1
-#define BMI08X_ACCEL_FAST_TEMP_ENABLE_MASK 0x0001
-#define BMI08X_ACCEL_FAST_TEMP_ENABLE_SHIFT 0
-
-/*!
- *  @brief Fast temp config structure
- */
-struct bmi08x_fast_temp_cfg {
-	/*! Enable (0 = Off, 1 = On) */
-	uint8_t enable;
-};
-
-#if BMI08X_FEATURE_BMI088 == 1
-
-#define BMI08X_ACCEL_VRE_FILTER_FILTER_ORDER_MAX 2
-/*!
- *  @brief iir filter coefficients data structure for accel vre feature
- */
-struct bmi08x_vre_filter_coef {
-	uint8_t filter_order;
-	int16_t iir_a_coef[BMI08X_ACCEL_VRE_FILTER_FILTER_ORDER_MAX + 1];
-	int16_t iir_b_coef[BMI08X_ACCEL_VRE_FILTER_FILTER_ORDER_MAX + 1];
-	int16_t iir_a_scale[BMI08X_ACCEL_VRE_FILTER_FILTER_ORDER_MAX + 1];
-	int16_t iir_b_scale[BMI08X_ACCEL_VRE_FILTER_FILTER_ORDER_MAX + 1];
-};
-
-#define BMI08X_ACCEL_VRE_FILTER_ADR 0x04
-#define BMI08X_ACCEL_VRE_FILTER_LEN 13
-#define BMI08X_ACCEL_VRE_FILTER_ENABLE_MASK 0x0001
-#define BMI08X_ACCEL_VRE_FILTER_ENABLE_SHIFT 0
-#define BMI08X_ACCEL_VRE_FILTER_FILTER_ORDER_MASK 0x0006
-#define BMI08X_ACCEL_VRE_FILTER_FILTER_ORDER_SHIFT 1
-#define BMI08X_ACCEL_VRE_FILTER_COEF_MASK 0xFFFF
-#define BMI08X_ACCEL_VRE_FILTER_COEF_SHIFT 0
-#define BMI08X_ACCEL_VRE_FILTER_SCALE_MASK 0xFFFF
-#define BMI08X_ACCEL_VRE_FILTER_SCALE_SHIFT 0
-
-/*!
- *  @brief vre filter config structure
- */
-struct bmi088_vre_filter_cfg {
-
-	uint16_t enable;
-	struct bmi08x_vre_filter_coef filter_coef;
-};
-#endif
 
 /*!
  *  @brief Enum to select accelerometer Interrupt pins
  */
 enum bmi08x_accel_int_channel {
-	BMI08X_INT_CHANNEL_1, /* interrupt Channel 1 for accel sensor*/
-	BMI08X_INT_CHANNEL_2 /* interrupt Channel 2 for accel sensor*/
+BMI08X_INT_CHANNEL_1, /* interrupt Channel 1 for accel sensor*/
+BMI08X_INT_CHANNEL_2 /* interrupt Channel 2 for accel sensor*/
 };
 
 /*!
  *  @brief Enum to select gyroscope Interrupt pins
  */
 enum bmi08x_gyro_int_channel {
-	BMI08X_INT_CHANNEL_3, /* interrupt Channel 3 for gyro sensor*/
-	BMI08X_INT_CHANNEL_4 /* interrupt Channel 4 for gyro sensor*/
+BMI08X_INT_CHANNEL_3, /* interrupt Channel 3 for gyro sensor*/
+BMI08X_INT_CHANNEL_4 /* interrupt Channel 4 for gyro sensor*/
 };
 
 /*!
  *  @brief Enum to select accelerometer interrupts
  */
 enum bmi08x_accel_int_types {
-	BMI08X_ACCEL_DATA_RDY_INT,		/* Accel data ready interrupt */
-	BMI08X_ACCEL_SYNC_DATA_RDY_INT,	/* Accel synchronized data ready interrupt */
-	BMI08X_ACCEL_SYNC_INPUT,		/* Accel synchronized data ready input*/
-	BMI08X_ACCEL_ANYMOTION_INT		/* Accel anymotion interrupt for BMI085 */
+BMI08X_ACCEL_DATA_RDY_INT,      /* Accel data ready interrupt */
+BMI08X_ACCEL_SYNC_DATA_RDY_INT, /* Accel synchronized data ready interrupt */
+BMI08X_ACCEL_SYNC_INPUT,        /* Accel synchronized data ready input*/
+BMI08X_ACCEL_ANYMOTION_INT      /* Accel anymotion interrupt for BMI085 */
 };
 
 /*!
  *  @brief Enum to select gyroscope interrupts
  */
 enum bmi08x_gyro_int_types {
-	BMI08X_GYRO_DATA_RDY_INT /* Gyro data ready interrupt */
+BMI08X_GYRO_DATA_RDY_INT /* Gyro data ready interrupt */
 };
 
 /*!
@@ -830,95 +763,95 @@ enum bmi08x_gyro_int_types {
  */
 struct bmi08x_int_pin_cfg {
 
-	/*! interrupt pin level configuration
-     * Assignable macros :
-     * - BMI08X_INT_ACTIVE_LOW
-     * - BMI08X_INT_ACTIVE_HIGH */
-	uint8_t lvl :1;
+/*! interrupt pin level configuration
+* Assignable macros :
+* - BMI08X_INT_ACTIVE_LOW
+* - BMI08X_INT_ACTIVE_HIGH */
+uint8_t lvl :1;
 
-	/*! interrupt pin mode configuration
-     * Assignable macros :
-     * - BMI08X_INT_MODE_PUSH_PULL
-     * - BMI08X_INT_MODE_OPEN_DRAIN */
-	uint8_t output_mode :1;
+/*! interrupt pin mode configuration
+* Assignable macros :
+* - BMI08X_INT_MODE_PUSH_PULL
+* - BMI08X_INT_MODE_OPEN_DRAIN */
+uint8_t output_mode :1;
 
-	/*! Enable interrupt pin
-	 * Assignable Macros :
-	 *   - BMI08X_ENABLE
-	 *   - BMI08X_DISABLE
-	 */
-	uint8_t enable_int_pin :1;
+/*! Enable interrupt pin
+* Assignable Macros :
+* - BMI08X_ENABLE
+* - BMI08X_DISABLE
+*/
+uint8_t enable_int_pin :1;
 };
 
 /*!
  *  @brief Interrupt channel structure for accel
  */
 struct bmi08x_accel_int_channel_cfg {
-	/*! Accel Interrupt channel*/
-	enum bmi08x_accel_int_channel int_channel;
-	/*! Select Accel Interrupt type*/
-	enum bmi08x_accel_int_types int_type;
-	/*! Structure to configure accel interrupt pins*/
-	struct bmi08x_int_pin_cfg int_pin_cfg;
+/*! Accel Interrupt channel*/
+enum bmi08x_accel_int_channel int_channel;
+/*! Select Accel Interrupt type*/
+enum bmi08x_accel_int_types int_type;
+/*! Structure to configure accel interrupt pins*/
+struct bmi08x_int_pin_cfg int_pin_cfg;
 };
 
 /*!
  *  @brief Interrupt channel structure for gyro
  */
 struct bmi08x_gyro_int_channel_cfg {
-	/*! Gyro Interrupt channel*/
-	enum bmi08x_gyro_int_channel int_channel;
-	/*! Select Gyro Interrupt type*/
-	enum bmi08x_gyro_int_types int_type;
-	/*! Structure to configure gyro interrupt pins*/
-	struct bmi08x_int_pin_cfg int_pin_cfg;
+/*! Gyro Interrupt channel*/
+enum bmi08x_gyro_int_channel int_channel;
+/*! Select Gyro Interrupt type*/
+enum bmi08x_gyro_int_types int_type;
+/*! Structure to configure gyro interrupt pins*/
+struct bmi08x_int_pin_cfg int_pin_cfg;
 };
 
 /*!
  *  @brief Interrupt Configuration structure
  */
 struct bmi08x_int_cfg {
-	/*! Configuration of first accel interrupt channel */
-	struct bmi08x_accel_int_channel_cfg accel_int_config_1;
-	/*! Configuration of second accel interrupt channel */
-	struct bmi08x_accel_int_channel_cfg accel_int_config_2;
-	/*! Configuration of first gyro interrupt channel */
-	struct bmi08x_gyro_int_channel_cfg gyro_int_config_1;
-	/*! Configuration of second gyro interrupt channel */
-	struct bmi08x_gyro_int_channel_cfg gyro_int_config_2;
+/*! Configuration of first accel interrupt channel */
+struct bmi08x_accel_int_channel_cfg accel_int_config_1;
+/*! Configuration of second accel interrupt channel */
+struct bmi08x_accel_int_channel_cfg accel_int_config_2;
+/*! Configuration of first gyro interrupt channel */
+struct bmi08x_gyro_int_channel_cfg gyro_int_config_1;
+/*! Configuration of second gyro interrupt channel */
+struct bmi08x_gyro_int_channel_cfg gyro_int_config_2;
 };
 /*!
  *  @brief
  *  This structure holds all relevant information about BMI08
  */
 struct bmi08x_dev {
-	/*! Accel chip Id */
-	uint8_t accel_chip_id;
-	/*! Gyro chip Id */
-	uint8_t gyro_chip_id;
-	/*! Accel device Id */
-	uint8_t accel_id;
-	/*! Gyro device Id */
-	uint8_t gyro_id;
-	/*! 0 - I2C , 1 - SPI Interface */
-	enum bmi08x_intf intf;
-	/*! Decide SPI or I2C read mechanism */
-	uint8_t dummy_byte;
-	/*! Structure to configure accel sensor  */
-	struct bmi08x_cfg accel_cfg;
-	/*! Structure to configure gyro sensor  */
-	struct bmi08x_cfg gyro_cfg;
-	/*! Config stream data buffer address will be assigned*/
-	const uint8_t *config_file_ptr;
-	/*! Max read/write length (maximum supported length is 32).
-	 To be set by the user */
-	uint8_t read_write_len;
-	/*! Read function pointer */
-	bmi08x_com_fptr_t read;
-	/*! Write function pointer */
-	bmi08x_com_fptr_t write;
-	/*! Delay function pointer */
-	bmi08x_delay_fptr_t delay_ms;
+/*! Accel chip Id */
+uint8_t accel_chip_id;
+/*! Gyro chip Id */
+uint8_t gyro_chip_id;
+/*! Accel device Id */
+uint8_t accel_id;
+/*! Gyro device Id */
+uint8_t gyro_id;
+/*! 0 - I2C , 1 - SPI Interface */
+enum bmi08x_intf intf;
+/*! Decide SPI or I2C read mechanism */
+uint8_t dummy_byte;
+/*! Structure to configure accel sensor  */
+struct bmi08x_cfg accel_cfg;
+/*! Structure to configure gyro sensor  */
+struct bmi08x_cfg gyro_cfg;
+/*! Config stream data buffer address will be assigned*/
+const uint8_t *config_file_ptr;
+/*! Max read/write length (maximum supported length is 32).
+To be set by the user */
+uint8_t read_write_len;
+/*! Read function pointer */
+bmi08x_com_fptr_t read;
+/*! Write function pointer */
+bmi08x_com_fptr_t write;
+/*! Delay function pointer */
+bmi08x_delay_fptr_t delay_ms;
 };
 
 #endif /* BMI08X_DEFS_H_ */

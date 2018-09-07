@@ -29,23 +29,25 @@ _bmi08x.h_      |  1.2.0  | 24 Aug, 2018|
 - Integrate _bmi085.c_,_bmi085.h_,_bmi088.c_,_bmi088.h_, _bmi08a.c_, _bmi08g.c_,_bmi08x_defs.h_ and _bmi08x.h_ in your project.
 
 Enable the below macro in bmi08x_defs.h to use the BMI085 sensor feature
+``` c
 /** \name enable bmi085 sensor */
  #ifndef BMI08X_ENABLE_BMI085
  #define BMI08X_ENABLE_BMI085       1
  #endif
-
+```
 Enable the below macro in bmi08x_defs.h to use the BMI088 sensor feature 
+``` c
 /** \name enable bmi088 sensor */
  #ifndef BMI08X_ENABLE_BMI088
  #define BMI08X_ENABLE_BMI088       1
  #endif
-
+```
 - User has to include _bmi08x.h_ and _bmi085.h_/_bmi088.h_ in the code to call sensor APIs as shown below :
 ``` c
 #include "bmi08x.h"
+```
 include the variant specific headers bmi085.h/bmi088.h
 
-````
 ### Driver files information<a name=file></a>
 - *_bmi085.c_*
    * This file has function definitions of bmi085 API interfaces.
@@ -137,8 +139,8 @@ uint8_t data = 0;
 
 if(rslt == BMI08X_OK) 
 {
-		/* Read accel chip id */
-		rslt = bmi08a_get_regs(BMI08X_ACCEL_CHIP_ID_REG, &data, 1, &dev);
+    /* Read accel chip id */
+    rslt = bmi08a_get_regs(BMI08X_ACCEL_CHIP_ID_REG, &data, 1, &dev);
 }
 			
 ```
@@ -201,7 +203,7 @@ rslt = bmi08a_get_data(&user_accel_bmi085, &dev);
 ```
 
 #### Interrupt Configuring for accel data ready interrupt
-``` c
+```c
 /* Mapping data ready interrupt to interrupt channel */
 
 int8_t rslt;
@@ -254,7 +256,7 @@ void interrupt_handler(void)
 }
 ```
 #### Interrupt Configuring for accel Anymotion interrupt
-```
+```c
 
 /* Initialize the device instance as per the initialization example */
 
@@ -267,9 +269,9 @@ uint8_t rslt;
 
 /*! Max read/write length (maximum supported length is 32).
 To be set by the user */
-bmi08xDev.read_write_len = 8;
+dev.read_write_len = 8;
 /* Enabling Accel Anymotion interrupt */	
-rslt = bmi085_apply_config_file(&bmi08xdev);
+rslt = bmi085_apply_config_file(&dev);
 	
 /*configure the any motion parameters*/
 
@@ -280,7 +282,7 @@ anymotion_cfg.x_en = 0x01;
 anymotion_cfg.y_en = 0x01;
 anymotion_cfg.z_en = 0x01;
 	
-rslt=bmi085_configure_anymotion(anymotion_cfg, &bmi08xdev);
+rslt=bmi085_configure_anymotion(anymotion_cfg, &dev);
 	
 /* Interrupt configurations */
 
@@ -304,6 +306,7 @@ void interrupt_handler(void)
 /* Disbaling Accel Anymotion interrupt */
 
 struct bmi08x_anymotion_cfg anymotion_cfg;
+
 anymotion_cfg.threshold = 0x44;
 anymotion_cfg.nomotion_sel = 0x00;
 anymotion_cfg.duration = 0x01;
@@ -311,7 +314,7 @@ anymotion_cfg.x_en = 0x00;
 anymotion_cfg.y_en = 0x00;
 anymotion_cfg.z_en = 0x00;
 
-rslt=bmi085_configure_anymotion(anymotion_cfg, &bmi08xdev);
+rslt=bmi085_configure_anymotion(anymotion_cfg, &dev);
 
 if(rslt == BMI08X_OK)  {
 	/* Interrupt configurations */
@@ -329,7 +332,7 @@ if(rslt == BMI08X_OK)  {
 
 
 #### Get the sensor time
-``` c
+```c
 
 int8_t rslt;
 uint32_t user_sampling_time;
@@ -342,7 +345,7 @@ rslt = bmi08a_get_sensor_time(&dev, &user_sampling_time);
 ```
 
 #### Read Chip ID from the gyro
-``` c
+```c
 
 int8_t rslt;
 uint8_t data = 0;
@@ -351,8 +354,8 @@ uint8_t data = 0;
 
 if(rslt == BMI08X_OK) 
 {
-		/* Read gyro chip id */
-		rslt = bmi08g_get_regs(BMI08X_GYRO_CHIP_ID_REG, &data, 1, &dev);
+    /* Read gyro chip id */
+    rslt = bmi08g_get_regs(BMI08X_GYRO_CHIP_ID_REG, &data, 1, &dev);
 }
 			
 ```
@@ -456,7 +459,6 @@ int_config.int_pin_cfg.output_mode = BMI08X_INT_MODE_PUSH_PULL;
 int_config.int_pin_cfg.enable_int_pin = BMI08X_DISABLE;
 
 /* Setting the interrupt configuration */
-
 rslt = bmi08g_set_int_config(&int_config, &dev);
 
 /* Configure the controller port pin for disabling the interrupt */

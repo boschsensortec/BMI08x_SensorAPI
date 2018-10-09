@@ -152,7 +152,7 @@ int_config.gyro_int_config_2.int_pin_cfg.output_mode = BMI08X_INT_MODE_PUSH_PULL
 
 /* Enable synchronization interrupt pin */
 rslt = bmi085_set_data_sync_int_config(&int_config, &bmi08xdev);
-
+```
 
 #### Read out raw accel data
 ```c
@@ -172,5 +172,4 @@ static struct bmi08x_sensor_data accel_bmi085;
 static struct bmi08x_sensor_data gyro_bmi085;
 
 rslt = bmi085_get_synchronized_data(&accel_bmi085,&gyro_bmi085, &bmi08xdev);
-
 ```

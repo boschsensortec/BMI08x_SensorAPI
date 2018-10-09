@@ -22,12 +22,12 @@ The data synchronization feature requires physical interrupt pin’s connection 
      +-----------+             +---------------+
      |           |           8 |               | 16
      |       SCK +------------>| SCK      INT1 |<-----+
-     |           |           9 |               | 1    |
+     |           |           9 |               | 12   |
      |      MOSI +------------>| SDO      INT3 |>-----+
      |           |          15 |               | 
-     |      MISO +-------+---->| SDO1          | 
+     |      MISO +<------+-----| SDO1          | 
      |           |       |  10 |               |
-     |           |       +---->| SDO2          |
+     |           |       +-----| SDO2          |
      |           |          14 |               |
      |   ACC_CSB +------------>| CSB1          |
      |           |           5 |               |

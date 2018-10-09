@@ -110,7 +110,8 @@ rslt = bmi08a_set_power_mode(&bmi08xdev);
 bmi08xdev.gyro_cfg.power = BMI08X_GYRO_PM_NORMAL;
 bmi08g_set_power_mode(&bmi08xdev);
 
-/*API uploads the bmi08x config file onto the device and wait for 150ms to enable the data synchronization - delay taken care inside the function */
+/* API uploads the bmi08x config file onto the device and wait for 150ms 
+   to enable the data synchronization - delay taken care inside the function */
 rslt = bmi085_apply_config_file(&bmi08xdev);
 
 /*assign accel range setting*/

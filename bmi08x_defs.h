@@ -617,8 +617,10 @@ BMI08X_SPI_INTF
  * @brief Bus communication function pointer which should be mapped to
  * the platform specific read and write functions of the user
  *
- *  @note : dev_addr is used for I2C read/write operations only.
- *          For SPI read/write operations this is dummy variable.
+ *  @note : dev_addr is used for I2C read/write operations, as it holds 
+ *          the i2c address. 
+ *          For SPI read/write operations, this variable can be used by 
+ *          the user to identify the corresponding chip select pin.
  */
 typedef int8_t (*bmi08x_com_fptr_t)(uint8_t dev_addr, uint8_t reg_addr, uint8_t *data, uint16_t len);
 
@@ -829,9 +831,9 @@ struct bmi08x_dev {
 uint8_t accel_chip_id;
 /*! Gyro chip Id */
 uint8_t gyro_chip_id;
-/*! Accel device Id */
+/*! Accel device Id in I2C mode, can be used for chip select pin in SPI mode */
 uint8_t accel_id;
-/*! Gyro device Id */
+/*! Gyro device Id in I2C mode, can be used for chip select pin in SPI mode */
 uint8_t gyro_id;
 /*! 0 - I2C , 1 - SPI Interface */
 enum bmi08x_intf intf;

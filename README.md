@@ -78,22 +78,39 @@ _Note: By default, the interface is I2C._
 To initialize BMI085 sensors, an instance of the bmi08x structure should be created. The following parameters are required to be updated in the structure, by the user, to initialize bmi085 sensors.
 
 Parameters    | Details
---------------|-----------------------------------
-_accel_id_    | Accel device address of I2C interface
-_gyro_id_     | Gyro device address of I2C interface        
+--------------|-------------------------------------------------------------------------------------
+_accel_id_    | Accel device address of I2C interface (can be used to identify CSB1 pin in SPI mode)
+_gyro_id_     | Gyro device address of I2C interface (can be used to identify CSB2 pin in SPI mode) 
 _intf_        | I2C or SPI 
 _read_        | read through I2C/SPI interface
 _write_       | write through I2C/SPI interface
 _delay_ms_    | delay   
 
+As defined in _bmi08x_defs.h_, the _read_/_write_ functions must be implemented in such a way that they comply with the following template of a function declaration:
+
+_typedef int8_t (*bmi08x_com_fptr_t)(uint8_t dev_addr, uint8_t reg_addr, uint8_t *data, uint16_t len);_
+
 ##### _Initialize through SPI interface_
+In order to use SPI interface, the user has to implement dedicated SPI read/write functions, which could for example look like this:
+
+_int8_t user_spi_write(uint8_t cs_pin, uint8_t reg_addr, uint8_t *data, uint16_t len);_
+
+_int8_t user_spi_read(uint8_t cs_pin, uint8_t reg_addr, uint8_t *data, uint16_t len);_
+
+Since the BMI08x sensor family has dedicated communication interfaces for gyro and accelerometer, two different chip select lines are required to retrieve all data from the sensor (see datasheet for details). The user can use the fields _accel_id_ and _gyro_id_ to provide an information to the generic SPI read/write function, which chip select to use. 
+
+When the sensorAPI functions call the _int8_t user_spi_write_ and _int8_t user_spi_read_ functions, they will pass the fields _accel_id_ or _gyro_id_ to the _cs_pin_ parameter.
+
+In the example below it is assumed that on the MCU platform of the user, the pin for CSB1 (chip select for accelerometer and temperature sensor data) is defined as MCU_GPIO_BMI08X_CSB1 and the pin for CSB2 (gyro chip select) is defined as MCU_GPIO_BMI08X_CSB2.
+Thus the user need to provide the following values to the _bmi08x_dev_ structure and initialize SPI as follows.
+
 ``` c
 
 int8_t rslt;
 
 struct bmi08x_dev dev = {
-        .accel_id = 0,
-        .gyro_id = 0,
+        .accel_id = MCU_GPIO_BMI08X_CSB1,
+        .gyro_id = MCU_GPIO_BMI08X_CSB2,
         .intf = BMI08X_SPI_INTF,  
         .read = user_spi_read,  
         .write = user_spi_write,  

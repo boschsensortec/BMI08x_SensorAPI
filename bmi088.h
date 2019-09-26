@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2017 - 2018 Bosch Sensortec GmbH
+ * Copyright (C) 2018 - 2019 Bosch Sensortec GmbH
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -40,29 +40,31 @@
  * patent rights of the copyright holder.
  *
  * @file       bmi088.h
- * @date       24 Aug 2018
- * @version    1.2.0
+ * @date       25 Sep 2019
+ * @version    1.4.0
  *
  */
+
 /*! \file bmi088.h
- \brief Sensor Driver for BMI088 family of sensors */
+ * \brief Sensor Driver for BMI088 family of sensors */
 #ifndef BMI088_H_
 #define BMI088_H_
 
 #ifdef __cplusplus
-extern "C"
-{
+extern "C" {
 #endif
 
 /* header files */
 #include "bmi08x_defs.h"
 #if BMI08X_FEATURE_BMI088 == 1
+
 /**********************************************************************************/
 /* (extern) variable declarations */
 /**********************************************************************************/
 
 /**********************************************************************************/
 /* function prototype declarations */
+
 /*!
  *  @brief This API is the entry point for bmi088 sensors.
  *  It performs the selection of I2C/SPI read mechanism according to the
@@ -110,6 +112,7 @@ int8_t bmi088_configure_data_synchronization(struct bmi08x_data_sync_cfg sync_cf
  *  @retval zero -> Success / -ve value -> Error
  */
 int8_t bmi088_configure_anymotion(struct bmi08x_anymotion_cfg anymotion_cfg, const struct bmi08x_dev *dev);
+
 /*!
  *  @brief This API reads the synchronized accel & gyro data from the sensor,
  *  store it in the bmi08x_sensor_data structure instance
@@ -123,8 +126,10 @@ int8_t bmi088_configure_anymotion(struct bmi08x_anymotion_cfg anymotion_cfg, con
  *  @return Result of API execution status
  *  @retval zero -> Success / -ve value -> Error
  */
-int8_t bmi088_get_synchronized_data(struct bmi08x_sensor_data *accel, struct bmi08x_sensor_data *gyro,
-		const struct bmi08x_dev *dev);
+int8_t bmi088_get_synchronized_data(struct bmi08x_sensor_data *accel,
+                                    struct bmi08x_sensor_data *gyro,
+                                    const struct bmi08x_dev *dev);
+
 /*!
  *  @brief This API configures the synchronization interrupt
  *  based on the user settings in the bmi08x_int_cfg

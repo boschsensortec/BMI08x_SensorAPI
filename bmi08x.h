@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2017 - 2018 Bosch Sensortec GmbH
+ * Copyright (C) 2018 - 2019 Bosch Sensortec GmbH
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -40,13 +40,13 @@
  * patent rights of the copyright holder.
  *
  * @file       bmi08x.h
- * @date       24 Aug 2018
- * @version    1.2.0
+ * @date       25 Sep 2019
+ * @version    1.4.0
  *
  */
 
 /*! \file bmi08x.h
- \brief Sensor Driver for BMI08x family of sensors */
+ * \brief Sensor Driver for BMI08x family of sensors */
 #ifndef BMI08X_H_
 #define BMI08X_H_
 
@@ -57,11 +57,13 @@ extern "C" {
 /*********************************************************************/
 /* header files */
 #include "bmi08x_defs.h"
+
 /*********************************************************************/
 /* (extern) variable declarations */
 /*********************************************************************/
 /* function prototype declarations */
 /*********************** BMI08x Accelerometer function prototypes ************************/
+
 /*!
  *  @brief This API is the entry point for accel sensor.
  *  It performs the selection of I2C/SPI read mechanism according to the
@@ -97,7 +99,7 @@ int8_t bmi08a_write_config_file(const struct bmi08x_dev *dev);
  *  @retval zero -> Success / -ve value -> Error
  */
 int8_t bmi08a_write_feature_config(uint8_t reg_addr, const uint16_t *reg_data, uint8_t len,
-	const struct bmi08x_dev *dev);
+                                   const struct bmi08x_dev *dev);
 
 /*!
  *  @brief This API reads the data from the given register address of accel sensor.
@@ -267,10 +269,10 @@ int8_t bmi08a_get_data(struct bmi08x_sensor_data *accel, const struct bmi08x_dev
 
 /*!
  *  @brief This API configures the necessary accel interrupt
- *  based on the user settings in the bmi08x_int_cfg
+ *  based on the user settings in the bmi08x_accel_int_channel_cfg
  *  structure instance.
  *
- *  @param[in] int_config  : Structure instance of bmi08x_int_cfg.
+ *  @param[in] int_config  : Structure instance of bmi08x_accel_int_channel_cfg.
  *  @param[in] dev         : Structure instance of bmi08x_dev.
  *  @note : Refer user guide for detailed info.
  *
@@ -304,6 +306,7 @@ int8_t bmi08a_get_sensor_temperature(const struct bmi08x_dev *dev, int32_t *sens
  *  @retval zero -> Success / -ve value -> Error
  */
 int8_t bmi08a_get_sensor_time(const struct bmi08x_dev *dev, uint32_t *sensor_time);
+
 /*!
  *  @brief This API checks whether the self test functionality of the sensor
  *  is working or not
@@ -321,6 +324,7 @@ int8_t bmi08a_get_sensor_time(const struct bmi08x_dev *dev, uint32_t *sensor_tim
 int8_t bmi08a_perform_selftest(struct bmi08x_dev *dev);
 
 /*********************** BMI088 Gyroscope function prototypes ****************************/
+
 /*!
  *  @brief This API is the entry point for gyro sensor.
  *  It performs the selection of I2C/SPI read mechanism according to the
@@ -440,10 +444,10 @@ int8_t bmi08g_get_data(struct bmi08x_sensor_data *gyro, const struct bmi08x_dev 
 
 /*!
  *  @brief This API configures the necessary gyro interrupt
- *  based on the user settings in the bmi08x_int_cfg
+ *  based on the user settings in the bmi08x_gyro_int_channel_cfg
  *  structure instance.
  *
- *  @param[in] int_config  : Structure instance of bmi08x_int_cfg.
+ *  @param[in] int_config  : Structure instance of bmi08x_gyro_int_channel_cfg.
  *  @param[in] dev         : Structure instance of bmi08x_dev.
  *  @note : Refer user guide for detailed info.
  *
@@ -451,6 +455,7 @@ int8_t bmi08g_get_data(struct bmi08x_sensor_data *gyro, const struct bmi08x_dev 
  *  @retval zero -> Success / -ve value -> Error
  */
 int8_t bmi08g_set_int_config(const struct bmi08x_gyro_int_channel_cfg *int_config, const struct bmi08x_dev *dev);
+
 /*!
  *  @brief This API checks whether the self test functionality of the
  *  gyro sensor is working or not
@@ -467,6 +472,149 @@ int8_t bmi08g_set_int_config(const struct bmi08x_gyro_int_channel_cfg *int_confi
  */
 int8_t bmi08g_perform_selftest(const struct bmi08x_dev *dev);
 
+/*!
+ * @brief This API sets the FIFO configuration in the sensor.
+ *
+ * @param[in] config        : Structure instance of FIFO configurations.
+ * @param[in] dev           : Structure instance of bmi08x_dev.
+ *
+ * @return Result of API execution status
+ *
+ * @retval BMI08X_OK - Success.
+ * @retval BMI08X_E_NULL_PTR - Error: Null pointer error
+ * @retval BMI08X_E_COM_FAIL - Error: Communication fail
+ */
+int8_t bmi08a_set_fifo_config(const struct accel_fifo_config *config, const struct bmi08x_dev *dev);
+
+/*!
+ * @brief This API gets the FIFO configuration from the sensor.
+ *
+ * @param[out] config   : Structure instance to get FIFO configuration value.
+ * @param[in]  dev      : Structure instance of bmi08x_dev.
+ *
+ * @retval BMI08X_OK - Success.
+ * @retval BMI08X_E_NULL_PTR - Error: Null pointer error
+ * @retval BMI08X_E_COM_FAIL - Error: Communication fail
+ */
+int8_t bmi08a_get_fifo_config(struct accel_fifo_config *config, const struct bmi08x_dev *dev);
+
+/*!
+ * @brief This API reads FIFO data.
+ *
+ * @param[in, out] fifo     : Structure instance of bmi08x_fifo_frame.
+ * @param[in]      dev      : Structure instance of bmi08x_dev.
+ *
+ * @note APS has to be disabled before calling this function.
+ *
+ * @return Result of API execution status
+ *
+ * @retval BMI08X_OK - Success.
+ * @retval BMI08X_E_NULL_PTR - Error: Null pointer error
+ * @retval BMI08X_E_COM_FAIL - Error: Communication fail
+ */
+int8_t bmi08a_read_fifo_data(struct bmi08x_fifo_frame *fifo, const struct bmi08x_dev *dev);
+
+/*!
+ * @brief This API gets the length of FIFO data available in the sensor in
+ * bytes.
+ *
+ * @param[out] fifo_length  : Pointer variable to store the value of FIFO byte
+ *                            counter.
+ * @param[in]  dev          : Structure instance of bmi08x_dev.
+ *
+ * @note The byte counter is updated each time a complete frame is read or
+ * written.
+ *
+ * @return Result of API execution status
+ *
+ * @retval BMI08X_OK - Success.
+ * @retval BMI08X_E_NULL_PTR - Error: Null pointer error
+ * @retval BMI08X_E_COM_FAIL - Error: Communication fail
+ */
+int8_t bmi08a_get_fifo_length(uint16_t *fifo_length, const struct bmi08x_dev *dev);
+
+/*!
+ * @brief This API gets the FIFO water mark level which is set in the sensor.
+ *
+ * @param[out] wm        : Pointer variable to store FIFO water-mark level.
+ * @param[in]  dev            : Structure instance of bmi08x_dev.
+ *
+ * @return Result of API execution status
+ *
+ * @retval BMI08X_OK - Success.
+ * @retval BMI08X_E_NULL_PTR - Error: Null pointer error
+ * @retval BMI08X_E_COM_FAIL - Error: Communication fail
+ */
+int8_t bmi08a_get_fifo_wm(uint16_t *wm, const struct bmi08x_dev *dev);
+
+/*!
+ * @brief This API sets the FIFO water mark level which is set in the sensor.
+ *
+ * @param[out] wm        : Pointer variable to store FIFO water-mark level.
+ * @param[in]  dev            : Structure instance of bmi08x_dev.
+ *
+ * @return Result of API execution status
+ *
+ * @retval BMI08X_OK - Success.
+ * @retval BMI08X_E_NULL_PTR - Error: Null pointer error
+ * @retval BMI08X_E_COM_FAIL - Error: Communication fail
+ */
+int8_t bmi08a_set_fifo_wm(uint16_t wm, const struct bmi08x_dev *dev);
+
+/*!
+ * This API parses and extracts the accelerometer frames from FIFO data read by
+ * the "bmi08x_read_fifo_data" API and stores it in the "accel_data" structure
+ * instance.
+ *
+ * @param[out]    accel_data   : Structure instance of bmi08x_sensor_data
+ *                               where the parsed data bytes are stored.
+ * @param[in,out] accel_length : Number of accelerometer frames.
+ * @param[in,out] fifo         : Structure instance of bmi08x_fifo_frame.
+ * @param[in]     dev          : Structure instance of bmi08x_dev.
+ *
+ * @return Result of API execution status
+ *
+ * @retval BMI08X_OK - Success.
+ * @retval BMI08X_E_NULL_PTR - Error: Null pointer error
+ * @retval BMI08X_W_FIFO_EMPTY - Warning : FIFO is empty
+ * @retval BMI08X_W_PARTIAL_READ - Warning : There are more frames to be read
+ */
+int8_t bmi08a_extract_accel(struct bmi08x_sensor_data *accel_data,
+                            uint16_t *accel_length,
+                            struct bmi08x_fifo_frame *fifo,
+                            const struct bmi08x_dev *dev);
+
+/*!
+ * @brief This API gets the down sampling rate, configured for FIFO
+ * accelerometer.
+ *
+ * @param[out] fifo_downs : Pointer variable to store the down sampling rate
+ * @param[in]  dev            : Structure instance of bmi08x_dev.
+ *
+ * @return Result of API execution status
+ *
+ * @retval BMI08X_OK - Success.
+ * @retval BMI08X_E_NULL_PTR - Error: Null pointer error
+ * @retval BMI08X_E_COM_FAIL - Error: Communication fail
+ */
+
+int8_t bmi08a_get_fifo_down_sample(uint8_t *fifo_downs, const struct bmi08x_dev *dev);
+
+/*!
+ * @brief This API sets the down sampling rate for FIFO accelerometer FIFO data.
+ *
+ * @param[in] fifo_downs : Variable to set the down sampling rate.
+ * @param[in] dev            : Structure instance of bmi08x_dev.
+ *
+ * @return Result of API execution status
+ *
+ * @retval BMI08X_OK - Success.
+ * @retval BMI08X_E_NULL_PTR - Error: Null pointer error
+ * @retval BMI08X_E_COM_FAIL - Error: Communication fail
+ * @retval BMI08X_E_OUT_OF_RANGE - Error: Out of range
+ */
+int8_t bmi08a_set_fifo_down_sample(uint8_t fifo_downs, const struct bmi08x_dev *dev);
+
 #ifdef __cplusplus
 }
 #endif
@@ -474,4 +622,3 @@ int8_t bmi08g_perform_selftest(const struct bmi08x_dev *dev);
 #endif /* BMI08X_H_ */
 
 /** @}*/
-

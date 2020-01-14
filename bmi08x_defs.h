@@ -1,49 +1,40 @@
 /**
- * Copyright (C) 2018 - 2019 Bosch Sensortec GmbH
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *
- * Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * Neither the name of the copyright holder nor the names of the
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND
- * CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
- * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL COPYRIGHT HOLDER
- * OR CONTRIBUTORS BE LIABLE FOR ANY
- * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
- * OR CONSEQUENTIAL DAMAGES(INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
- * ANY WAY OUT OF THE USE OF THIS
- * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE
- *
- * The information provided is believed to be accurate and reliable.
- * The copyright holder assumes no responsibility
- * for the consequences of use
- * of such information nor for any infringement of patents or
- * other rights of third parties which may result from its use.
- * No license is granted by implication or otherwise under any patent or
- * patent rights of the copyright holder.
- *
- * @file        bmi08x_defs.h
- * @date        25 Sep 2019
- * @version     1.4.0
- *
- */
+* Copyright (c) 2020 Bosch Sensortec GmbH. All rights reserved.
+*
+* BSD-3-Clause
+*
+* Redistribution and use in source and binary forms, with or without
+* modification, are permitted provided that the following conditions are met:
+*
+* 1. Redistributions of source code must retain the above copyright
+*    notice, this list of conditions and the following disclaimer.
+*
+* 2. Redistributions in binary form must reproduce the above copyright
+*    notice, this list of conditions and the following disclaimer in the
+*    documentation and/or other materials provided with the distribution.
+*
+* 3. Neither the name of the copyright holder nor the names of its
+*    contributors may be used to endorse or promote products derived from
+*    this software without specific prior written permission.
+*
+* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+* "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+* LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+* FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+* COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+* INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+* (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+* SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+* HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+* STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
+* IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+* POSSIBILITY OF SUCH DAMAGE.
+*
+* @file bmi08x_defs.h
+* @date 10/01/2020
+* @version  1.4.4
+*
+*/
 
 /*! \file bmi08x_defs.h */
 
@@ -588,7 +579,7 @@
 #define BMI08X_FIFO_HEADER_SKIP_FRM            UINT8_C(0x40)
 #define BMI08X_FIFO_HEADER_INPUT_CFG_FRM       UINT8_C(0x48)
 #define BMI08X_FIFO_HEAD_OVER_READ_MSB         UINT8_C(0x80)
-#define BMI08X_FIFO_SAMPLE_DROP_FRM 		   UINT8_C(0x50)
+#define BMI08X_FIFO_SAMPLE_DROP_FRM            UINT8_C(0x50)
 
 /* Accel registers */
 #define BMI08X_FIFO_LENGTH_0_ADDR              UINT8_C(0x24)
@@ -850,10 +841,10 @@ struct bmi08x_data_sync_cfg
  *  @brief Enum to select accelerometer Interrupt pins
  */
 enum bmi08x_accel_int_channel {
-	/* interrupt Channel 1 for accel sensor */
+    /* interrupt Channel 1 for accel sensor */
     BMI08X_INT_CHANNEL_1,
 
-	/* interrupt Channel 2 for accel sensor */
+    /* interrupt Channel 2 for accel sensor */
     BMI08X_INT_CHANNEL_2
 };
 
@@ -861,11 +852,10 @@ enum bmi08x_accel_int_channel {
  *  @brief Enum to select gyroscope Interrupt pins
  */
 enum bmi08x_gyro_int_channel {
-
-	/* interrupt Channel 3 for gyro sensor */
+    /* interrupt Channel 3 for gyro sensor */
     BMI08X_INT_CHANNEL_3,
 
-	/* interrupt Channel 4 for gyro sensor */
+    /* interrupt Channel 4 for gyro sensor */
     BMI08X_INT_CHANNEL_4
 };
 
@@ -895,8 +885,7 @@ enum bmi08x_accel_int_types {
  *  @brief Enum to select gyroscope interrupts
  */
 enum bmi08x_gyro_int_types {
-
-	/* Gyro data ready interrupt */
+    /* Gyro data ready interrupt */
     BMI08X_GYRO_DATA_RDY_INT
 };
 

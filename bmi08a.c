@@ -1,49 +1,40 @@
-/**\mainpage
- * Copyright (C) 2018 - 2019 Bosch Sensortec GmbH
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *
- * Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * Neither the name of the copyright holder nor the names of the
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND
- * CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
- * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL COPYRIGHT HOLDER
- * OR CONTRIBUTORS BE LIABLE FOR ANY
- * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
- * OR CONSEQUENTIAL DAMAGES(INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
- * ANY WAY OUT OF THE USE OF THIS
- * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE
- *
- * The information provided is believed to be accurate and reliable.
- * The copyright holder assumes no responsibility
- * for the consequences of use
- * of such information nor for any infringement of patents or
- * other rights of third parties which may result from its use.
- * No license is granted by implication or otherwise under any patent or
- * patent rights of the copyright holder.
- *
- * @file        bmi08a.c
- * @date        25 Sep 2019
- * @version     1.4.0
- *
- */
+/**
+* Copyright (c) 2020 Bosch Sensortec GmbH. All rights reserved.
+*
+* BSD-3-Clause
+*
+* Redistribution and use in source and binary forms, with or without
+* modification, are permitted provided that the following conditions are met:
+*
+* 1. Redistributions of source code must retain the above copyright
+*    notice, this list of conditions and the following disclaimer.
+*
+* 2. Redistributions in binary form must reproduce the above copyright
+*    notice, this list of conditions and the following disclaimer in the
+*    documentation and/or other materials provided with the distribution.
+*
+* 3. Neither the name of the copyright holder nor the names of its
+*    contributors may be used to endorse or promote products derived from
+*    this software without specific prior written permission.
+*
+* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+* "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+* LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+* FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+* COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+* INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+* (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+* SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+* HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+* STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
+* IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+* POSSIBILITY OF SUCH DAMAGE.
+*
+* @file bmi08a.c
+* @date 10/01/2020
+* @version  1.4.4
+*
+*/
 
 /*! \file bmi08a.c
  * \brief Sensor Driver for BMI08x family of sensors */
@@ -704,7 +695,6 @@ static void reset_fifo_frame_structure(struct bmi08x_fifo_frame *fifo);
  *                            the parsed accelerometer data bytes are stored.
  * @param[in] accel_length  : Number of accelerometer frames (x,y,z data).
  * @param[in] fifo          : Structure instance of bmi08x_fifo_frame.
- * @param[in] dev           : Structure instance of bmi08x_dev.
  *
  * @return Result of API execution status
  *
@@ -714,8 +704,7 @@ static void reset_fifo_frame_structure(struct bmi08x_fifo_frame *fifo);
  */
 static int8_t extract_acc_header_mode(struct bmi08x_sensor_data *acc,
                                       uint16_t *accel_length,
-                                      struct bmi08x_fifo_frame *fifo,
-                                      const struct bmi08x_dev *dev);
+                                      struct bmi08x_fifo_frame *fifo);
 
 /*!
  * @brief This API sets the FIFO watermark interrupt for accel sensor
@@ -867,8 +856,7 @@ int8_t bmi08a_write_config_file(const struct bmi08x_dev *dev)
 
                     if (rslt == BMI08X_OK)
                     {
-                        /* Wait till ASIC is initialized. Refer the data-sheet
-                         * for more information */
+                        /* Wait till ASIC is initialized. Refer the data-sheet for more information */
                         dev->delay_ms(BMI08X_ASIC_INIT_TIME_MS);
 
                         /* Check for config initialization status (1 = OK)*/
@@ -1096,8 +1084,8 @@ int8_t bmi08a_soft_reset(const struct bmi08x_dev *dev)
             dev->delay_ms(BMI08X_ACCEL_SOFTRESET_DELAY_MS);
 
             /* After soft reset SPI mode in the initialization phase, need to  perform a dummy SPI read
-             * operation, The soft-reset performs a fundamental reset to the device, which is largely
-             * equivalent to a power cycle. */
+             * operation, The soft-reset performs a fundamental reset to the device,
+             * which is largely equivalent to a power cycle. */
             if (dev->intf == BMI08X_SPI_INTF)
             {
                 /* Dummy SPI read operation of Chip-ID */
@@ -1172,6 +1160,7 @@ int8_t bmi08a_set_meas_conf(const struct bmi08x_dev *dev)
             /* Updating the status */
             is_bw_invalid = TRUE;
         }
+
 #if BMI08X_FEATURE_BMI085 == 1
 
         /* Check for valid Range */
@@ -1180,6 +1169,7 @@ int8_t bmi08a_set_meas_conf(const struct bmi08x_dev *dev)
             /* Updating the status */
             is_range_invalid = TRUE;
         }
+
 #elif BMI08X_FEATURE_BMI088 == 1
 
         /* Check for valid Range */
@@ -1188,6 +1178,7 @@ int8_t bmi08a_set_meas_conf(const struct bmi08x_dev *dev)
             /* Updating the status */
             is_range_invalid = TRUE;
         }
+
 #endif
 
         /* If ODR, BW and Range are valid, write it to accel config. registers */
@@ -1793,8 +1784,7 @@ int8_t bmi08a_extract_accel(struct bmi08x_sensor_data *accel_data,
     if ((rslt == BMI08X_OK) && (accel_data != NULL) && (accel_length != NULL) && (fifo != NULL))
     {
         /* Parsing the FIFO data in header mode */
-        rslt = extract_acc_header_mode(accel_data, accel_length, fifo, dev);
-
+        rslt = extract_acc_header_mode(accel_data, accel_length, fifo);
     }
     else
     {
@@ -2505,7 +2495,6 @@ static int8_t move_next_frame(uint16_t *data_index, uint8_t current_frame_length
     {
         /* Move the data index to next frame */
         (*data_index) = (*data_index) + current_frame_length;
-
     }
 
     return rslt;
@@ -2558,8 +2547,7 @@ static int8_t unpack_sensortime_frame(uint16_t *data_index, struct bmi08x_fifo_f
  */
 static int8_t extract_acc_header_mode(struct bmi08x_sensor_data *acc,
                                       uint16_t *accel_length,
-                                      struct bmi08x_fifo_frame *fifo,
-                                      const struct bmi08x_dev *dev)
+                                      struct bmi08x_fifo_frame *fifo)
 {
     /* Variable to define error */
     int8_t rslt = BMI08X_OK;
@@ -2576,13 +2564,6 @@ static int8_t extract_acc_header_mode(struct bmi08x_sensor_data *acc,
     /* Variable to indicate accelerometer frames read */
     uint16_t frame_to_read = *accel_length;
 
-    /* Check if this is the first iteration of data unpacking
-     * if yes, then consider dummy byte on SPI
-     */
-    if (fifo->acc_byte_start_idx == 0)
-    {
-        fifo->acc_byte_start_idx = dev->dummy_byte;
-    }
     for (data_index = fifo->acc_byte_start_idx; data_index < fifo->length;)
     {
         /* Get frame header byte */
@@ -2615,10 +2596,10 @@ static int8_t extract_acc_header_mode(struct bmi08x_sensor_data *acc,
                 rslt = move_next_frame(&data_index, BMI08X_FIFO_INPUT_CFG_LENGTH, fifo);
                 break;
 
-             /* If header defines sample drop frame */
+            /* If header defines sample drop frame */
             case BMI08X_FIFO_SAMPLE_DROP_FRM:
-            	rslt = move_next_frame(&data_index, BMI08X_FIFO_INPUT_CFG_LENGTH, fifo);
-            	break;
+                rslt = move_next_frame(&data_index, BMI08X_FIFO_INPUT_CFG_LENGTH, fifo);
+                break;
 
             /* If header defines invalid frame or end of valid data */
             case BMI08X_FIFO_HEAD_OVER_READ_MSB:

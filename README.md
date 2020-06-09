@@ -2,7 +2,6 @@
 
 ## Table of Contents
  - [Introduction](#Intro)
- - [Version and date](#Ver)
  - [Integration details](#Integration)
  - [Driver files information](#file)
  - [Sensor interfaces](#interface)
@@ -11,52 +10,29 @@
 ### Introduction<a name=Intro></a>
 This package contains Bosch Sensortec's BMI08X Sensor API.
 
-### Version and date<a name=Ver></a> 
-
-Driver files 	| Version |    Date     |
-----------------|---------|------------ |
-_bmi085.c_      |  1.4.4  | 10 Jan, 2019|
-_bmi085.h_      |  1.4.4  | 10 Jan, 2019|
-_bmi088.c_      |  1.4.4  | 10 Jan, 2019|
-_bmi088.h_      |  1.4.4  | 10 Jan, 2019|
-_bmi08a.c_      |  1.4.4  | 10 Jan, 2019|
-_bmi08g.c_      |  1.4.4  | 10 Jan, 2019|
-_bmi08x_defs.h_ |  1.4.4  | 10 Jan, 2019|
-_bmi08x.h_      |  1.4.4  | 10 Jan, 2019|
-
 
 ### Integration details<a name=Integration></a>
-- Integrate _bmi085.c_,_bmi085.h_,_bmi088.c_,_bmi088.h_, _bmi08a.c_, _bmi08g.c_,_bmi08x_defs.h_ and _bmi08x.h_ in your project.
+- Integrate _bmi08a.c_, _bmi08g.c_,_bmi08x_defs.h_ and _bmi08x.h_ in your project.
 
-Enable the below macro in bmi08x_defs.h to use the BMI085 sensor feature
-/** \name enable bmi085 sensor */
-``` c
- #ifndef BMI08X_ENABLE_BMI085
- #define BMI08X_ENABLE_BMI085       1
- #endif
+Update variant of bmi08x_dev to BMI085_VARIANT to use the BMI085 sensor feature
+
 ```
-Enable the below macro in bmi08x_defs.h to use the BMI088 sensor feature 
-/** \name enable bmi088 sensor */
-``` c
- #ifndef BMI08X_ENABLE_BMI088
- #define BMI08X_ENABLE_BMI088       1
- #endif
+ dev.variant = BMI085_VARIANT;
 ```
-- User has to include _bmi08x.h_ and _bmi085.h_/_bmi088.h_ in the code to call sensor APIs as shown below :
-``` c
-#include "bmi08x.h"
+
+Update variant of bmi08x_dev to BMI088_VARIANT to use the BMI085 sensor feature
+
 ```
-include the variant specific headers bmi085.h/bmi088.h
+ dev.variant = BMI088_VARIANT;
+```
+
+- User has to include _bmi08x.h_ in the code to call sensor APIs as shown below :
+
+```
+ #include "bmi08x.h"
+```
 
 ### Driver files information<a name=file></a>
-- *_bmi085.c_*
-   * This file has function definitions of bmi085 API interfaces.
-- *_bmi085.h_*
-   * This header file has necessary include files,bmi085 function declarations, required to make API calls.
-- *_bmi088.c_*
-   * This file has function definitions of bmi088 API interfaces.
-- *_bmi088.h_*
-   * This header file has necessary include files,bmi088 function declarations, required to make API calls.
 - *_bmi08a.c_*
    * This file has function definitions of bmi08x accel generic API interfaces.
 - *_bmi08g.c_*
@@ -74,63 +50,83 @@ _Note: By default, the interface is I2C._
 ### Integration examples<a name=examples></a>
 #### Initializing BMI085 sensors
  /* below code shows bmi085 integration steps */
- #include "bmi085.h"
 To initialize BMI085 sensors, an instance of the bmi08x structure should be created. The following parameters are required to be updated in the structure, by the user, to initialize bmi085 sensors.
 
-Parameters    | Details
---------------|-----------------------------------
-_accel_id_    | Accel device address of I2C interface
-_gyro_id_     | Gyro device address of I2C interface        
-_intf_        | I2C or SPI 
-_read_        | read through I2C/SPI interface
-_write_       | write through I2C/SPI interface
-_delay_ms_    | delay   
+Parameters          | Details
+--------------------|--------------------------------------------------------
+_intf_ptr_accel_    | Interface pointer that can hold Accel device address
+_intf_ptr_gyro_     | Interface pointer that can hold Gyro device address    
+_intf_              | I2C or SPI 
+_read_              | read through I2C/SPI interface
+_write_             | write through I2C/SPI interface
+_delay_us_          | delay in microseconds
+_variant_           | BMI085_VARIANT
 
 ##### _Initialize through SPI interface_
-``` c
 
 int8_t rslt;
 
+uint8_t acc_dev_addr = 0;
+uint8_t gyro_dev_addr = 0;
+
 struct bmi08x_dev dev = {
-        .accel_id = 0,
-        .gyro_id = 0,
+
+        .intf_ptr_accel = &acc_dev_addr,
+        .intf_ptr_gyro = &gyro_dev_addr,
         .intf = BMI08X_SPI_INTF,  
         .read = user_spi_read,  
         .write = user_spi_write,  
-        .delay_ms = user_delay_milli_sec
+        .delay_us = user_delay,
+        .variant = BMI085_VARIANT 
 };
 
 /* Initialize the SPI */
 
-/* Initializing the bmi085 sensors the below function will Initialize both accel and gyro sensors */
-rslt = bmi085_init(&dev);
+/* Initializing the bmi085 sensors the below functions */
 
-```
+/* To Initialize accel sensor */
+
+rslt = bmi08a_init(&dev);
+
+/* To Initialize gyro sensor */
+
+rslt = bmi08g_init(&dev);
 
 ##### _Initialize through I2C interface_
-``` c
+
 /* I2C slave address depends on the hardware configuration for details please refer Data sheet */
 
 int8_t rslt;
 
+uint8_t acc_dev_addr = BMI08X_ACCEL_I2C_ADDR_PRIMARY; /* User has define this macro depends on the I2C slave address */
+
+uint8_t gyro_dev_addr = BMI08X_GYRO_I2C_ADDR_PRIMARY; /* User has define this macro depends on the I2C slave address */
+
 struct bmi08x_dev dev = {
-        .accel_id = BMI08X_ACCEL_I2C_ADDR_PRIMARY, /* User has define this macro depends on the I2C slave address */
-        .gyro_id  = BMI08X_GYRO_I2C_ADDR_PRIMARY, /* User has define this macro depends on the I2C slave address */
+
+        .intf_ptr_accel = &acc_dev_addr,
+        .intf_ptr_gyro = &gyro_dev_addr,
         .intf = BMI08X_I2C_INTF,  
         .read = user_i2c_read,  
         .write = user_i2c_write,  
-        .delay_ms = user_delay_milli_sec
+        .delay_ms = user_delay,
+        .variant = BMI085_VARIANT
 };
 
 /* Initialize the I2C */
 
-/* Initializing the bmi085 sensors the below function will Initialize both accel and gyro sensors */
-rslt = bmi085_init(&dev);
-	
-```
+/* Initializing the bmi085 sensors the below functions */
+
+/* To Initialize accel sensor */
+
+rslt = bmi08a_init(&dev);
+
+/* To Initialize gyro sensor */
+
+rslt = bmi08g_init(&dev);
 
 #### Read Chip ID from the accel
-``` c
+
 
 int8_t rslt;
 uint8_t data = 0;
@@ -139,58 +135,63 @@ uint8_t data = 0;
 
 if(rslt == BMI08X_OK) 
 {
+
     /* Read accel chip id */
     rslt = bmi08a_get_regs(BMI08X_ACCEL_CHIP_ID_REG, &data, 1, &dev);
 }
-			
-```
 
 #### Get the accel power mode
-``` c
+
 int8_t rslt;
 
 /* Initialize the device instance as per the initialization example */
 
 /* Read the accel power mode */
-rslt = bmi08a_get_power_mode(&dev)	
+
+rslt = bmi08a_get_power_mode(&dev);
+
 /* Power mode will be updated in the dev.accel_cfg.power */
 	
-```
 
 #### Get the accelerometer configurations
-``` c
+
 int8_t rslt;
 
 /* Initialize the device instance as per the initialization example */
 
 /* Read the accel sensor config parameters (odr,bw,range) */
-rslt = bmi08a_get_meas_conf(&dev)
-/* Config parameters will be updated in the dev.accel_cfg.odr,dev.accel_cfg.bw and dev.accel_cfg.range */
+
+rslt = bmi08a_get_meas_conf(&dev);
+
+/* Config parameters will be updated in the  dev.accel_cfg.odr,dev.accel_cfg.bw and dev.accel_cfg.range */
 	
-```
 
 #### Configuring the accelerometer
-``` c
 
 int8_t rslt;
 
 /* Initialize the device instance as per the initialization example */
 
 /* Assign the desired configurations */
+
 dev.accel_cfg.bw = BMI08X_ACCEL_BW_NORMAL;
+
 dev.accel_cfg.odr = BMI08X_ACCEL_ODR_100_HZ;
+
 dev.accel_cfg.range = BMI085_ACCEL_RANGE_4G;
+
 dev.accel_cfg.power = BMI08X_ACCEL_PM_ACTIVE;
 
+
 rslt = bmi08a_set_power_mode(&dev);
+
 /* Wait for 10ms to switch between the power modes - delay taken care inside the function */
 
 rslt = bmi08a_set_meas_conf(&dev);
 	
-```
 
 #### Get accelerometer data
-``` c
+
 
 int8_t rslt;
 struct bmi08x_sensor_data user_accel_bmi085;
@@ -198,12 +199,12 @@ struct bmi08x_sensor_data user_accel_bmi085;
 /* Initialize the device instance as per the initialization example */
 
 /* Read the sensor data into the sensor data instance */
+
 rslt = bmi08a_get_data(&user_accel_bmi085, &dev);
 
-```
 
 #### Interrupt Configuring for accel data ready interrupt
-```c
+
 /* Mapping data ready interrupt to interrupt channel */
 
 int8_t rslt;
@@ -212,17 +213,22 @@ struct bmi08x_accel_int_channel_cfg int_config;
 /* Initialize the device instance as per the initialization example */
 
 /* Interrupt configurations */
+
 int_config.int_channel = BMI08X_INT_CHANNEL_1;
+
 int_config.int_type = BMI08X_ACCEL_DATA_RDY_INT;
+
 int_config.int_pin_cfg.lvl = BMI08X_INT_ACTIVE_HIGH;
+
 int_config.int_pin_cfg.output_mode = BMI08X_INT_MODE_PUSH_PULL;
+
 int_config.int_pin_cfg.enable_int_pin = BMI08X_ENABLE;
 
 /* Configure the controller port pin for the interrupt and assign the ISR */
 	
 /* Setting the interrupt configuration */
-rslt = bmi08a_set_int_config(&int_config, &dev);
 
+rslt = bmi08a_set_int_config(&int_config, &dev);
 
 	
 void interrupt_handler(void)
@@ -233,108 +239,40 @@ void interrupt_handler(void)
 /* Unmapping data ready interrupt to interrupt channel */
 
 int8_t rslt;
+
 struct bmi08x_accel_int_channel_cfg int_config;
 
 /* Initialize the device instance as per the initialization example */
 
 /* Interrupt configurations */
+
 int_config.int_channel = BMI08X_INT_CHANNEL_1;
+
 int_config.int_type = BMI08X_ACCEL_DATA_RDY_INT;
+
 int_config.int_pin_cfg.lvl = BMI08X_INT_ACTIVE_HIGH;
+
 int_config.int_pin_cfg.output_mode = BMI08X_INT_MODE_PUSH_PULL;
+
 int_config.int_pin_cfg.enable_int_pin = BMI08X_DISABLE;
 
+
 /* Setting the interrupt configuration */
+
 rslt = bmi08a_set_int_config(&int_config, &dev);
 
 /* Configure the controller port pin for disabling the interrupt */
 
-	
 void interrupt_handler(void)
 {
 	/* ISR functionality */
 }
-```
-#### Interrupt Configuring for accel Anymotion interrupt
-```c
-
-/* Initialize the device instance as per the initialization example */
-
-/* Declare the anymotion configuration structure */
-
-struct bmi08x_anymotion_cfg anymotion_cfg;
-
-struct bmi08x_accel_int_channel_cfg int_config;
-uint8_t rslt;
-
-/*! Max read/write length (maximum supported length is 32).
-To be set by the user */
-dev.read_write_len = 8;
-/* Enabling Accel Anymotion interrupt */	
-rslt = bmi085_apply_config_file(&dev);
-	
-/* Configure the any motion parameters */
-
-anymotion_cfg.threshold = 0x44;
-anymotion_cfg.nomotion_sel = 0x00;
-anymotion_cfg.duration = 0x01;
-anymotion_cfg.x_en = 0x01;
-anymotion_cfg.y_en = 0x01;
-anymotion_cfg.z_en = 0x01;
-	
-rslt=bmi085_configure_anymotion(anymotion_cfg, &dev);
-	
-/* Interrupt configurations */
-
-int_config.int_channel = BMI08X_INT_CHANNEL_1;
-int_config.int_type = BMI08X_ACCEL_DATA_RDY_INT;
-int_config.int_pin_cfg.lvl = BMI08X_INT_ACTIVE_HIGH;
-int_config.int_pin_cfg.output_mode = BMI08X_INT_MODE_PUSH_PULL;
-int_config.int_pin_cfg.enable_int_pin = BMI08X_ENABLE;
-
-/* Configure the controller port pin for the interrupt and assign the ISR */
-	
-/* Setting the interrupt configuration */
-
-rslt = bmi08a_set_int_config(&int_config, &dev);
-
-void interrupt_handler(void)
-{
-	/* ISR functionality */
-}
-
-/* Disbaling Accel Anymotion interrupt */
-
-struct bmi08x_anymotion_cfg anymotion_cfg;
-
-anymotion_cfg.threshold = 0x44;
-anymotion_cfg.nomotion_sel = 0x00;
-anymotion_cfg.duration = 0x01;
-anymotion_cfg.x_en = 0x00;
-anymotion_cfg.y_en = 0x00;
-anymotion_cfg.z_en = 0x00;
-
-rslt=bmi085_configure_anymotion(anymotion_cfg, &dev);
-
-if(rslt == BMI08X_OK)  {
-	/* Interrupt configurations */
-	int_config.int_channel = BMI08X_INT_CHANNEL_1;
-	int_config.int_type = BMI08X_ACCEL_DATA_RDY_INT;
-	int_config.int_pin_cfg.lvl = BMI08X_INT_ACTIVE_HIGH;
-	int_config.int_pin_cfg.output_mode = BMI08X_INT_MODE_PUSH_PULL;
-	int_config.int_pin_cfg.enable_int_pin = BMI08X_DISABLE;
-	
-	/* Setting the interrupt configuration */
-	rslt = bmi08a_set_int_config(&int_config, &dev);
-}
-
-```
 
 
 #### Get the sensor time
-```c
 
 int8_t rslt;
+
 uint32_t user_sampling_time;
 
 /* Initialize the device instance as per the initialization example */
@@ -342,10 +280,8 @@ uint32_t user_sampling_time;
 /* Read the sensor time */
 rslt = bmi08a_get_sensor_time(&dev, &user_sampling_time);
 	
-```
 
 #### Read Chip ID from the gyro
-```c
 
 int8_t rslt;
 uint8_t data = 0;
@@ -354,40 +290,41 @@ uint8_t data = 0;
 
 if(rslt == BMI08X_OK) 
 {
+
     /* Read gyro chip id */
     rslt = bmi08g_get_regs(BMI08X_GYRO_CHIP_ID_REG, &data, 1, &dev);
 }
 			
-```
 
 #### Get the gyro power mode
-``` c
+
 
 int8_t rslt;
 
 /* Initialize the device instance as per the initialization example */
 
 /* Read the gyro power mode */
+
 rslt = bmi08g_get_power_mode(&dev)
+
 /* Power mode will be updated in the dev.gyro_cfg.power */
 	
-```
 
 #### Get the gyro sensor config
-``` c
+
 
 int8_t rslt;
 
 /* Initialize the device instance as per the initialization example */
 
 /* Read the gyro sensor config parameters (odr,bw,range) */
-rslt = bmi08g_get_meas_conf(&dev)
+
+rslt = bmi08g_get_meas_conf(&dev);
+
 /* Config parameters will be updated in the dev.gyro_cfg.odr,dev.gyro_cfg.bw and dev.gyro_cfg.range */
 	
-```
 
 #### Configuring the gyro
-``` c
 
 int8_t rslt;
 
@@ -396,32 +333,34 @@ int8_t rslt;
 dev.gyro_cfg.power = BMI08X_GYRO_PM_NORMAL;
 
 rslt = bmi08g_set_power_mode(&dev);
+
 /* Wait for 30ms to switch between the power modes - delay taken care inside the function */
 	
 /* Assign the desired configurations */
+
 dev.gyro_cfg.odr = BMI08X_GYRO_BW_23_ODR_200_HZ;
+
 dev.gyro_cfg.range = BMI08X_GYRO_RANGE_1000_DPS;
+
 dev.gyro_cfg.bw = BMI08X_GYRO_BW_23_ODR_200_HZ;
 
 rslt = bmi08g_set_meas_conf(&dev);
 	
-```
 
 #### Get gyro data
-``` c
 
 int8_t rslt;
+
 struct bmi08x_sensor_data user_gyro_bmi085;
 
 /* Initialize the device instance as per the initialization example */
 
 /* Read the sensor data into the sensor data instance */
+
 rslt = bmi08g_get_data(&user_gyro_bmi085, &dev);
 
-```
 
 #### Interrupt Configuring for gyro data ready interrupt
-``` c
 
 int8_t rslt;
 struct bmi08x_gyro_int_channel_cfg int_config;
@@ -431,12 +370,17 @@ struct bmi08x_gyro_int_channel_cfg int_config;
 /* Mapping data ready interrupt to interrupt channel */
 
 int_config.int_channel = BMI08X_INT_CHANNEL_3;
+
 int_config.int_type = BMI08X_GYRO_DATA_RDY_INT;
+
 int_config.int_pin_cfg.lvl = BMI08X_INT_ACTIVE_HIGH;
+
 int_config.int_pin_cfg.output_mode = BMI08X_INT_MODE_PUSH_PULL;
+
 int_config.int_pin_cfg.enable_int_pin = BMI08X_ENABLE;
 
 /* Setting the interrupt configuration */
+
 rslt = bmi08g_set_int_config(&int_config, &dev);
 
 /* Configure the controller port pin for the interrupt and assign the ISR */
@@ -453,10 +397,16 @@ struct bmi08x_gyro_int_channel_cfg int_config;
 /* Initialize the device instance as per the initialization example */
 
 int_config.int_channel = BMI08X_INT_CHANNEL_3;
+
 int_config.int_type = BMI08X_GYRO_DATA_RDY_INT;
+
 int_config.int_pin_cfg.lvl = BMI08X_INT_ACTIVE_HIGH;
+
 int_config.int_pin_cfg.output_mode = BMI08X_INT_MODE_PUSH_PULL;
+
 int_config.int_pin_cfg.enable_int_pin = BMI08X_DISABLE;
 
+
 /* Setting the interrupt configuration */
+
 rslt = bmi08g_set_int_config(&int_config, &dev);

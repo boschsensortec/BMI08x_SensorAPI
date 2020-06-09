@@ -1,40 +1,40 @@
 /**
-* Copyright (c) 2020 Bosch Sensortec GmbH. All rights reserved.
-*
-* BSD-3-Clause
-*
-* Redistribution and use in source and binary forms, with or without
-* modification, are permitted provided that the following conditions are met:
-*
-* 1. Redistributions of source code must retain the above copyright
-*    notice, this list of conditions and the following disclaimer.
-*
-* 2. Redistributions in binary form must reproduce the above copyright
-*    notice, this list of conditions and the following disclaimer in the
-*    documentation and/or other materials provided with the distribution.
-*
-* 3. Neither the name of the copyright holder nor the names of its
-*    contributors may be used to endorse or promote products derived from
-*    this software without specific prior written permission.
-*
-* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-* "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-* LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
-* FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-* COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
-* INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-* (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-* SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
-* HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
-* STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
-* IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-* POSSIBILITY OF SUCH DAMAGE.
-*
-* @file bmi08g.c
-* @date 10/01/2020
-* @version  1.4.4
-*
-*/
+ * Copyright (c) 2020 Bosch Sensortec GmbH. All rights reserved.
+ *
+ * BSD-3-Clause
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ *
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ *
+ * 3. Neither the name of the copyright holder nor the names of its
+ *    contributors may be used to endorse or promote products derived from
+ *    this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+ * FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+ * COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+ * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+ * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
+ * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ *
+ * @file       bmi08g.c
+ * @date       2020-06-08
+ * @version    v1.5.2
+ *
+ */
 
 /*! \file bmi08g.c
  * \brief Sensor Driver for BMI08X family of sensors */
@@ -62,7 +62,9 @@
  * @param[in] dev : Structure instance of bmi08x_dev.
  *
  * @return Result of API execution status
- * @retval zero -> Success / -ve value -> Error
+ * @retval 0 -> Success
+ * @retval < 0 -> Fail
+ *
  */
 static int8_t null_ptr_check(const struct bmi08x_dev *dev);
 
@@ -74,10 +76,12 @@ static int8_t null_ptr_check(const struct bmi08x_dev *dev);
  *  @param[in] len       : No. of bytes of data to be read.
  *  @param[in] dev       : Structure instance of bmi08x_dev.
  *
- *  @return Result of API execution status
- *  @retval zero -> Success / -ve value -> Error
+ * @return Result of API execution status
+ * @retval 0 -> Success
+ * @retval < 0 -> Fail
+ *
  */
-static int8_t get_regs(uint8_t reg_addr, uint8_t *data, uint16_t len, const struct bmi08x_dev *dev);
+static int8_t get_regs(uint8_t reg_addr, uint8_t *data, uint32_t len, struct bmi08x_dev *dev);
 
 /*!
  *  @brief This API writes the given data to the register address
@@ -89,10 +93,12 @@ static int8_t get_regs(uint8_t reg_addr, uint8_t *data, uint16_t len, const stru
  *  @param[in] len       : No. of bytes of data to write.
  *  @param[in] dev       : Structure instance of bmi08x_dev.
  *
- *  @return Result of API execution status
- *  @retval zero -> Success / -ve value -> Error
+ * @return Result of API execution status
+ * @retval 0 -> Success
+ * @retval < 0 -> Fail
+ *
  */
-static int8_t set_regs(uint8_t reg_addr, uint8_t *reg_data, uint16_t len, const struct bmi08x_dev *dev);
+static int8_t set_regs(uint8_t reg_addr, const uint8_t *reg_data, uint32_t len, struct bmi08x_dev *dev);
 
 /*!
  * @brief This API sets the data ready interrupt for gyro sensor.
@@ -101,10 +107,11 @@ static int8_t set_regs(uint8_t reg_addr, uint8_t *reg_data, uint16_t len, const 
  * @param[in] dev         : Structure instance of bmi08x_dev.
  *
  * @return Result of API execution status
- * @retval zero -> Success / -ve value -> Error
+ * @retval 0 -> Success
+ * @retval < 0 -> Fail
+ *
  */
-static int8_t set_gyro_data_ready_int(const struct bmi08x_gyro_int_channel_cfg *int_config,
-                                      const struct bmi08x_dev *dev);
+static int8_t set_gyro_data_ready_int(const struct bmi08x_gyro_int_channel_cfg *int_config, struct bmi08x_dev *dev);
 
 /*!
  * @brief This API configures the pins which fire the
@@ -114,9 +121,11 @@ static int8_t set_gyro_data_ready_int(const struct bmi08x_gyro_int_channel_cfg *
  * @param[in] dev         : Structure instance of bmi08x_dev.
  *
  * @return Result of API execution status
- * @retval zero -> Success / -ve value -> Error
+ * @retval 0 -> Success
+ * @retval < 0 -> Fail
+ *
  */
-static int8_t set_int_pin_config(const struct bmi08x_gyro_int_channel_cfg *int_config, const struct bmi08x_dev *dev);
+static int8_t set_int_pin_config(const struct bmi08x_gyro_int_channel_cfg *int_config, struct bmi08x_dev *dev);
 
 /*!
  *  @brief This API enables or disables the Gyro Self test feature in the
@@ -131,11 +140,12 @@ static int8_t set_int_pin_config(const struct bmi08x_gyro_int_channel_cfg *int_c
  *
  *  @param[in] dev : Structure instance of bmi08x_dev
  *
- *  @return Result of API execution status
- *  @retval zero -> Success  / -ve value -> Error
+ * @return Result of API execution status
+ * @retval 0 -> Success
+ * @retval < 0 -> Fail
  *
  */
-static int8_t set_gyro_selftest(uint8_t selftest, const struct bmi08x_dev *dev);
+static int8_t set_gyro_selftest(uint8_t selftest, struct bmi08x_dev *dev);
 
 /****************************************************************************/
 
@@ -169,7 +179,7 @@ int8_t bmi08g_init(struct bmi08x_dev *dev)
     if (rslt == BMI08X_OK)
     {
         /* Read gyro chip id */
-        rslt = get_regs(BMI08X_GYRO_CHIP_ID_REG, &chip_id, 1, dev);
+        rslt = get_regs(BMI08X_REG_GYRO_CHIP_ID, &chip_id, 1, dev);
 
         if (rslt == BMI08X_OK)
         {
@@ -192,7 +202,7 @@ int8_t bmi08g_init(struct bmi08x_dev *dev)
  * @brief This API reads the data from the given register address
  * of gyro sensor.
  */
-int8_t bmi08g_get_regs(uint8_t reg_addr, uint8_t *reg_data, uint16_t len, const struct bmi08x_dev *dev)
+int8_t bmi08g_get_regs(uint8_t reg_addr, uint8_t *reg_data, uint32_t len, struct bmi08x_dev *dev)
 {
     int8_t rslt;
 
@@ -224,7 +234,7 @@ int8_t bmi08g_get_regs(uint8_t reg_addr, uint8_t *reg_data, uint16_t len, const 
  * @brief This API writes the given data to the register address
  * of gyro sensor.
  */
-int8_t bmi08g_set_regs(uint8_t reg_addr, uint8_t *reg_data, uint16_t len, const struct bmi08x_dev *dev)
+int8_t bmi08g_set_regs(uint8_t reg_addr, const uint8_t *reg_data, uint32_t len, struct bmi08x_dev *dev)
 {
     int8_t rslt;
 
@@ -255,7 +265,7 @@ int8_t bmi08g_set_regs(uint8_t reg_addr, uint8_t *reg_data, uint16_t len, const 
 /*!
  * @brief This API resets the gyro sensor.
  */
-int8_t bmi08g_soft_reset(const struct bmi08x_dev *dev)
+int8_t bmi08g_soft_reset(struct bmi08x_dev *dev)
 {
     int8_t rslt;
     uint8_t data;
@@ -268,12 +278,12 @@ int8_t bmi08g_soft_reset(const struct bmi08x_dev *dev)
     {
         /* Reset gyro device */
         data = BMI08X_SOFT_RESET_CMD;
-        rslt = set_regs(BMI08X_GYRO_SOFTRESET_REG, &data, 1, dev);
+        rslt = set_regs(BMI08X_REG_GYRO_SOFTRESET, &data, 1, dev);
 
         if (rslt == BMI08X_OK)
         {
             /* delay 30 ms after writing reset value to its register */
-            dev->delay_ms(BMI08X_GYRO_SOFTRESET_DELAY);
+            dev->delay_us(BMI08X_MS_TO_US(BMI08X_GYRO_SOFTRESET_DELAY), dev->intf_ptr_gyro);
         }
     }
 
@@ -295,7 +305,7 @@ int8_t bmi08g_get_meas_conf(struct bmi08x_dev *dev)
     /* Proceed if null check is fine */
     if (rslt == BMI08X_OK)
     {
-        rslt = get_regs(BMI08X_GYRO_RANGE_REG, data, 2, dev);
+        rslt = get_regs(BMI08X_REG_GYRO_RANGE, data, 2, dev);
 
         if (rslt == BMI08X_OK)
         {
@@ -312,7 +322,7 @@ int8_t bmi08g_get_meas_conf(struct bmi08x_dev *dev)
  * @brief This API sets the output data rate, range and bandwidth
  * of gyro sensor.
  */
-int8_t bmi08g_set_meas_conf(const struct bmi08x_dev *dev)
+int8_t bmi08g_set_meas_conf(struct bmi08x_dev *dev)
 {
     int8_t rslt;
     uint8_t data;
@@ -344,30 +354,29 @@ int8_t bmi08g_set_meas_conf(const struct bmi08x_dev *dev)
         if ((!is_odr_invalid) && (!is_range_invalid))
         {
             /* Read range value from the range register */
-            rslt = get_regs(BMI08X_GYRO_BANDWIDTH_REG, &data, 1, dev);
+            rslt = get_regs(BMI08X_REG_GYRO_BANDWIDTH, &data, 1, dev);
 
             if (rslt == BMI08X_OK)
             {
                 data = BMI08X_SET_BITS_POS_0(data, BMI08X_GYRO_BW, odr);
 
                 /* Write odr value to odr register */
-                rslt = set_regs(BMI08X_GYRO_BANDWIDTH_REG, &data, 1, dev);
+                rslt = set_regs(BMI08X_REG_GYRO_BANDWIDTH, &data, 1, dev);
 
                 if (rslt == BMI08X_OK)
                 {
                     /* Read range value from the range register */
-                    rslt = get_regs(BMI08X_GYRO_RANGE_REG, &data, 1, dev);
+                    rslt = get_regs(BMI08X_REG_GYRO_RANGE, &data, 1, dev);
 
                     if (rslt == BMI08X_OK)
                     {
                         data = BMI08X_SET_BITS_POS_0(data, BMI08X_GYRO_RANGE, range);
 
                         /* Write range value to range register */
-                        rslt = set_regs(BMI08X_GYRO_RANGE_REG, &data, 1, dev);
+                        rslt = set_regs(BMI08X_REG_GYRO_RANGE, &data, 1, dev);
                     }
                 }
             }
-
         }
         else
         {
@@ -396,7 +405,7 @@ int8_t bmi08g_get_power_mode(struct bmi08x_dev *dev)
     /* Proceed if null check is fine */
     if (rslt == BMI08X_OK)
     {
-        rslt = get_regs(BMI08X_GYRO_LPM1_REG, &data, 1, dev);
+        rslt = get_regs(BMI08X_REG_GYRO_LPM1, &data, 1, dev);
 
         if (rslt == BMI08X_OK)
         {
@@ -411,7 +420,7 @@ int8_t bmi08g_get_power_mode(struct bmi08x_dev *dev)
 /*!
  * @brief This API sets the power mode of the gyro sensor.
  */
-int8_t bmi08g_set_power_mode(const struct bmi08x_dev *dev)
+int8_t bmi08g_set_power_mode(struct bmi08x_dev *dev)
 {
     int8_t rslt;
     uint8_t power_mode, data;
@@ -424,7 +433,7 @@ int8_t bmi08g_set_power_mode(const struct bmi08x_dev *dev)
     if (rslt == BMI08X_OK)
     {
         /*read the previous power state*/
-        rslt = get_regs(BMI08X_GYRO_LPM1_REG, &data, 1, dev);
+        rslt = get_regs(BMI08X_REG_GYRO_LPM1, &data, 1, dev);
 
         if (rslt == BMI08X_OK)
         {
@@ -450,14 +459,13 @@ int8_t bmi08g_set_power_mode(const struct bmi08x_dev *dev)
             if (is_power_switching_mode_valid)
             {
                 /* Write power to power register */
-                rslt = set_regs(BMI08X_GYRO_LPM1_REG, &power_mode, 1, dev);
+                rslt = set_regs(BMI08X_REG_GYRO_LPM1, &power_mode, 1, dev);
 
                 if (rslt == BMI08X_OK)
                 {
                     /* Time required to switch the power mode */
-                    dev->delay_ms(BMI08X_GYRO_POWER_MODE_CONFIG_DELAY);
+                    dev->delay_us(BMI08X_MS_TO_US(BMI08X_GYRO_POWER_MODE_CONFIG_DELAY), dev->intf_ptr_gyro);
                 }
-
             }
             else
             {
@@ -475,7 +483,7 @@ int8_t bmi08g_set_power_mode(const struct bmi08x_dev *dev)
  * store it in the bmi08x_sensor_data structure instance
  * passed by the user.
  */
-int8_t bmi08g_get_data(struct bmi08x_sensor_data *gyro, const struct bmi08x_dev *dev)
+int8_t bmi08g_get_data(struct bmi08x_sensor_data *gyro, struct bmi08x_dev *dev)
 {
     int8_t rslt;
     uint8_t data[6];
@@ -489,7 +497,7 @@ int8_t bmi08g_get_data(struct bmi08x_sensor_data *gyro, const struct bmi08x_dev 
     if ((rslt == BMI08X_OK) && (gyro != NULL))
     {
         /* read gyro sensor data */
-        rslt = get_regs(BMI08X_GYRO_X_LSB_REG, data, 6, dev);
+        rslt = get_regs(BMI08X_REG_GYRO_X_LSB, data, 6, dev);
 
         if (rslt == BMI08X_OK)
         {
@@ -508,7 +516,6 @@ int8_t bmi08g_get_data(struct bmi08x_sensor_data *gyro, const struct bmi08x_dev 
             msblsb = (msb << 8) | lsb;
             gyro->z = (int16_t)msblsb; /* Data in Z axis */
         }
-
     }
     else
     {
@@ -523,7 +530,7 @@ int8_t bmi08g_get_data(struct bmi08x_sensor_data *gyro, const struct bmi08x_dev 
  * based on the user settings in the bmi08x_int_cfg
  * structure instance.
  */
-int8_t bmi08g_set_int_config(const struct bmi08x_gyro_int_channel_cfg *int_config, const struct bmi08x_dev *dev)
+int8_t bmi08g_set_int_config(const struct bmi08x_gyro_int_channel_cfg *int_config, struct bmi08x_dev *dev)
 {
     int8_t rslt;
 
@@ -560,7 +567,7 @@ int8_t bmi08g_set_int_config(const struct bmi08x_gyro_int_channel_cfg *int_confi
  *  @brief This API checks whether the self test functionality of the
  *  gyro sensor is working or not.
  */
-int8_t bmi08g_perform_selftest(const struct bmi08x_dev *dev)
+int8_t bmi08g_perform_selftest(struct bmi08x_dev *dev)
 {
     int8_t rslt;
     uint8_t data = 0, loop_break = 1;
@@ -580,7 +587,7 @@ int8_t bmi08g_perform_selftest(const struct bmi08x_dev *dev)
             while (loop_break)
             {
                 /* Read self-test register to check if self-test ready bit is set */
-                rslt = get_regs(BMI08X_GYRO_SELF_TEST_REG, &data, 1, dev);
+                rslt = get_regs(BMI08X_REG_GYRO_SELF_TEST, &data, 1, dev);
 
                 if (rslt == BMI08X_OK)
                 {
@@ -591,7 +598,6 @@ int8_t bmi08g_perform_selftest(const struct bmi08x_dev *dev)
                         /* If self-test ready bit is set, exit the loop */
                         loop_break = 0;
                     }
-
                 }
                 else
                 {
@@ -603,7 +609,7 @@ int8_t bmi08g_perform_selftest(const struct bmi08x_dev *dev)
             if (rslt == BMI08X_OK)
             {
                 /* Read self-test register to check for self-test Ok bit */
-                rslt = get_regs(BMI08X_GYRO_SELF_TEST_REG, &data, 1, dev);
+                rslt = get_regs(BMI08X_REG_GYRO_SELF_TEST, &data, 1, dev);
 
                 if (rslt == BMI08X_OK)
                 {
@@ -627,6 +633,11 @@ int8_t bmi08g_perform_selftest(const struct bmi08x_dev *dev)
 /*****************************************************************************/
 /* Static function definition */
 
+/*! @cond DOXYGEN_SUPRESS */
+
+/* Suppressing doxygen warnings triggered for same static function names present across various sensor variant
+ * directories */
+
 /*!
  * @brief This API is used to validate the device structure pointer for
  * null conditions.
@@ -635,7 +646,8 @@ static int8_t null_ptr_check(const struct bmi08x_dev *dev)
 {
     int8_t rslt;
 
-    if ((dev == NULL) || (dev->read == NULL) || (dev->write == NULL) || (dev->delay_ms == NULL))
+    if ((dev == NULL) || (dev->read == NULL) || (dev->write == NULL) || (dev->delay_us == NULL) ||
+        (dev->intf_ptr_accel == NULL) || (dev->intf_ptr_gyro == NULL))
     {
         /* Device structure pointer is not valid */
         rslt = BMI08X_E_NULL_PTR;
@@ -652,9 +664,9 @@ static int8_t null_ptr_check(const struct bmi08x_dev *dev)
 /*!
  * @brief This API reads the data from the given register address of gyro sensor.
  */
-static int8_t get_regs(uint8_t reg_addr, uint8_t *reg_data, uint16_t len, const struct bmi08x_dev *dev)
+static int8_t get_regs(uint8_t reg_addr, uint8_t *reg_data, uint32_t len, struct bmi08x_dev *dev)
 {
-    int8_t rslt;
+    int8_t rslt = BMI08X_OK;
 
     if (dev->intf == BMI08X_SPI_INTF)
     {
@@ -663,9 +675,9 @@ static int8_t get_regs(uint8_t reg_addr, uint8_t *reg_data, uint16_t len, const 
     }
 
     /* read a gyro register */
-    rslt = dev->read(dev->gyro_id, reg_addr, reg_data, len);
+    dev->intf_rslt = dev->read(reg_addr, reg_data, len, dev->intf_ptr_gyro);
 
-    if (rslt != BMI08X_OK)
+    if (dev->intf_rslt != BMI08X_INTF_RET_SUCCESS)
     {
         /* Updating the error */
         rslt = BMI08X_E_COM_FAIL;
@@ -677,9 +689,9 @@ static int8_t get_regs(uint8_t reg_addr, uint8_t *reg_data, uint16_t len, const 
 /*!
  * @brief This API writes the given data to the register address of gyro sensor.
  */
-static int8_t set_regs(uint8_t reg_addr, uint8_t *reg_data, uint16_t len, const struct bmi08x_dev *dev)
+static int8_t set_regs(uint8_t reg_addr, const uint8_t *reg_data, uint32_t len, struct bmi08x_dev *dev)
 {
-    int8_t rslt;
+    int8_t rslt = BMI08X_OK;
 
     if (dev->intf == BMI08X_SPI_INTF)
     {
@@ -688,9 +700,9 @@ static int8_t set_regs(uint8_t reg_addr, uint8_t *reg_data, uint16_t len, const 
     }
 
     /* write to a gyro register */
-    rslt = dev->write(dev->gyro_id, reg_addr, reg_data, len);
+    dev->intf_rslt = dev->write(reg_addr, reg_data, len, dev->intf_ptr_gyro);
 
-    if (rslt != BMI08X_OK)
+    if (dev->intf_rslt != BMI08X_INTF_RET_SUCCESS)
     {
         /* Updating the error */
         rslt = BMI08X_E_COM_FAIL;
@@ -702,14 +714,13 @@ static int8_t set_regs(uint8_t reg_addr, uint8_t *reg_data, uint16_t len, const 
 /*!
  * @brief This API sets the data ready interrupt for gyro sensor.
  */
-static int8_t set_gyro_data_ready_int(const struct bmi08x_gyro_int_channel_cfg *int_config,
-                                      const struct bmi08x_dev *dev)
+static int8_t set_gyro_data_ready_int(const struct bmi08x_gyro_int_channel_cfg *int_config, struct bmi08x_dev *dev)
 {
     int8_t rslt;
     uint8_t conf, data[2] = { 0 };
 
     /* read interrupt map register */
-    rslt = get_regs(BMI08X_GYRO_INT3_INT4_IO_MAP_REG, &data[0], 1, dev);
+    rslt = get_regs(BMI08X_REG_GYRO_INT3_INT4_IO_MAP, &data[0], 1, dev);
 
     if (rslt == BMI08X_OK)
     {
@@ -750,7 +761,7 @@ static int8_t set_gyro_data_ready_int(const struct bmi08x_gyro_int_channel_cfg *
             }
 
             /* write data to interrupt map register */
-            rslt = set_regs(BMI08X_GYRO_INT3_INT4_IO_MAP_REG, &data[0], 1, dev);
+            rslt = set_regs(BMI08X_REG_GYRO_INT3_INT4_IO_MAP, &data[0], 1, dev);
 
             if (rslt == BMI08X_OK)
             {
@@ -760,12 +771,10 @@ static int8_t set_gyro_data_ready_int(const struct bmi08x_gyro_int_channel_cfg *
                 if (rslt == BMI08X_OK)
                 {
                     /* write data to interrupt control register */
-                    rslt = set_regs(BMI08X_GYRO_INT_CTRL_REG, &data[1], 1, dev);
+                    rslt = set_regs(BMI08X_REG_GYRO_INT_CTRL, &data[1], 1, dev);
                 }
-
             }
         }
-
     }
 
     return rslt;
@@ -775,13 +784,13 @@ static int8_t set_gyro_data_ready_int(const struct bmi08x_gyro_int_channel_cfg *
  * @brief This API configures the pins which fire the
  * interrupt signal when any interrupt occurs.
  */
-static int8_t set_int_pin_config(const struct bmi08x_gyro_int_channel_cfg *int_config, const struct bmi08x_dev *dev)
+static int8_t set_int_pin_config(const struct bmi08x_gyro_int_channel_cfg *int_config, struct bmi08x_dev *dev)
 {
     int8_t rslt;
     uint8_t data;
 
     /* Read interrupt configuration register */
-    rslt = get_regs(BMI08X_GYRO_INT3_INT4_IO_CONF_REG, &data, 1, dev);
+    rslt = get_regs(BMI08X_REG_GYRO_INT3_INT4_IO_CONF, &data, 1, dev);
 
     if (rslt == BMI08X_OK)
     {
@@ -807,7 +816,7 @@ static int8_t set_int_pin_config(const struct bmi08x_gyro_int_channel_cfg *int_c
         }
 
         /* write to interrupt configuration register */
-        rslt = set_regs(BMI08X_GYRO_INT3_INT4_IO_CONF_REG, &data, 1, dev);
+        rslt = set_regs(BMI08X_REG_GYRO_INT3_INT4_IO_CONF, &data, 1, dev);
     }
 
     return rslt;
@@ -817,7 +826,7 @@ static int8_t set_int_pin_config(const struct bmi08x_gyro_int_channel_cfg *int_c
  *  @brief This API enables or disables the Gyro Self test feature in the
  *  sensor.
  */
-static int8_t set_gyro_selftest(uint8_t selftest, const struct bmi08x_dev *dev)
+static int8_t set_gyro_selftest(uint8_t selftest, struct bmi08x_dev *dev)
 {
     int8_t rslt;
     uint8_t data = 0;
@@ -826,7 +835,7 @@ static int8_t set_gyro_selftest(uint8_t selftest, const struct bmi08x_dev *dev)
     if ((selftest == BMI08X_ENABLE) || (selftest == BMI08X_DISABLE))
     {
         /* Read self test register */
-        rslt = get_regs(BMI08X_GYRO_SELF_TEST_REG, &data, 1, dev);
+        rslt = get_regs(BMI08X_REG_GYRO_SELF_TEST, &data, 1, dev);
 
         if (rslt == BMI08X_OK)
         {
@@ -834,9 +843,8 @@ static int8_t set_gyro_selftest(uint8_t selftest, const struct bmi08x_dev *dev)
             data = BMI08X_SET_BITS_POS_0(data, BMI08X_GYRO_SELF_TEST_EN, selftest);
 
             /* write self test input value to self-test register */
-            rslt = set_regs(BMI08X_GYRO_SELF_TEST_REG, &data, 1, dev);
+            rslt = set_regs(BMI08X_REG_GYRO_SELF_TEST, &data, 1, dev);
         }
-
     }
     else
     {
@@ -846,4 +854,4 @@ static int8_t set_gyro_selftest(uint8_t selftest, const struct bmi08x_dev *dev)
     return rslt;
 }
 
-/** @}*/
+/*! @endcond */

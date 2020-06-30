@@ -31,8 +31,8 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 * @file       bmi08x_defs.h
-* @date       2020-06-08
-* @version    v1.5.2
+* @date       2020-06-26
+* @version    v1.5.3
 *
 */
 
@@ -678,8 +678,8 @@ enum bmi08x_intf {
 
 /*!  @name Enum to define BMA4 variants */
 enum  bmi08x_variant {
-    BMI085_VARIANT = 1,
-    BMI088_VARIANT
+    BMI085_VARIANT = 0,
+    BMI088_VARIANT = 1
 };
 
 /*************************** Data structures *****************************/
@@ -689,24 +689,19 @@ enum  bmi08x_variant {
 /*!
  * @brief Bus communication function pointer which should be mapped to
  * the platform specific read and write functions of the user
- *
- *  @note : dev_addr is used for I2C read/write operations only.
- *          For SPI read/write operations this is dummy variable.
  */
 
 /*!
  * @brief Bus communication function pointer which should be mapped to
  * the platform specific read functions of the user
  *
- * @param[in] reg_addr       : Register address from which data is read.
- * @param[out] read_data     : Pointer to data buffer where read data is stored.
- * @param[in] len            : Number of bytes of data to be read.
- * @param[in, out] intf_ptr  : Void pointer that can enable the linking of descriptors
- *                                  for interface related call backs.
- *
- * @retval BMI08X_INTF_RET_SUCCESS -> Success.
- * @retval != BMI08X_INTF_RET_SUCCESS -> Fail.
- *
+ * @param[in]     reg_addr : 8bit register address of the sensor
+ * @param[out]    reg_data : Data from the specified address
+ * @param[in]     length   : Length of the reg_data array
+ * @param[in,out] intf_ptr : Void pointer that can enable the linking of descriptors
+ *                           for interface related callbacks
+ * @retval 0 for Success
+ * @retval Non-zero for Failure
  */
 typedef BMI08X_INTF_RET_TYPE (*bmi08x_read_fptr_t)(uint8_t reg_addr, uint8_t *read_data, uint32_t len, void *intf_ptr);
 
@@ -714,15 +709,13 @@ typedef BMI08X_INTF_RET_TYPE (*bmi08x_read_fptr_t)(uint8_t reg_addr, uint8_t *re
  * @brief Bus communication function pointer which should be mapped to
  * the platform specific write functions of the user
  *
- * @param[in] reg_addr      : Register address to which the data is written.
- * @param[in] read_data     : Pointer to data buffer in which data to be written
- *                            is stored.
- * @param[in] len           : Number of bytes of data to be written.
- * @param[in, out] intf_ptr : Void pointer that can enable the linking of descriptors
- *                            for interface related call backs
- *
- * @retval BMI08X_INTF_RET_SUCCESS -> Success.
- * @retval != BMI08X_INTF_RET_SUCCESS -> Fail.
+ * @param[in]     reg_addr : 8bit register address of the sensor
+ * @param[out]    reg_data : Data to the specified address
+ * @param[in]     length   : Length of the reg_data array
+ * @param[in,out] intf_ptr : Void pointer that can enable the linking of descriptors
+ *                           for interface related callbacks
+ * @retval 0 for Success
+ * @retval Non-zero for Failure
  *
  */
 typedef BMI08X_INTF_RET_TYPE (*bmi08x_write_fptr_t)(uint8_t reg_addr, const uint8_t *read_data, uint32_t len,

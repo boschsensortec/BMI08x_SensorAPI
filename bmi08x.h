@@ -31,8 +31,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  * @file       bmi08x.h
- * @date       2020-06-08
- * @version    v1.5.2
+ * @date       2020-06-26
+ * @version    v1.5.3
  *
  */
 

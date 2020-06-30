@@ -31,8 +31,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  * @file       bmi08a.c
- * @date       2020-06-08
- * @version    v1.5.2
+ * @date       2020-06-26
+ * @version    v1.5.3
  *
  */
 
@@ -2425,9 +2425,9 @@ static int8_t validate_accel_self_test(const struct bmi08x_sensor_data *accel_po
     /*! Structure for difference of accel values in mg */
     struct bmi08a_selftest_delta_limit accel_data_diff_mg = { 0 };
 
-    accel_data_diff.x = (uint16_t) (BMI08X_ABS(accel_pos->x) + BMI08X_ABS(accel_neg->x));
-    accel_data_diff.y = (uint16_t) (BMI08X_ABS(accel_pos->y) + BMI08X_ABS(accel_neg->y));
-    accel_data_diff.z = (uint16_t) (BMI08X_ABS(accel_pos->z) + BMI08X_ABS(accel_neg->z));
+    accel_data_diff.x = (uint16_t)BMI08X_ABS(accel_pos->x - accel_neg->x);
+    accel_data_diff.y = (uint16_t)BMI08X_ABS(accel_pos->y - accel_neg->y);
+    accel_data_diff.z = (uint16_t)BMI08X_ABS(accel_pos->z - accel_neg->z);
 
     if (variant == BMI085_VARIANT)
     {

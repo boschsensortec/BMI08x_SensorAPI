@@ -31,8 +31,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  * @file       bmi08x.h
- * @date       2020-06-26
- * @version    v1.5.3
+ * @date       2020-12-11
+ * @version    v1.5.5
  *
  */
 
@@ -603,12 +603,12 @@ int8_t bmi08a_get_synchronized_data(struct bmi08x_sensor_data *accel,
 
 /**
  * \ingroup bmi08ag
- * \defgroup bmi08aApiSyncInt Synchronize interrupt
- * @brief Configuring synchronization of interrupt
+ * \defgroup bmi08aApiInt interrupt
+ * @brief Configuring Interrupts
  */
 
 /*!
- * \ingroup bmi08aApiSyncInt
+ * \ingroup bmi08aApiInt
  * \page bmi08a_api_bmi08a_set_data_sync_int_config bmi08a_set_data_sync_int_config
  * \code
  * int8_t bmi08a_set_data_sync_int_config(const struct bmi08x_int_cfg *int_config, const struct bmi08x_dev *dev);
@@ -627,6 +627,33 @@ int8_t bmi08a_get_synchronized_data(struct bmi08x_sensor_data *accel,
  *
  */
 int8_t bmi08a_set_data_sync_int_config(const struct bmi08x_int_cfg *int_config, struct bmi08x_dev *dev);
+
+/*!
+ * \ingroup bmi08aApiInt
+ * \page bmi08a_api_bmi08a_get_data_int_status bmi08a_get_data_int_status
+ * \code
+ * int8_t bmi08a_get_data_int_status(uint8_t *int_status, struct bmi08x_dev *dev);
+ * \endcode
+ * @details This API is to get accel feature interrupt status
+ *
+ * @param[out] int_status      : Variable to store interrupt status
+ * @param[in]  dev             : Structure instance of bmi08x_dev
+ *
+ *@verbatim
+ *-----------------------------------------
+ *   int_status    |     Interrupt
+ *-----------------------------------------
+ *      0x01       |    Fifo full
+ *      0x02       |    Fifo watermark
+ *      0x08       |    Accel data ready
+ *------------------------------------------
+ *@endverbatim
+ *
+ *  @return Result of API execution status
+ *  @retval 0 -> Success
+ *  @retval < 0 -> Fail
+ */
+int8_t bmi08a_get_data_int_status(uint8_t *int_status, struct bmi08x_dev *dev);
 
 /*********************** BMI088 Gyroscope function prototypes ****************************/
 
@@ -872,6 +899,32 @@ int8_t bmi08g_get_data(struct bmi08x_sensor_data *gyro, struct bmi08x_dev *dev);
  */
 int8_t bmi08g_set_int_config(const struct bmi08x_gyro_int_channel_cfg *int_config, struct bmi08x_dev *dev);
 
+/*!
+ * \ingroup bmi08gApiIntconfig
+ * \page bmi08g_api_bmi08g_get_data_int_status bmi08g_get_data_int_status
+ * \code
+ * int8_t bmi08g_get_data_int_status(uint8_t *int_status, struct bmi08x_dev *dev);
+ * \endcode
+ * @details This API is to get accel feature interrupt status
+ *
+ * @param[out] int_status      : Variable to store interrupt status
+ * @param[in]  dev             : Structure instance of bmi08x_dev
+ *
+ *@verbatim
+ *----------------------------------------------
+ *   int_status    |     Interrupt
+ *----------------------------------------------
+ *      0x08       |    Gyro data ready
+ *      0x10       | Fifo full, Fifo watermark
+ *----------------------------------------------
+ *@endverbatim
+ *
+ *  @return Result of API execution status
+ *  @retval 0 -> Success
+ *  @retval < 0 -> Fail
+ */
+int8_t bmi08g_get_data_int_status(uint8_t *int_status, struct bmi08x_dev *dev);
+
 /**
  * \ingroup bmi08ag
  * \defgroup bmi08gApiSelftest Gyro self test
@@ -898,12 +951,163 @@ int8_t bmi08g_perform_selftest(struct bmi08x_dev *dev);
 
 /**
  * \ingroup bmi08ag
- * \defgroup bmi08gApiFifo FIFO operations
+ * \defgroup bmi08gApiFIFO FIFO
+ * @brief Access and extract FIFO gyro data
+ */
+
+/*!
+ * \ingroup bmi08gApiFIFO
+ * \page bmi08g_api_bmi08g_get_fifo_config bmi08g_get_fifo_config
+ * \code
+ * int8_t bmi08g_get_fifo_config(struct bmi08x_gyr_fifo_config *fifo_conf, , struct bmi08x_dev *dev);
+ * \endcode
+ * @details This API is used to get the fifo configurations like fifo mode, fifo data select, etc
+ *
+ * @param[in] fifo_conf  : Structure pointer to fifo configurations
+ * @param[in] dev        : Structure instance of bmi08x_dev.
+ *
+ * @return Result of API execution status
+ * @retval 0 -> Success
+ * @retval >0 -> Warning
+ * @retval <0 -> Fail
+ */
+int8_t bmi08g_get_fifo_config(struct bmi08x_gyr_fifo_config *fifo_conf, struct bmi08x_dev *dev);
+
+/*!
+ * \ingroup bmi08gApiFIFO
+ * \page bmi08g_api_bmi08g_set_fifo_config bmi08g_set_fifo_config
+ * \code
+ * int8_t bmi08g_set_fifo_config(const struct bmi08x_gyr_fifo_config *fifo_conf, , struct bmi08x_dev *dev);
+ * \endcode
+ * @details This API is used to set the fifo configurations like fifo mode, fifo data select, etc
+ *
+ * @param[in] fifo_conf  : Structure pointer to fifo configurations
+ * @param[in] dev        : Structure instance of bmi08x_dev.
+ *
+ * @return Result of API execution status
+ * @retval 0 -> Success
+ * @retval >0 -> Warning
+ * @retval <0 -> Fail
+ */
+int8_t bmi08g_set_fifo_config(const struct bmi08x_gyr_fifo_config *fifo_conf, struct bmi08x_dev *dev);
+
+/*!
+ * \ingroup bmi08gApiFIFO
+ * \page bmi08g_api_bmi08g_get_fifo_length bmi08g_get_fifo_length
+ * \code
+ * int8_t bmi08g_get_fifo_length(const struct bmi08x_gyr_fifo_config *fifo_config, struct bmi08x_fifo_frame *fifo);
+ * \endcode
+ * @details This API is used to get fifo length
+ *
+ * @param[in] fifo_config  : Structure instance of bmi08x_gyr_fifo_config
+ * @param[in] fifo         : Structure instance of bmi08x_fifo_frame.
+ *
+ * @return Result of API execution status
+ * @retval 0 -> Success
+ * @retval >0 -> Warning
+ * @retval <0 -> Fail
+ */
+int8_t bmi08g_get_fifo_length(const struct bmi08x_gyr_fifo_config *fifo_config, struct bmi08x_fifo_frame *fifo);
+
+/*!
+ * \ingroup bmi08gApiFIFO
+ * \page bmi08g_api_bmi08g_read_fifo_data bmi08g_read_fifo_data
+ * \code
+ * int8_t bmi08g_read_fifo_data(const struct bmi08x_gyr_fifo_config *fifo, struct bmi08x_dev *dev);
+ * \endcode
+ * @details This API reads FIFO data.
+ *
+ * @param[in, out] fifo       : Structure instance of bmi08x_fifo_frame
+ * @param[in]      dev        : Structure instance of bmi08x_dev.
+ *
+ * @note APS has to be disabled before calling this function.
+ *
+ * @return Result of API execution status
+ * @retval 0 -> Success
+ * @retval >0 -> Warning
+ * @retval <0 -> Fail
+ */
+int8_t bmi08g_read_fifo_data(const struct bmi08x_fifo_frame *fifo, struct bmi08x_dev *dev);
+
+/*!
+ * \ingroup bmi08gApiFIFO
+ * \page bmi08g_api_bmi08g_extract_gyro bmi08g_extract_gyro
+ * \code
+ * void bmi08g_extract_gyro(struct bmi08x_sensor_data *gyro_data,
+ *                        const uint16_t *gyro_length,
+ *                        const struct bmi08x_gyr_fifo_config *fifo_conf,
+ *                        const struct bmi08x_fifo_frame *fifo);
+ * \endcode
+ * @details This API parses and extracts the gyroscope frames from FIFO data read by the
+ * "bmi08g_read_fifo_data" API and stores it in the "gyro_data"
+ * structure instance.
+ *
+ * @param[out]    gyro_data    : Structure instance of bmi08x_sensor_data
+ *                               where the parsed data bytes are stored.
+ * @param[in,out] gyro_length  : Number of gyroscope frames.
+ * @param[in,out] fifo_conf    : Structure instance of bmi08x_gyr_fifo_config
+ * @param[in,out] fifo         : Structure instance of bmi08x_fifo_frame
+ *
+ * @return Result of API execution status
+ * @retval 0 -> Success
+ * @retval >0 -> Warning
+ * @retval <0 -> Fail
+ */
+void bmi08g_extract_gyro(struct bmi08x_sensor_data *gyro_data,
+                         const uint16_t *gyro_length,
+                         const struct bmi08x_gyr_fifo_config *fifo_conf,
+                         const struct bmi08x_fifo_frame *fifo);
+
+/*!
+ * \ingroup bmi08gApiFIFO
+ * \page bmi08g_api_bmi08g_get_fifo_overrun bmi08g_get_fifo_overrun
+ * \code
+ * int8_t bmi08g_get_fifo_overrun(uint8_t *fifo_overrun, struct bmi08x_dev *dev);
+ * \endcode
+ * @details This API is used to get the fifo over run
+ *  in the register 0x0E bit 7
+ *
+ * @param[in,out] fifo_overrun  : The value of fifo over run
+ * @param[in]     dev           : Structure instance of bmi08x_dev.
+ *
+ * @return Result of API execution status
+ * @retval 0 -> Success
+ * @retval >0 -> Warning
+ * @retval <0 -> Fail
+ */
+int8_t bmi08g_get_fifo_overrun(uint8_t *fifo_overrun, struct bmi08x_dev *dev);
+
+/*!
+ * \ingroup bmi08gApiFIFO
+ * \page bmi08g_api_bmi08g_enable_watermark bmi08g_enable_watermark
+ * \code
+ * int8_t bmi08g_enable_watermark(uint8_t enable, struct bmi08x_dev *dev);
+ * \endcode
+ * @details This API is used to set fifo watermark enable/disable
+ *  in the register 0x1E bit 7
+ *
+ * @param[in,out] enable        : The value of fifo watermark enable/disable
+ * @param[in]     dev           : Structure instance of bmi08x_dev.
+ *
+ * @return Result of API execution status
+ * @retval 0 -> Success
+ * @retval >0 -> Warning
+ * @retval <0 -> Fail
+ */
+int8_t bmi08g_enable_watermark(uint8_t enable, struct bmi08x_dev *dev);
+
+/*********************************************************************************/
+/*                              Accel APIs                                       */
+/*********************************************************************************/
+
+/**
+ * \ingroup bmi08ag
+ * \defgroup bmi08aApiFifo FIFO operations
  * @brief FIFO operations of the sensor
  */
 
 /*!
- * \ingroup bmi08gApiFifo
+ * \ingroup bmi08aApiFifo
  * \page bmi08a_api_bmi08a_set_fifo_config bmi08a_set_fifo_config
  * \code
  * int8_t bmi08a_set_fifo_config(const struct bmi08x_accel_fifo_config *config, const struct bmi08x_dev *dev);
@@ -921,7 +1125,7 @@ int8_t bmi08g_perform_selftest(struct bmi08x_dev *dev);
 int8_t bmi08a_set_fifo_config(const struct bmi08x_accel_fifo_config *config, struct bmi08x_dev *dev);
 
 /*!
- * \ingroup bmi08gApiFifo
+ * \ingroup bmi08aApiFifo
  * \page bmi08a_api_bmi08a_get_fifo_config bmi08a_get_fifo_config
  * \code
  * int8_t bmi08a_get_fifo_config(struct bmi08x_accel_fifo_config *config, const struct bmi08x_dev *dev);
@@ -939,7 +1143,7 @@ int8_t bmi08a_set_fifo_config(const struct bmi08x_accel_fifo_config *config, str
 int8_t bmi08a_get_fifo_config(struct bmi08x_accel_fifo_config *config, struct bmi08x_dev *dev);
 
 /*!
- * \ingroup bmi08gApiFifo
+ * \ingroup bmi08aApiFifo
  * \page bmi08a_api_bmi08a_read_fifo_data bmi08a_read_fifo_data
  * \code
  * int8_t bmi08a_read_fifo_data(struct bmi08x_fifo_frame *fifo, const struct bmi08x_dev *dev);
@@ -959,7 +1163,7 @@ int8_t bmi08a_get_fifo_config(struct bmi08x_accel_fifo_config *config, struct bm
 int8_t bmi08a_read_fifo_data(struct bmi08x_fifo_frame *fifo, struct bmi08x_dev *dev);
 
 /*!
- * \ingroup bmi08gApiFifo
+ * \ingroup bmi08aApiFifo
  * \page bmi08a_api_bmi08a_get_fifo_length bmi08a_get_fifo_length
  * \code
  * int8_t bmi08a_get_fifo_length(uint16_t *fifo_length, const struct bmi08x_dev *dev);
@@ -982,7 +1186,7 @@ int8_t bmi08a_read_fifo_data(struct bmi08x_fifo_frame *fifo, struct bmi08x_dev *
 int8_t bmi08a_get_fifo_length(uint16_t *fifo_length, struct bmi08x_dev *dev);
 
 /*!
- * \ingroup bmi08gApiFifo
+ * \ingroup bmi08aApiFifo
  * \page bmi08a_api_bmi08a_get_fifo_wm bmi08a_get_fifo_wm
  * \code
  * int8_t bmi08a_get_fifo_wm(uint16_t *wm, const struct bmi08x_dev *dev);
@@ -1000,7 +1204,7 @@ int8_t bmi08a_get_fifo_length(uint16_t *fifo_length, struct bmi08x_dev *dev);
 int8_t bmi08a_get_fifo_wm(uint16_t *wm, struct bmi08x_dev *dev);
 
 /*!
- * \ingroup bmi08gApiFifo
+ * \ingroup bmi08aApiFifo
  * \page bmi08a_api_bmi08a_set_fifo_wm bmi08a_set_fifo_wm
  * \code
  * int8_t bmi08a_set_fifo_wm(uint16_t wm, const struct bmi08x_dev *dev);
@@ -1081,7 +1285,7 @@ int8_t bmi08a_get_fifo_down_sample(uint8_t *fifo_downs, struct bmi08x_dev *dev);
 
 /*!
  * \ingroup bmi08aApiFIFODown
- * \page bmi08g_api_bmi08a_set_fifo_down_sample bmi08a_set_fifo_down_sample
+ * \page bmi08a_api_bmi08a_set_fifo_down_sample bmi08a_set_fifo_down_sample
  * \code
  * int8_t bmi08a_set_fifo_down_sample(uint8_t fifo_downs, const struct bmi08x_dev *dev);
  * \endcode

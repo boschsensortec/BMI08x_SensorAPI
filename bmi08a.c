@@ -1,40 +1,40 @@
 /**
- * Copyright (c) 2020 Bosch Sensortec GmbH. All rights reserved.
- *
- * BSD-3-Clause
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- *
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- *
- * 3. Neither the name of the copyright holder nor the names of its
- *    contributors may be used to endorse or promote products derived from
- *    this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
- * FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
- * COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
- * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
- * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- * @file       bmi08a.c
- * @date       2020-12-11
- * @version    v1.5.5
- *
- */
+* Copyright (c) 2021 Bosch Sensortec GmbH. All rights reserved.
+*
+* BSD-3-Clause
+*
+* Redistribution and use in source and binary forms, with or without
+* modification, are permitted provided that the following conditions are met:
+*
+* 1. Redistributions of source code must retain the above copyright
+*    notice, this list of conditions and the following disclaimer.
+*
+* 2. Redistributions in binary form must reproduce the above copyright
+*    notice, this list of conditions and the following disclaimer in the
+*    documentation and/or other materials provided with the distribution.
+*
+* 3. Neither the name of the copyright holder nor the names of its
+*    contributors may be used to endorse or promote products derived from
+*    this software without specific prior written permission.
+*
+* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+* "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+* LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+* FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+* COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+* INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+* (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+* SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+* HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+* STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
+* IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+* POSSIBILITY OF SUCH DAMAGE.
+*
+* @file       bmi08a.c
+* @date       2021-06-22
+* @version    v1.5.7
+*
+*/
 
 /*! \file bmi08a.c
  * \brief Sensor Driver for BMI08x family of sensors */
@@ -722,15 +722,16 @@ static int8_t set_fifo_wm_int(const struct bmi08x_accel_int_channel_cfg *int_con
  */
 static int8_t set_fifo_full_int(const struct bmi08x_accel_int_channel_cfg *int_config, struct bmi08x_dev *dev);
 
-/****************************************************************************/
-
-/**\name        Extern Declarations
- ****************************************************************************/
-
-/****************************************************************************/
-
-/**\name        Globals
- ****************************************************************************/
+/* @brief This API is used to write the binary configuration in the sensor
+ *
+ * @param[in] dev : Structure instance of bmi08x_dev.
+ *
+ * @return Result of API execution status
+ * @retval 0 -> Success
+ * @retval < 0 -> Fail
+ *
+ */
+static int8_t write_config_file(struct bmi08x_dev *dev);
 
 /****************************************************************************/
 
@@ -812,111 +813,7 @@ int8_t bmi08a_load_config_file(struct bmi08x_dev *dev)
         dev->config_file_ptr = bmi08x_config_file;
 
         /* Upload binary */
-        rslt = bmi08a_write_config_file(dev);
-    }
-
-    return rslt;
-}
-
-/*!
- *  @brief This API is used to write the binary configuration in the sensor.
- */
-int8_t bmi08a_write_config_file(struct bmi08x_dev *dev)
-{
-    int8_t rslt;
-
-    /* Config loading disable*/
-    uint8_t config_load = BMI08X_DISABLE;
-    uint8_t current_acc_pwr_ctrl = BMI08X_DISABLE;
-    uint8_t aps_disable = BMI08X_DISABLE;
-    uint16_t index = 0;
-    uint8_t reg_data = 0;
-
-    /* Check for null pointer in the device structure */
-    rslt = null_ptr_check(dev);
-
-    /* Check if config file pointer is not null */
-    if ((rslt == BMI08X_OK) && (dev->config_file_ptr != NULL))
-    {
-        /* Check whether the read/write length is valid */
-        if (dev->read_write_len > 0)
-        {
-            /* Get accel status */
-            rslt = bmi08a_get_regs(BMI08X_REG_ACCEL_PWR_CTRL, &current_acc_pwr_ctrl, 1, dev);
-
-            if (rslt == BMI08X_OK)
-            {
-                /* Disable advanced power save mode */
-                rslt = bmi08a_set_regs(BMI08X_REG_ACCEL_PWR_CONF, &aps_disable, 1, dev);
-
-                if (rslt == BMI08X_OK)
-                {
-                    rslt = bmi08a_set_regs(BMI08X_REG_ACCEL_PWR_CTRL, &config_load, 1, dev);
-
-                    if (rslt == BMI08X_OK)
-                    {
-                        /* Delay required to switch power modes */
-                        dev->delay_us(BMI08X_MS_TO_US(BMI08X_POWER_CONFIG_DELAY), dev->intf_ptr_accel);
-
-                        /* Disable config loading */
-                        rslt = bmi08a_set_regs(BMI08X_REG_ACCEL_INIT_CTRL, &config_load, 1, dev);
-                    }
-                }
-            }
-
-            if (rslt == BMI08X_OK)
-            {
-                for (index = 0; index < BMI08X_CONFIG_STREAM_SIZE;
-                     index += dev->read_write_len)
-                {
-                    /* Write the config stream */
-                    rslt = stream_transfer_write((dev->config_file_ptr + index), index, dev);
-
-                    dev->delay_us(5000, dev->intf_ptr_accel);
-                }
-
-                if (rslt == BMI08X_OK)
-                {
-                    /* Enable config loading and FIFO mode */
-                    config_load = BMI08X_ENABLE;
-
-                    rslt = bmi08a_set_regs(BMI08X_REG_ACCEL_INIT_CTRL, &config_load, 1, dev);
-
-                    if (rslt == BMI08X_OK)
-                    {
-                        /* Wait till ASIC is initialized. Refer the data-sheet for more information */
-                        dev->delay_us(BMI08X_MS_TO_US(BMI08X_ASIC_INIT_TIME_MS), dev->intf_ptr_accel);
-
-                        /* Check for config initialization status (1 = OK)*/
-                        rslt = bmi08a_get_regs(BMI08X_REG_ACCEL_INTERNAL_STAT, &reg_data, 1, dev);
-                    }
-                }
-
-                if (rslt == BMI08X_OK && reg_data != 1)
-                {
-                    rslt = BMI08X_E_CONFIG_STREAM_ERROR;
-                }
-                else
-                {
-                    /* Restore accel */
-                    rslt = bmi08a_set_regs(BMI08X_REG_ACCEL_PWR_CTRL, &current_acc_pwr_ctrl, 1, dev);
-
-                    if (rslt == BMI08X_OK)
-                    {
-                        /* Delay required to switch power modes */
-                        dev->delay_us(BMI08X_MS_TO_US(BMI08X_POWER_CONFIG_DELAY), dev->intf_ptr_accel);
-                    }
-                }
-            }
-        }
-        else
-        {
-            rslt = BMI08X_E_RD_WR_LENGTH_INVALID;
-        }
-    }
-    else
-    {
-        rslt = BMI08X_E_NULL_PTR;
+        rslt = write_config_file(dev);
     }
 
     return rslt;
@@ -1657,6 +1554,9 @@ int8_t bmi08a_read_fifo_data(struct bmi08x_fifo_frame *fifo, struct bmi08x_dev *
     /* Variable to define error */
     int8_t rslt;
 
+    /* Variable to store available fifo length */
+    uint16_t fifo_length;
+
     /* Array to store FIFO configuration data */
     uint8_t config_data = 0;
 
@@ -1670,8 +1570,29 @@ int8_t bmi08a_read_fifo_data(struct bmi08x_fifo_frame *fifo, struct bmi08x_dev *
         /* Clear the FIFO data structure */
         reset_fifo_frame_structure(fifo);
 
-        /* Read FIFO data */
-        rslt = bmi08a_get_regs(addr, fifo->data, fifo->length, dev);
+        if (dev->intf == BMI08X_SPI_INTF)
+        {
+            /* SPI mask added */
+            addr = addr | BMI08X_SPI_RD_MASK;
+        }
+
+        /* Read available fifo length */
+        rslt = bmi08a_get_fifo_length(&fifo_length, dev);
+
+        if (rslt == BMI08X_OK)
+        {
+            fifo->length = fifo_length + dev->dummy_byte;
+
+            /* Read FIFO data */
+            dev->intf_rslt = dev->read(addr, fifo->data, (uint32_t)fifo->length, dev->intf_ptr_accel);
+
+            /* If interface read fails, update rslt variable with communication failure */
+            if (dev->intf_rslt != BMI08X_INTF_RET_SUCCESS)
+            {
+                rslt = BMI08X_E_COM_FAIL;
+            }
+        }
+
         if (rslt == BMI08X_OK)
         {
             /* Get the set FIFO frame configurations */
@@ -1804,6 +1725,15 @@ int8_t bmi08a_extract_accel(struct bmi08x_sensor_data *accel_data,
     rslt = null_ptr_check(dev);
     if ((rslt == BMI08X_OK) && (accel_data != NULL) && (accel_length != NULL) && (fifo != NULL))
     {
+        /* Check if this is the first iteration of data unpacking
+         * if yes, then consider dummy byte on SPI
+         */
+        if (fifo->acc_byte_start_idx == 0)
+        {
+            /* Dummy byte included */
+            fifo->acc_byte_start_idx = dev->dummy_byte;
+        }
+
         /* Parsing the FIFO data in header mode */
         rslt = extract_acc_header_mode(accel_data, accel_length, fifo);
     }
@@ -2070,7 +2000,7 @@ static int8_t null_ptr_check(const struct bmi08x_dev *dev)
     int8_t rslt;
 
     if ((dev == NULL) || (dev->read == NULL) || (dev->write == NULL) || (dev->delay_us == NULL) ||
-        (dev->intf_ptr_accel == NULL) || (dev->intf_ptr_gyro == NULL))
+        (dev->intf_ptr_accel == NULL))
     {
         /* Device structure pointer is not valid */
         rslt = BMI08X_E_NULL_PTR;
@@ -2091,8 +2021,7 @@ static int8_t get_regs(uint8_t reg_addr, uint8_t *reg_data, uint32_t len, struct
 {
     int8_t rslt = BMI08X_OK;
     uint16_t index;
-    uint32_t temp_len = len + dev->dummy_byte;
-    uint8_t temp_buff[temp_len];
+    uint8_t temp_buff[BMI08X_MAX_LEN];
 
     if (dev->intf == BMI08X_SPI_INTF)
     {
@@ -2101,7 +2030,7 @@ static int8_t get_regs(uint8_t reg_addr, uint8_t *reg_data, uint32_t len, struct
     }
 
     /* Read the data from the register */
-    dev->intf_rslt = dev->read(reg_addr, temp_buff, temp_len, dev->intf_ptr_accel);
+    dev->intf_rslt = dev->read(reg_addr, temp_buff, (len + dev->dummy_byte), dev->intf_ptr_accel);
 
     if (dev->intf_rslt == BMI08X_INTF_RET_SUCCESS)
     {
@@ -2518,7 +2447,7 @@ static int8_t unpack_skipped_frame(uint16_t *data_index, struct bmi08x_fifo_fram
     int8_t rslt = BMI08X_OK;
 
     /* Validate data index */
-    if ((*data_index) >= fifo->length)
+    if (((*data_index) + BMI08X_FIFO_SKIP_FRM_LENGTH) > fifo->length)
     {
         /* Update the data index to the last byte */
         (*data_index) = fifo->length;
@@ -2604,7 +2533,7 @@ static int8_t unpack_accel_frame(struct bmi08x_sensor_data *acc,
         case BMI08X_FIFO_HEADER_ACC_FRM:
 
             /* Partially read, then skip the data */
-            if (((*idx) + fifo->acc_frm_len) > fifo->length)
+            if (((*idx) + BMI08X_FIFO_ACCEL_LENGTH) > fifo->length)
             {
                 /* Update the data index as complete*/
                 (*idx) = fifo->length;
@@ -2896,6 +2825,88 @@ static int8_t set_fifo_full_int(const struct bmi08x_accel_int_channel_cfg *int_c
                 rslt = bmi08a_set_regs(BMI08X_REG_ACCEL_INT1_INT2_MAP_DATA, &data, 1, dev);
             }
         }
+    }
+
+    return rslt;
+}
+
+/*
+ * @brief This API is used to write the binary configuration in the sensor
+ */
+static int8_t write_config_file(struct bmi08x_dev *dev)
+{
+    int8_t rslt;
+
+    /* Config loading disable */
+    uint8_t config_load = BMI08X_DISABLE;
+
+    /* APS disable */
+    uint8_t aps_disable = BMI08X_DISABLE;
+
+    uint16_t index = 0;
+    uint8_t reg_data = 0;
+
+    /* Check for null pointer in the device structure */
+    rslt = null_ptr_check(dev);
+
+    /* Check if config file pointer is not null */
+    if ((rslt == BMI08X_OK) && (dev->config_file_ptr != NULL))
+    {
+        /* Check whether the read/write length is valid */
+        if (dev->read_write_len > 0)
+        {
+            /* Disable advanced power save mode */
+            rslt = bmi08a_set_regs(BMI08X_REG_ACCEL_PWR_CONF, &aps_disable, 1, dev);
+
+            if (rslt == BMI08X_OK)
+            {
+                /* Wait until APS disable is set. Refer the data-sheet for more information */
+                dev->delay_us(450, dev->intf_ptr_accel);
+
+                /* Disable config loading */
+                rslt = bmi08a_set_regs(BMI08X_REG_ACCEL_INIT_CTRL, &config_load, 1, dev);
+            }
+
+            if (rslt == BMI08X_OK)
+            {
+                for (index = 0; index < BMI08X_CONFIG_STREAM_SIZE;
+                     index += dev->read_write_len)
+                {
+                    /* Write the config stream */
+                    rslt = stream_transfer_write((dev->config_file_ptr + index), index, dev);
+                }
+
+                if (rslt == BMI08X_OK)
+                {
+                    /* Enable config loading and FIFO mode */
+                    config_load = BMI08X_ENABLE;
+
+                    rslt = bmi08a_set_regs(BMI08X_REG_ACCEL_INIT_CTRL, &config_load, 1, dev);
+
+                    if (rslt == BMI08X_OK)
+                    {
+                        /* Wait till ASIC is initialized. Refer the data-sheet for more information */
+                        dev->delay_us(BMI08X_MS_TO_US(BMI08X_ASIC_INIT_TIME_MS), dev->intf_ptr_accel);
+
+                        /* Check for config initialization status (1 = OK)*/
+                        rslt = bmi08a_get_regs(BMI08X_REG_ACCEL_INTERNAL_STAT, &reg_data, 1, dev);
+                    }
+                }
+
+                if (rslt == BMI08X_OK && reg_data != 1)
+                {
+                    rslt = BMI08X_E_CONFIG_STREAM_ERROR;
+                }
+            }
+        }
+        else
+        {
+            rslt = BMI08X_E_RD_WR_LENGTH_INVALID;
+        }
+    }
+    else
+    {
+        rslt = BMI08X_E_NULL_PTR;
     }
 
     return rslt;

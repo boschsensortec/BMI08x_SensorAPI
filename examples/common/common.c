@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2020 Bosch Sensortec GmbH. All rights reserved.
+ * Copyright (C) 2021 Bosch Sensortec GmbH. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -8,8 +8,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#include "coines.h"
-#include "bmi08x_defs.h"
+#include "common.h"
 
 /******************************************************************************/
 /*!                       Macro definitions                                   */
@@ -110,9 +109,27 @@ int8_t bmi08x_interface_init(struct bmi08x_dev *bmi08x, uint8_t intf, uint8_t va
 
         if (result == COINES_SUCCESS)
         {
+            if ((board_info.shuttle_id == BMI085_SHUTTLE_ID) && (variant == BMI088_VARIANT))
+            {
+                printf(
+                    "! Warning - BMI085 sensor shuttle and BMI088 variant used \n ,"
+                    "This application will not support this combination \n");
+                exit(COINES_E_FAILURE);
+            }
+
+            if ((board_info.shuttle_id == BMI088_SHUTTLE_ID) && (variant == BMI085_VARIANT))
+            {
+                printf(
+                    "! Warning - BMI088 sensor shuttle and BMI085 variant used \n ,"
+                    "This application will not support this combination \n");
+                exit(COINES_E_FAILURE);
+            }
+
             if ((board_info.shuttle_id != BMI085_SHUTTLE_ID) && (board_info.shuttle_id != BMI088_SHUTTLE_ID))
             {
-                printf("! Warning invalid sensor shuttle \n ," "This application will not support this sensor \n");
+                printf(
+                    "! Warning invalid sensor shuttle (neither BMI085 nor BMI088 used) \n ,"
+                    "This application will not support this sensor \n");
                 exit(COINES_E_FAILURE);
             }
         }
@@ -135,10 +152,7 @@ int8_t bmi08x_interface_init(struct bmi08x_dev *bmi08x, uint8_t intf, uint8_t va
             /* SDO pin is made low for selecting I2C address 0x76*/
             coines_set_pin_config(COINES_SHUTTLE_PIN_8, COINES_PIN_DIRECTION_OUT, COINES_PIN_VALUE_LOW);
 
-            /* set the sensor interface as I2C with 400kHz speed
-             Use I2C Fast mode (400kHz) for reliable operation with high ODR/sampling time
-             See Readme.txt - NOTE section for details*/
-            coines_config_i2c_bus(COINES_I2C_BUS_0, COINES_I2C_FAST_MODE);
+            coines_config_i2c_bus(COINES_I2C_BUS_0, COINES_I2C_STANDARD_MODE);
             coines_delay_msec(10);
 
             /* PS pin is made high for selecting I2C protocol (gyroscope)*/
@@ -246,6 +260,10 @@ void bmi08x_error_codes_print_result(const char api_name[], int8_t rslt)
         {
             printf("Error [%d] : Feature not supported\r\n", rslt);
         }
+        else if (rslt == BMI08X_W_FIFO_EMPTY)
+        {
+            printf("Warning [%d] : FIFO empty\r\n", rslt);
+        }
         else
         {
             printf("Error [%d] : Unknown error code\r\n", rslt);
@@ -260,5 +278,14 @@ void bmi08x_error_codes_print_result(const char api_name[], int8_t rslt)
  */
 void bmi08x_coines_deinit(void)
 {
+    fflush(stdout);
+
+    coines_set_shuttleboard_vdd_vddio_config(0, 0);
+    coines_delay_msec(100);
+
+    /* Coines interface reset */
+    coines_soft_reset();
+    coines_delay_msec(100);
+
     coines_close_comm_intf(COINES_COMM_INTF_USB);
 }

@@ -1,11 +1,7 @@
 /**
- * Copyright (C) 2020 Bosch Sensortec GmbH
+ * Copyright (C) 2021 Bosch Sensortec GmbH
  *
  * SPDX-License-Identifier: BSD-3-Clause
- *
- * @file    polling_streaming.c
- * @brief   Example file to stream bmi08x sensor data using LIB COINES
- *
  */
 
 /*********************************************************************/
@@ -302,8 +298,13 @@ static int8_t init_bmi08x(void)
 
     if (rslt == BMI08X_OK)
     {
-        coines_delay_msec(100);
+        printf("Uploading config file !\n");
+        rslt = bmi08a_load_config_file(&bmi08xdev);
+        bmi08x_error_codes_print_result("bmi08a_load_config_file", rslt);
+    }
 
+    if (rslt == BMI08X_OK)
+    {
         bmi08xdev.accel_cfg.odr = BMI08X_ACCEL_ODR_1600_HZ;
 
         if (bmi08xdev.variant == BMI085_VARIANT)
@@ -320,11 +321,9 @@ static int8_t init_bmi08x(void)
 
         rslt = bmi08a_set_power_mode(&bmi08xdev);
         bmi08x_error_codes_print_result("bmi08a_set_power_mode", rslt);
-        coines_delay_msec(10);
 
         rslt = bmi08a_set_meas_conf(&bmi08xdev);
         bmi08x_error_codes_print_result("bmi08a_set_meas_conf", rslt);
-        coines_delay_msec(10);
 
         bmi08xdev.gyro_cfg.odr = BMI08X_GYRO_BW_230_ODR_2000_HZ;
         bmi08xdev.gyro_cfg.range = BMI08X_GYRO_RANGE_250_DPS;
@@ -333,11 +332,9 @@ static int8_t init_bmi08x(void)
 
         rslt = bmi08g_set_power_mode(&bmi08xdev);
         bmi08x_error_codes_print_result("bmi08g_set_power_mode", rslt);
-        coines_delay_msec(10);
 
         rslt = bmi08g_set_meas_conf(&bmi08xdev);
         bmi08x_error_codes_print_result("bmi08g_set_meas_conf", rslt);
-        coines_delay_msec(10);
     }
 
     return rslt;

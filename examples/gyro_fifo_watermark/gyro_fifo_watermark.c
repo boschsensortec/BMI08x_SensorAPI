@@ -1,10 +1,7 @@
 /**\
- * Copyright (c) 2020 Bosch Sensortec GmbH. All rights reserved.
+ * Copyright (c) 2021 Bosch Sensortec GmbH. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
- *
- * @file    gyro_fifo_watermark.c
- * @brief   Example file how to read bmi08x gyro FIFO watermark data
  */
 
 /******************************************************************************/
@@ -84,11 +81,9 @@ static int8_t init_bmi08x(void)
 
         rslt = bmi08a_set_power_mode(&bmi08xdev);
         bmi08x_error_codes_print_result("bmi08a_set_power_mode", rslt);
-        coines_delay_msec(10);
 
         rslt = bmi08a_set_meas_conf(&bmi08xdev);
         bmi08x_error_codes_print_result("bmi08a_set_meas_conf", rslt);
-        coines_delay_msec(10);
 
         bmi08xdev.gyro_cfg.odr = BMI08X_GYRO_BW_32_ODR_100_HZ;
         bmi08xdev.gyro_cfg.range = BMI08X_GYRO_RANGE_125_DPS;
@@ -97,11 +92,9 @@ static int8_t init_bmi08x(void)
 
         rslt = bmi08g_set_power_mode(&bmi08xdev);
         bmi08x_error_codes_print_result("bmi08g_set_power_mode", rslt);
-        coines_delay_msec(10);
 
         rslt = bmi08g_set_meas_conf(&bmi08xdev);
         bmi08x_error_codes_print_result("bmi08g_set_meas_conf", rslt);
-        coines_delay_msec(10);
     }
 
     return rslt;
@@ -248,9 +241,6 @@ int main(void)
 
                         rslt = bmi08g_get_fifo_length(&gyr_conf, &fifo);
                         bmi08x_error_codes_print_result("bmi08g_get_fifo_length", rslt);
-
-                        /* Delay to read FIFO with microcontroller */
-                        bmi08xdev.delay_us(1000, bmi08xdev.intf_ptr_gyro);
 
                         /* Read FIFO data */
                         rslt = bmi08g_read_fifo_data(&fifo, &bmi08xdev);

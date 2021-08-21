@@ -1,11 +1,7 @@
 /**
- * Copyright (C) 2020 Bosch Sensortec GmbH
+ * Copyright (C) 2021 Bosch Sensortec GmbH
  *
  * SPDX-License-Identifier: BSD-3-Clause
- *
- * @file    read_synchronized_data_mcu.c
- * @brief   Example file how to read bmi08x sensor data using LIB COINES
- *
  */
 
 /*********************************************************************/
@@ -126,6 +122,10 @@ static int8_t init_bmi08x(void)
          To be set by the user */
         bmi08xdev.read_write_len = 32;
 
+        printf("Uploading BMI08X data synchronization feature config !\n");
+        rslt = bmi08a_load_config_file(&bmi08xdev);
+        bmi08x_error_codes_print_result("bmi08a_load_config_file", rslt);
+
         /* Set accel power mode */
         bmi08xdev.accel_cfg.power = BMI08X_ACCEL_PM_ACTIVE;
         rslt = bmi08a_set_power_mode(&bmi08xdev);
@@ -141,36 +141,27 @@ static int8_t init_bmi08x(void)
         if ((bmi08xdev.accel_cfg.power == BMI08X_ACCEL_PM_ACTIVE) &&
             (bmi08xdev.gyro_cfg.power == BMI08X_GYRO_PM_NORMAL))
         {
-            printf("Uploading BMI08X data synchronization feature config !\n");
-
             /* API uploads the bmi08x config file onto the device */
             if (rslt == BMI08X_OK)
             {
-                rslt = bmi08a_load_config_file(&bmi08xdev);
-                bmi08x_error_codes_print_result("bmi08a_load_config_file", rslt);
-
-                /* Wait for 150ms to enable the data synchronization --delay taken care inside the function */
-                if (rslt == BMI08X_OK)
+                /* Assign accel range setting */
+                if (bmi08xdev.variant == BMI085_VARIANT)
                 {
-                    /* Assign accel range setting */
-                    if (bmi08xdev.variant == BMI085_VARIANT)
-                    {
-                        bmi08xdev.accel_cfg.range = BMI085_ACCEL_RANGE_16G;
-                    }
-                    else if (bmi08xdev.variant == BMI088_VARIANT)
-                    {
-                        bmi08xdev.accel_cfg.range = BMI088_ACCEL_RANGE_24G;
-                    }
-
-                    /* Assign gyro range setting */
-                    bmi08xdev.gyro_cfg.range = BMI08X_GYRO_RANGE_2000_DPS;
-
-                    /* Mode (0 = off, 1 = 400Hz, 2 = 1kHz, 3 = 2kHz) */
-                    sync_cfg.mode = BMI08X_ACCEL_DATA_SYNC_MODE_400HZ;
-
-                    rslt = bmi08a_configure_data_synchronization(sync_cfg, &bmi08xdev);
-                    bmi08x_error_codes_print_result("bmi08a_configure_data_synchronization", rslt);
+                    bmi08xdev.accel_cfg.range = BMI085_ACCEL_RANGE_16G;
                 }
+                else if (bmi08xdev.variant == BMI088_VARIANT)
+                {
+                    bmi08xdev.accel_cfg.range = BMI088_ACCEL_RANGE_24G;
+                }
+
+                /* Assign gyro range setting */
+                bmi08xdev.gyro_cfg.range = BMI08X_GYRO_RANGE_2000_DPS;
+
+                /* Mode (0 = off, 1 = 400Hz, 2 = 1kHz, 3 = 2kHz) */
+                sync_cfg.mode = BMI08X_ACCEL_DATA_SYNC_MODE_400HZ;
+
+                rslt = bmi08a_configure_data_synchronization(sync_cfg, &bmi08xdev);
+                bmi08x_error_codes_print_result("bmi08a_configure_data_synchronization", rslt);
             }
 
             if (rslt == BMI08X_OK)

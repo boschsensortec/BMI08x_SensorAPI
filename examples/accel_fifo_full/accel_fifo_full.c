@@ -1,11 +1,7 @@
 /**
- * Copyright (C) 2020 Bosch Sensortec GmbH
+ * Copyright (C) 2021 Bosch Sensortec GmbH
  *
  * SPDX-License-Identifier: BSD-3-Clause
- *
- * @file    accel_fifo_full.c
- * @brief   Example file how to read bmi08x accel FIFO full data
- *
  */
 
 /*********************************************************************/
@@ -85,6 +81,13 @@ static int8_t init_bmi08x(void)
 
     if (rslt == BMI08X_OK)
     {
+        printf("Uploading config file !\n");
+        rslt = bmi08a_load_config_file(&bmi08xdev);
+        bmi08x_error_codes_print_result("bmi08a_load_config_file", rslt);
+    }
+
+    if (rslt == BMI08X_OK)
+    {
         bmi08xdev.accel_cfg.odr = BMI08X_ACCEL_ODR_1600_HZ;
 
         if (bmi08xdev.variant == BMI085_VARIANT)
@@ -101,11 +104,9 @@ static int8_t init_bmi08x(void)
 
         rslt = bmi08a_set_power_mode(&bmi08xdev);
         bmi08x_error_codes_print_result("bmi08a_set_power_mode", rslt);
-        coines_delay_msec(10);
 
         rslt = bmi08a_set_meas_conf(&bmi08xdev);
         bmi08x_error_codes_print_result("bmi08a_set_meas_conf", rslt);
-        coines_delay_msec(10);
 
         bmi08xdev.gyro_cfg.odr = BMI08X_GYRO_BW_230_ODR_2000_HZ;
         bmi08xdev.gyro_cfg.range = BMI08X_GYRO_RANGE_250_DPS;
@@ -114,11 +115,9 @@ static int8_t init_bmi08x(void)
 
         rslt = bmi08g_set_power_mode(&bmi08xdev);
         bmi08x_error_codes_print_result("bmi08g_set_power_mode", rslt);
-        coines_delay_msec(10);
 
         rslt = bmi08g_set_meas_conf(&bmi08xdev);
         bmi08x_error_codes_print_result("bmi08g_set_meas_conf", rslt);
-        coines_delay_msec(10);
     }
 
     return rslt;
@@ -235,10 +234,6 @@ int main(void)
 
         if (rslt == BMI08X_OK)
         {
-            /* Update FIFO structure */
-            fifo_frame.data = fifo_data;
-            fifo_frame.length = BMI08X_ACC_FIFO_RAW_DATA_USER_LENGTH;
-
             config.accel_en = BMI08X_ENABLE;
 
             /* Set FIFO configuration by enabling accelerometer */
@@ -254,6 +249,10 @@ int main(void)
                 {
                     printf("\nIteration : %d\n", try);
 
+                    /* Update FIFO structure */
+                    fifo_frame.data = fifo_data;
+                    fifo_frame.length = BMI08X_ACC_FIFO_RAW_DATA_USER_LENGTH;
+
                     accel_length = BMI08X_ACC_FIFO_FULL_EXTRACTED_DATA_FRAME_COUNT;
 
                     rslt = bmi08a_get_fifo_length(&fifo_length, &bmi08xdev);
@@ -266,9 +265,6 @@ int main(void)
 
                     if (rslt == BMI08X_OK)
                     {
-                        /* Delay to read FIFO with microcontroller */
-                        bmi08xdev.delay_us(1000, bmi08xdev.intf_ptr_accel);
-
                         /* Read FIFO data */
                         rslt = bmi08a_read_fifo_data(&fifo_frame, &bmi08xdev);
                         bmi08x_error_codes_print_result("bmi08a_read_fifo_data", rslt);
@@ -292,7 +288,7 @@ int main(void)
                         rslt = bmi08a_get_sensor_time(&bmi08xdev, &sensor_time);
                         bmi08x_error_codes_print_result("bmi08a_get_sensor_time", rslt);
 
-                        printf("Sensor time : %lu\n", sensor_time);
+                        printf("Sensor time : %.4lf   s\n", (sensor_time * BMI08X_SENSORTIME_RESOLUTION));
                     }
 
                     try++;

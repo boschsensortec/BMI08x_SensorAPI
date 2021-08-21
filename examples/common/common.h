@@ -1,5 +1,5 @@
 /**\
- * Copyright (c) 2020 Bosch Sensortec GmbH. All rights reserved.
+ * Copyright (c) 2021 Bosch Sensortec GmbH. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  **/
@@ -13,6 +13,8 @@ extern "C" {
 #endif
 
 #include <stdio.h>
+
+#include "coines.h"
 #include "bmi08x_defs.h"
 
 /*!

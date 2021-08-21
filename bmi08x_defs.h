@@ -1,5 +1,5 @@
 /**
-* Copyright (c) 2020 Bosch Sensortec GmbH. All rights reserved.
+* Copyright (c) 2021 Bosch Sensortec GmbH. All rights reserved.
 *
 * BSD-3-Clause
 *
@@ -31,8 +31,8 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 * @file       bmi08x_defs.h
-* @date       2020-12-11
-* @version    v1.5.5
+* @date       2021-06-22
+* @version    v1.5.7
 *
 */
 
@@ -231,9 +231,9 @@
 #define BMI08X_GYRO_FIFO_FULL_INT                UINT8_C(0x10)
 
 /**\name    Accel Bandwidth */
-#define BMI08X_ACCEL_BW_OSR4                     UINT8_C(0x00)
-#define BMI08X_ACCEL_BW_OSR2                     UINT8_C(0x01)
-#define BMI08X_ACCEL_BW_NORMAL                   UINT8_C(0x02)
+#define BMI08X_ACCEL_BW_OSR4                     UINT8_C(0x08)
+#define BMI08X_ACCEL_BW_OSR2                     UINT8_C(0x09)
+#define BMI08X_ACCEL_BW_NORMAL                   UINT8_C(0x0A)
 
 /**\name    BMI085 Accel Range */
 #define BMI085_ACCEL_RANGE_2G                    UINT8_C(0x00)
@@ -297,7 +297,7 @@
 
 /**\name    Mask definitions for odr, bandwidth and range */
 #define BMI08X_ACCEL_ODR_MASK                    UINT8_C(0x0F)
-#define BMI08X_ACCEL_BW_MASK                     UINT8_C(0x70)
+#define BMI08X_ACCEL_BW_MASK                     UINT8_C(0xF0)
 #define BMI08X_ACCEL_RANGE_MASK                  UINT8_C(0x03)
 
 /**\name    Position definitions for odr, bandwidth and range */
@@ -571,9 +571,15 @@
 #define BMI08X_DISABLE                           UINT8_C(0)
 #define BMI08X_ENABLE                            UINT8_C(1)
 
-/*! @name To define warnings for FIFO activity */
+/**\name  To define warnings for FIFO activity */
 #define BMI08X_W_FIFO_EMPTY                      INT8_C(1)
 #define BMI08X_W_PARTIAL_READ                    INT8_C(2)
+
+/**\name  Maximum length to read */
+#define BMI08X_MAX_LEN                           UINT8_C(128)
+
+/**\name  Sensortime resolution in seconds */
+#define BMI08X_SENSORTIME_RESOLUTION             0.0000390625f
 
 /**\name    Constant values macros */
 #define BMI08X_SENSOR_DATA_SYNC_TIME_MS          UINT8_C(1)
@@ -1066,12 +1072,6 @@ struct bmi08x_fifo_frame
 
     /*! Water-mark level for water-mark interrupt */
     uint16_t wm_lvl;
-
-    /*! Accelerometer frame length */
-    uint8_t acc_frm_len;
-
-    /*! Gyro frame length */
-    uint8_t gyr_frm_len;
 
     /*! FIFO accelerometer configurations */
     struct bmi08x_accel_fifo_config acc_fifo_conf;

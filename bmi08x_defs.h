@@ -1,5 +1,5 @@
 /**
-* Copyright (c) 2021 Bosch Sensortec GmbH. All rights reserved.
+* Copyright (c) 2022 Bosch Sensortec GmbH. All rights reserved.
 *
 * BSD-3-Clause
 *
@@ -31,8 +31,8 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 * @file       bmi08x_defs.h
-* @date       2021-06-22
-* @version    v1.5.7
+* @date       2022-01-03
+* @version    v1.5.8
 *
 */
 
@@ -1118,7 +1118,7 @@ struct bmi08x_dev
     /*! Config stream data buffer address will be assigned */
     const uint8_t *config_file_ptr;
 
-    /*! Max read/write length (maximum supported length is 32).
+    /*! Max read/write length
      * To be set by the user */
     uint8_t read_write_len;
 

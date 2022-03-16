@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2021 Bosch Sensortec GmbH
+ * Copyright (C) 2022 Bosch Sensortec GmbH
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -266,79 +266,85 @@ int main(void)
 
         if (rslt == BMI08X_OK)
         {
-            printf("\nACCEL DATA\n");
-            printf("Accel data in LSB units and Gravity data in m/s^2\n");
-            printf("Accel data range : 16G for BMI085 and 24G for BMI088\n\n");
-
-            while (times_to_read < 10)
+            if (bmi08xdev.accel_cfg.power == BMI08X_ACCEL_PM_ACTIVE)
             {
-                rslt = bmi08a_get_data_int_status(&status, &bmi08xdev);
-                bmi08x_error_codes_print_result("bmi08a_get_data_int_status", rslt);
+                printf("\nACCEL DATA\n");
+                printf("Accel data in LSB units and Gravity data in m/s^2\n");
+                printf("Accel data range : 16G for BMI085 and 24G for BMI088\n\n");
 
-                if (status & BMI08X_ACCEL_DATA_READY_INT)
+                while (times_to_read < 10)
                 {
-                    rslt = bmi08a_get_data(&bmi08x_accel, &bmi08xdev);
-                    bmi08x_error_codes_print_result("bmi08a_get_data", rslt);
+                    rslt = bmi08a_get_data_int_status(&status, &bmi08xdev);
+                    bmi08x_error_codes_print_result("bmi08a_get_data_int_status", rslt);
 
-                    printf("ACCEL[%d]  Acc_Raw_X : %d  Acc_Raw_Y : %d   Acc_Raw_Z : %d  ",
-                           times_to_read,
-                           bmi08x_accel.x,
-                           bmi08x_accel.y,
-                           bmi08x_accel.z);
-
-                    if (bmi08xdev.variant == BMI085_VARIANT)
+                    if (status & BMI08X_ACCEL_DATA_READY_INT)
                     {
-                        /* Converting lsb to meter per second squared for 16 bit accelerometer at 16G range. */
-                        x = lsb_to_mps2(bmi08x_accel.x, 16, 16);
-                        y = lsb_to_mps2(bmi08x_accel.y, 16, 16);
-                        z = lsb_to_mps2(bmi08x_accel.z, 16, 16);
-                    }
-                    else if (bmi08xdev.variant == BMI088_VARIANT)
-                    {
-                        /* Converting lsb to meter per second squared for 16 bit accelerometer at 24G range. */
-                        x = lsb_to_mps2(bmi08x_accel.x, 24, 16);
-                        y = lsb_to_mps2(bmi08x_accel.y, 24, 16);
-                        z = lsb_to_mps2(bmi08x_accel.z, 24, 16);
-                    }
+                        rslt = bmi08a_get_data(&bmi08x_accel, &bmi08xdev);
+                        bmi08x_error_codes_print_result("bmi08a_get_data", rslt);
 
-                    /* Print the data in m/s2. */
-                    printf("\t  Acc_ms2_X = %4.2f,  Acc_ms2_Y = %4.2f,  Acc_ms2_Z = %4.2f\n", x, y, z);
+                        printf("ACCEL[%d]  Acc_Raw_X : %d  Acc_Raw_Y : %d   Acc_Raw_Z : %d  ",
+                               times_to_read,
+                               bmi08x_accel.x,
+                               bmi08x_accel.y,
+                               bmi08x_accel.z);
 
-                    times_to_read = times_to_read + 1;
+                        if (bmi08xdev.variant == BMI085_VARIANT)
+                        {
+                            /* Converting lsb to meter per second squared for 16 bit accelerometer at 16G range. */
+                            x = lsb_to_mps2(bmi08x_accel.x, 16, 16);
+                            y = lsb_to_mps2(bmi08x_accel.y, 16, 16);
+                            z = lsb_to_mps2(bmi08x_accel.z, 16, 16);
+                        }
+                        else if (bmi08xdev.variant == BMI088_VARIANT)
+                        {
+                            /* Converting lsb to meter per second squared for 16 bit accelerometer at 24G range. */
+                            x = lsb_to_mps2(bmi08x_accel.x, 24, 16);
+                            y = lsb_to_mps2(bmi08x_accel.y, 24, 16);
+                            z = lsb_to_mps2(bmi08x_accel.z, 24, 16);
+                        }
+
+                        /* Print the data in m/s2. */
+                        printf("\t  Acc_ms2_X = %4.2f,  Acc_ms2_Y = %4.2f,  Acc_ms2_Z = %4.2f\n", x, y, z);
+
+                        times_to_read = times_to_read + 1;
+                    }
                 }
             }
 
-            times_to_read = 0;
-
-            printf("\n\nGYRO DATA\n");
-            printf("Gyro data in LSB units and degrees per second\n");
-            printf("Gyro data range : 250 dps for BMI085 and BMI088\n\n");
-
-            while (times_to_read < 10)
+            if (bmi08xdev.gyro_cfg.power == BMI08X_GYRO_PM_NORMAL)
             {
-                rslt = bmi08g_get_data_int_status(&status, &bmi08xdev);
-                bmi08x_error_codes_print_result("bmi08g_get_data_int_status", rslt);
+                times_to_read = 0;
 
-                if (status & BMI08X_GYRO_DATA_READY_INT)
+                printf("\n\nGYRO DATA\n");
+                printf("Gyro data in LSB units and degrees per second\n");
+                printf("Gyro data range : 250 dps for BMI085 and BMI088\n\n");
+
+                while (times_to_read < 10)
                 {
-                    rslt = bmi08g_get_data(&bmi08x_gyro, &bmi08xdev);
-                    bmi08x_error_codes_print_result("bmi08g_get_data", rslt);
+                    rslt = bmi08g_get_data_int_status(&status, &bmi08xdev);
+                    bmi08x_error_codes_print_result("bmi08g_get_data_int_status", rslt);
 
-                    printf("GYRO[%d]  Gyr_Raw_X : %d   Gyr_Raw_Y : %d   Gyr_Raw_Z : %d   ",
-                           times_to_read,
-                           bmi08x_gyro.x,
-                           bmi08x_gyro.y,
-                           bmi08x_gyro.z);
+                    if (status & BMI08X_GYRO_DATA_READY_INT)
+                    {
+                        rslt = bmi08g_get_data(&bmi08x_gyro, &bmi08xdev);
+                        bmi08x_error_codes_print_result("bmi08g_get_data", rslt);
 
-                    /* Converting lsb to degree per second for 16 bit gyro at 250 dps range. */
-                    x = lsb_to_dps(bmi08x_gyro.x, 250, 16);
-                    y = lsb_to_dps(bmi08x_gyro.y, 250, 16);
-                    z = lsb_to_dps(bmi08x_gyro.z, 250, 16);
+                        printf("GYRO[%d]  Gyr_Raw_X : %d   Gyr_Raw_Y : %d   Gyr_Raw_Z : %d   ",
+                               times_to_read,
+                               bmi08x_gyro.x,
+                               bmi08x_gyro.y,
+                               bmi08x_gyro.z);
 
-                    /* Print the data in dps. */
-                    printf("\t  Gyr_DPS_X = %4.2f  , Gyr_DPS_Y = %4.2f  , Gyr_DPS_Z = %4.2f\n", x, y, z);
+                        /* Converting lsb to degree per second for 16 bit gyro at 250 dps range. */
+                        x = lsb_to_dps(bmi08x_gyro.x, 250, 16);
+                        y = lsb_to_dps(bmi08x_gyro.y, 250, 16);
+                        z = lsb_to_dps(bmi08x_gyro.z, 250, 16);
 
-                    times_to_read = times_to_read + 1;
+                        /* Print the data in dps. */
+                        printf("\t  Gyr_DPS_X = %4.2f  , Gyr_DPS_Y = %4.2f  , Gyr_DPS_Z = %4.2f\n", x, y, z);
+
+                        times_to_read = times_to_read + 1;
+                    }
                 }
             }
         }

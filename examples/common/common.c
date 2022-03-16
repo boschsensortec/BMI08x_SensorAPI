@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2021 Bosch Sensortec GmbH. All rights reserved.
+ * Copyright (C) 2022 Bosch Sensortec GmbH. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -114,7 +114,6 @@ int8_t bmi08x_interface_init(struct bmi08x_dev *bmi08x, uint8_t intf, uint8_t va
                 printf(
                     "! Warning - BMI085 sensor shuttle and BMI088 variant used \n ,"
                     "This application will not support this combination \n");
-                exit(COINES_E_FAILURE);
             }
 
             if ((board_info.shuttle_id == BMI088_SHUTTLE_ID) && (variant == BMI085_VARIANT))
@@ -122,7 +121,6 @@ int8_t bmi08x_interface_init(struct bmi08x_dev *bmi08x, uint8_t intf, uint8_t va
                 printf(
                     "! Warning - BMI088 sensor shuttle and BMI085 variant used \n ,"
                     "This application will not support this combination \n");
-                exit(COINES_E_FAILURE);
             }
 
             if ((board_info.shuttle_id != BMI085_SHUTTLE_ID) && (board_info.shuttle_id != BMI088_SHUTTLE_ID))
@@ -130,7 +128,6 @@ int8_t bmi08x_interface_init(struct bmi08x_dev *bmi08x, uint8_t intf, uint8_t va
                 printf(
                     "! Warning invalid sensor shuttle (neither BMI085 nor BMI088 used) \n ,"
                     "This application will not support this sensor \n");
-                exit(COINES_E_FAILURE);
             }
         }
 

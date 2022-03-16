@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2021 Bosch Sensortec GmbH
+ * Copyright (C) 2022 Bosch Sensortec GmbH
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -118,8 +118,7 @@ static int8_t init_bmi08x(void)
         rslt = bmi08a_soft_reset(&bmi08xdev);
         bmi08x_error_codes_print_result("bmi08a_soft_reset", rslt);
 
-        /* Max read/write length (maximum supported length is 32).
-         To be set by the user */
+        /* Read/write length */
         bmi08xdev.read_write_len = 32;
 
         printf("Uploading BMI08X data synchronization feature config !\n");

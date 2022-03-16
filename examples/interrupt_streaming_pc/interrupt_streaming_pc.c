@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2021 Bosch Sensortec GmbH
+ * Copyright (C) 2022 Bosch Sensortec GmbH
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */

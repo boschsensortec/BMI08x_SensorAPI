@@ -10,44 +10,24 @@ _Note: data synchronization is designed for applications requiring high bandwidt
 ##	Concept
 Synchronized data means that the acquisition of the gyroscope and accelerometer data is happening at the same time and the signals have same propagation time. The time between motion to register read-out depends on the physical propagation time mainly caused by signal filtering path. The synchronization between accelerometer and gyroscope data to a common point of time and a common group delay can be realized with the approach described in the following sections.
 
-The hardware interrupts pins (INT1 / INT3) of the BMI085 are used for data synchronization purposes and must be connected. The interrupt pin INT2 can be used for data ready notification to the host by BMI085.
-
-##	Technical realization
-The data synchronization feature requires physical interrupt pin’s connection of the sensors on the pcb and a special configuration of the BMI085. Requirements and the steps are described below.
-
-### Connection diagram
+### Connection diagram (APP3.0)
 
 ```
-       MCU                    BMI085
-     +-----------+             +---------------+
-     |           |           8 |               | 16
-     |       SCK +------------>| SCK      INT1 |<-----+
-     |           |           9 |               | 12   |
-     |      MOSI +------------>| SDO      INT3 |>-----+
-     |           |          15 |               | 
-     |      MISO +<------+-----| SDO1          | 
-     |           |       |  10 |               |
-     |           |       +-----| SDO2          |
-     |           |          14 |               |
-     |   ACC_CSB +------------>| CSB1          |
-     |           |           5 |               |
-     |  GYRO_CSB +------------>| CSB2          | 
-     |           |           1 |               |
-     |  DATA_RDY +<------------| INT2       PS +------+
-     |           |             |               |      |
-     +-----------+             +---------------+      |
-                                                      |
-                                                     ---
+
+       INT2 A   1   JP3   2   INT4 G           
+     ------------- (-|-) ------------ 
 ```
 
 For latency-critical multisensory applications, it is recommended to use SPI interface for fastest sensor data read (recommended SPI clock speed is >2MHz).
+
+Further details in [https://www.bosch-sensortec.com/media/boschsensortec/downloads/shuttle_board_flyer/application_board_3_1/bst-bmi088-sf000.pdf](https://www.bosch-sensortec.com/media/boschsensortec/downloads/shuttle_board_flyer/application_board_3_1/bst-bmi088-sf000.pdf "Shuttle Board 3.0 Flyer")
 
 ### Configuring BMI085 for data synchronization
 
 Include the bmi08x header 
 
-``` c
-#include "bmi08x.h"
+```
+ #include "bmi08x.h"
 ```
 
 Update variant of bmi08x_dev to BMI085_VARIANT to use the BMI085 sensor feature
@@ -105,12 +85,11 @@ rslt = bmi08g_init(&dev);
 rslt = bmi08a_soft_reset(&bmi08xdev);
 
 
-/*! Max read/write length (maximum supported length is 32).
- To be set by the user */
+/* Read/write length */
 
 bmi08xdev.read_write_len = 32;
 
-/*set accel power mode */
+/* Set accel power mode */
 
 bmi08xdev.accel_cfg.power = BMI08X_ACCEL_PM_ACTIVE;
 
@@ -125,24 +104,24 @@ bmi08g_set_power_mode(&bmi08xdev);
 
 rslt = bmi08a_load_config_file(&bmi08xdev);
 
-/*assign accel range setting*/
+/* Assign accel range setting*/
 
 bmi08xdev.accel_cfg.range = BMI085_ACCEL_RANGE_4G;
 
-/*assign gyro range setting*/
+/* Assign gyro range setting*/
 
 bmi08xdev.gyro_cfg.range = BMI08X_GYRO_RANGE_2000_DPS;
 
-/*! Mode (0 = off, 1 = 400Hz, 2 = 1kHz, 3 = 2kHz) */
+/* Mode (0 = off, 1 = 400Hz, 2 = 1kHz, 3 = 2kHz) */
 
 sync_cfg.mode = BMI08X_ACCEL_DATA_SYNC_MODE_2000HZ;
 
 rslt = bmi08a_configure_data_synchronization(sync_cfg, &bmi08xdev);
 
 
-/*set accel interrupt pin configuration*/
+/* Set accel interrupt pin configuration*/
 
-/*configure host data ready interrupt */
+/* Configure host data ready interrupt */
 
 int_config.accel_int_config_1.int_channel = BMI08X_INT_CHANNEL_1;
 
@@ -154,7 +133,7 @@ int_config.accel_int_config_1.int_pin_cfg.lvl = BMI08X_INT_ACTIVE_HIGH;
 
 int_config.accel_int_config_1.int_pin_cfg.enable_int_pin = BMI08X_ENABLE;
 
-/*configure Accel syncronization input interrupt pin */
+/* Configure Accel syncronization input interrupt pin */
 
 int_config.accel_int_config_2.int_channel = BMI08X_INT_CHANNEL_2;
 
@@ -166,7 +145,7 @@ int_config.accel_int_config_2.int_pin_cfg.lvl = BMI08X_INT_ACTIVE_HIGH;
 
 int_config.accel_int_config_2.int_pin_cfg.enable_int_pin = BMI08X_ENABLE;
 
-/*set gyro interrupt pin configuration*/
+/* Set gyro interrupt pin configuration*/
 
 int_config.gyro_int_config_1.int_channel = BMI08X_INT_CHANNEL_3;
 

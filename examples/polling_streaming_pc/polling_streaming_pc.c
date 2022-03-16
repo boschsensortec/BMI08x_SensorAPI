@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2021 Bosch Sensortec GmbH
+ * Copyright (C) 2022 Bosch Sensortec GmbH
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -177,99 +177,105 @@ void read_sensor_data(void)
     int buffer_index = 0;
     float x = 0.0, y = 0.0, z = 0.0;
 
-    memset(&bmi08x_accel_stream_buffer[0], 0, COINES_STREAM_RSP_BUF_SIZE);
-    rslt = coines_read_stream_sensor_data(1, 1, &bmi08x_accel_stream_buffer[0], &valid_sample_count);
-    if (rslt == COINES_SUCCESS)
+    if (bmi08xdev.accel_cfg.power == BMI08X_ACCEL_PM_ACTIVE)
     {
-        buffer_index = 0;
-        printf("\nACCEL DATA \n");
-        printf("Accel data in LSB units and Gravity data in m/s^2\n");
-        printf("Accel data range : 16G for BMI085 and 24G for BMI088\n\n");
-
-        if (valid_sample_count > 100)
+        memset(&bmi08x_accel_stream_buffer[0], 0, COINES_STREAM_RSP_BUF_SIZE);
+        rslt = coines_read_stream_sensor_data(1, 1, &bmi08x_accel_stream_buffer[0], &valid_sample_count);
+        if (rslt == COINES_SUCCESS)
         {
-            valid_sample_count = 100;
-        }
+            buffer_index = 0;
+            printf("\nACCEL DATA \n");
+            printf("Accel data in LSB units and Gravity data in m/s^2\n");
+            printf("Accel data range : 16G for BMI085 and 24G for BMI088\n\n");
 
-        for (idx = 0; idx < valid_sample_count; idx++)
-        {
-            if (bmi08xdev.intf == BMI08X_SPI_INTF)
+            if (valid_sample_count > 100)
             {
-                buffer_index++; /*dummy byte; ignore for SPI */
+                valid_sample_count = 100;
             }
 
-            lsb = bmi08x_accel_stream_buffer[buffer_index++];
-            msb = bmi08x_accel_stream_buffer[buffer_index++];
-            ax = (msb << 8) | lsb;
-
-            lsb = bmi08x_accel_stream_buffer[buffer_index++];
-            msb = bmi08x_accel_stream_buffer[buffer_index++];
-            ay = (msb << 8) | lsb;
-
-            lsb = bmi08x_accel_stream_buffer[buffer_index++];
-            msb = bmi08x_accel_stream_buffer[buffer_index++];
-            az = (msb << 8) | lsb;
-
-            printf("ACCEL[%d]  Acc_Raw_X : %-5d  Acc_Raw_Y : %-5d   Acc_Raw_Z : %-5d   ", idx, ax, ay, az);
-
-            if (bmi08xdev.variant == BMI085_VARIANT)
+            for (idx = 0; idx < valid_sample_count; idx++)
             {
-                /* Converting lsb to meter per second squared for 16 bit accelerometer at 16G range. */
-                x = lsb_to_mps2(ax, 16, 16);
-                y = lsb_to_mps2(ay, 16, 16);
-                z = lsb_to_mps2(az, 16, 16);
-            }
-            else if (bmi08xdev.variant == BMI088_VARIANT)
-            {
-                /* Converting lsb to meter per second squared for 16 bit accelerometer at 24G range. */
-                x = lsb_to_mps2(ax, 24, 16);
-                y = lsb_to_mps2(ay, 24, 16);
-                z = lsb_to_mps2(az, 24, 16);
-            }
+                if (bmi08xdev.intf == BMI08X_SPI_INTF)
+                {
+                    buffer_index++; /*dummy byte; ignore for SPI */
+                }
 
-            /* Print the data in m/s2. */
-            printf("\t  Acc_ms2_X = %4.2f   Acc_ms2_Y = %4.2f   Acc_ms2_Z = %4.2f\n", x, y, z);
+                lsb = bmi08x_accel_stream_buffer[buffer_index++];
+                msb = bmi08x_accel_stream_buffer[buffer_index++];
+                ax = (msb << 8) | lsb;
+
+                lsb = bmi08x_accel_stream_buffer[buffer_index++];
+                msb = bmi08x_accel_stream_buffer[buffer_index++];
+                ay = (msb << 8) | lsb;
+
+                lsb = bmi08x_accel_stream_buffer[buffer_index++];
+                msb = bmi08x_accel_stream_buffer[buffer_index++];
+                az = (msb << 8) | lsb;
+
+                printf("ACCEL[%d]  Acc_Raw_X : %-5d  Acc_Raw_Y : %-5d   Acc_Raw_Z : %-5d   ", idx, ax, ay, az);
+
+                if (bmi08xdev.variant == BMI085_VARIANT)
+                {
+                    /* Converting lsb to meter per second squared for 16 bit accelerometer at 16G range. */
+                    x = lsb_to_mps2(ax, 16, 16);
+                    y = lsb_to_mps2(ay, 16, 16);
+                    z = lsb_to_mps2(az, 16, 16);
+                }
+                else if (bmi08xdev.variant == BMI088_VARIANT)
+                {
+                    /* Converting lsb to meter per second squared for 16 bit accelerometer at 24G range. */
+                    x = lsb_to_mps2(ax, 24, 16);
+                    y = lsb_to_mps2(ay, 24, 16);
+                    z = lsb_to_mps2(az, 24, 16);
+                }
+
+                /* Print the data in m/s2. */
+                printf("\t  Acc_ms2_X = %4.2f   Acc_ms2_Y = %4.2f   Acc_ms2_Z = %4.2f\n", x, y, z);
+            }
         }
     }
 
-    memset(&bmi08x_gyro_stream_buffer[0], 0, COINES_STREAM_RSP_BUF_SIZE);
-    rslt = coines_read_stream_sensor_data(2, 1, &bmi08x_gyro_stream_buffer[0], &valid_sample_count);
-    if (rslt == COINES_SUCCESS)
+    if (bmi08xdev.gyro_cfg.power == BMI08X_GYRO_PM_NORMAL)
     {
-        buffer_index = 0;
-        printf("\n\nGYRO DATA \n");
-        printf("Gyro data in LSB units and degrees per second\n");
-        printf("Gyro data range : 250 dps for BMI085 and BMI088\n\n");
-
-        if (valid_sample_count > 100)
+        memset(&bmi08x_gyro_stream_buffer[0], 0, COINES_STREAM_RSP_BUF_SIZE);
+        rslt = coines_read_stream_sensor_data(2, 1, &bmi08x_gyro_stream_buffer[0], &valid_sample_count);
+        if (rslt == COINES_SUCCESS)
         {
-            valid_sample_count = 100;
-        }
+            buffer_index = 0;
+            printf("\n\nGYRO DATA \n");
+            printf("Gyro data in LSB units and degrees per second\n");
+            printf("Gyro data range : 250 dps for BMI085 and BMI088\n\n");
 
-        for (idx = 0; idx < valid_sample_count; idx++)
-        {
+            if (valid_sample_count > 100)
+            {
+                valid_sample_count = 100;
+            }
 
-            lsb = bmi08x_gyro_stream_buffer[buffer_index++];
-            msb = bmi08x_gyro_stream_buffer[buffer_index++];
-            gx = (msb << 8) | lsb;
+            for (idx = 0; idx < valid_sample_count; idx++)
+            {
 
-            lsb = bmi08x_gyro_stream_buffer[buffer_index++];
-            msb = bmi08x_gyro_stream_buffer[buffer_index++];
-            gy = (msb << 8) | lsb;
+                lsb = bmi08x_gyro_stream_buffer[buffer_index++];
+                msb = bmi08x_gyro_stream_buffer[buffer_index++];
+                gx = (msb << 8) | lsb;
 
-            lsb = bmi08x_gyro_stream_buffer[buffer_index++];
-            msb = bmi08x_gyro_stream_buffer[buffer_index++];
-            gz = (msb << 8) | lsb;
+                lsb = bmi08x_gyro_stream_buffer[buffer_index++];
+                msb = bmi08x_gyro_stream_buffer[buffer_index++];
+                gy = (msb << 8) | lsb;
 
-            printf("GYRO[%d]  Gyr_Raw_X : %-5d   Gyr_Raw_Y : %-5d    Gyr_Raw_Z : %-5d   ", idx, gx, gy, gz);
+                lsb = bmi08x_gyro_stream_buffer[buffer_index++];
+                msb = bmi08x_gyro_stream_buffer[buffer_index++];
+                gz = (msb << 8) | lsb;
 
-            /* Converting lsb to degree per second for 16 bit gyro at 250 dps range. */
-            x = lsb_to_dps(gx, 250, 16);
-            y = lsb_to_dps(gy, 250, 16);
-            z = lsb_to_dps(gz, 250, 16);
+                printf("GYRO[%d]  Gyr_Raw_X : %-5d   Gyr_Raw_Y : %-5d    Gyr_Raw_Z : %-5d   ", idx, gx, gy, gz);
 
-            /* Print the data in dps. */
-            printf("\t  Gyr_DPS_X = %4.2f   Gyr_DPS_Y = %4.2f   Gyr_DPS_Z = %4.2f\n", x, y, z);
+                /* Converting lsb to degree per second for 16 bit gyro at 250 dps range. */
+                x = lsb_to_dps(gx, 250, 16);
+                y = lsb_to_dps(gy, 250, 16);
+                z = lsb_to_dps(gz, 250, 16);
+
+                /* Print the data in dps. */
+                printf("\t  Gyr_DPS_X = %4.2f   Gyr_DPS_Y = %4.2f   Gyr_DPS_Z = %4.2f\n", x, y, z);
+            }
         }
     }
 }

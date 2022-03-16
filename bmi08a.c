@@ -1,5 +1,5 @@
 /**
-* Copyright (c) 2021 Bosch Sensortec GmbH. All rights reserved.
+* Copyright (c) 2022 Bosch Sensortec GmbH. All rights reserved.
 *
 * BSD-3-Clause
 *
@@ -31,8 +31,8 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 * @file       bmi08a.c
-* @date       2021-06-22
-* @version    v1.5.7
+* @date       2022-01-03
+* @version    v1.5.8
 *
 */
 
@@ -904,6 +904,22 @@ int8_t bmi08a_set_regs(uint8_t reg_addr, const uint8_t *reg_data, uint32_t len, 
         {
             /* Writing to the register */
             rslt = set_regs(reg_addr, reg_data, len, dev);
+
+            /* Delay for suspended mode of the sensor is 450 us */
+            if (dev->accel_cfg.power == BMI08X_ACCEL_PM_SUSPEND)
+            {
+                dev->delay_us(450, dev->intf_ptr_accel);
+            }
+            /* Delay for Normal mode of the sensor is 2 us */
+            else if (dev->accel_cfg.power == BMI08X_ACCEL_PM_ACTIVE)
+            {
+                dev->delay_us(2, dev->intf_ptr_accel);
+            }
+            else
+            {
+                /* Invalid power input */
+                rslt = BMI08X_E_INVALID_INPUT;
+            }
         }
         else
         {

@@ -89,6 +89,11 @@ rslt = bmi08a_soft_reset(&bmi08xdev);
 
 bmi08xdev.read_write_len = 32;
 
+/* API uploads the bmi08x config file onto the device and wait for 150ms 
+   to enable the data synchronization - delay taken care inside the function */
+
+rslt = bmi08a_load_config_file(&bmi08xdev);
+
 /* Set accel power mode */
 
 bmi08xdev.accel_cfg.power = BMI08X_ACCEL_PM_ACTIVE;
@@ -98,11 +103,6 @@ rslt = bmi08a_set_power_mode(&bmi08xdev);
 bmi08xdev.gyro_cfg.power = BMI08X_GYRO_PM_NORMAL;
 
 bmi08g_set_power_mode(&bmi08xdev);
-
-/* API uploads the bmi08x config file onto the device and wait for 150ms 
-   to enable the data synchronization - delay taken care inside the function */
-
-rslt = bmi08a_load_config_file(&bmi08xdev);
 
 /* Assign accel range setting*/
 
@@ -137,7 +137,7 @@ int_config.accel_int_config_1.int_pin_cfg.enable_int_pin = BMI08X_ENABLE;
 
 int_config.accel_int_config_2.int_channel = BMI08X_INT_CHANNEL_2;
 
-int_config.accel_int_config_2.int_type = BMI08X_ACCEL_SYNC_DATA_RDY_INT;
+int_config.accel_int_config_2.int_type = BMI08X_ACCEL_INT_SYNC_DATA_RDY;
 
 int_config.accel_int_config_2.int_pin_cfg.output_mode = BMI08X_INT_MODE_PUSH_PULL;
 
@@ -149,7 +149,7 @@ int_config.accel_int_config_2.int_pin_cfg.enable_int_pin = BMI08X_ENABLE;
 
 int_config.gyro_int_config_1.int_channel = BMI08X_INT_CHANNEL_3;
 
-int_config.gyro_int_config_1.int_type = BMI08X_GYRO_DATA_RDY_INT;
+int_config.gyro_int_config_1.int_type = BMI08X_GYRO_INT_DATA_RDY;
 
 int_config.gyro_int_config_1.int_pin_cfg.enable_int_pin = BMI08X_ENABLE;
 
@@ -159,7 +159,7 @@ int_config.gyro_int_config_1.int_pin_cfg.output_mode = BMI08X_INT_MODE_PUSH_PULL
 
 int_config.gyro_int_config_2.int_channel = BMI08X_INT_CHANNEL_4;
 
-int_config.gyro_int_config_2.int_type = BMI08X_GYRO_DATA_RDY_INT;
+int_config.gyro_int_config_2.int_type = BMI08X_GYRO_INT_DATA_RDY;
 
 int_config.gyro_int_config_2.int_pin_cfg.enable_int_pin = BMI08X_DISABLE;
 

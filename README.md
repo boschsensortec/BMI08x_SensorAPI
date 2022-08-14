@@ -20,7 +20,7 @@ Update variant of bmi08x_dev to BMI085_VARIANT to use the BMI085 sensor feature
  dev.variant = BMI085_VARIANT;
 ```
 
-Update variant of bmi08x_dev to BMI088_VARIANT to use the BMI085 sensor feature
+Update variant of bmi08x_dev to BMI088_VARIANT to use the BMI088 sensor feature
 
 ```
  dev.variant = BMI088_VARIANT;

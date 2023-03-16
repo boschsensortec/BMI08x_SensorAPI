@@ -180,6 +180,32 @@ int8_t bmi08xa_set_meas_conf(struct bmi08_dev *dev);
  */
 int8_t bmi08xa_perform_selftest(struct bmi08_dev *dev);
 
+/**
+ * \ingroup bmi08xag
+ * \defgroup bmi08xaApiSync Data Synchronization
+ * @brief Enable / Disable data synchronization
+ */
+
+/*!
+ * \ingroup bmi08xaApiSync
+ * \page bmi08xa_api_bmi08xa_configure_data_synchronization bmi08xa_configure_data_synchronization
+ * \code
+ * int8_t bmi08xa_configure_data_synchronization(struct bmi08_data_sync_cfg sync_cfg, struct bmi08_dev *dev);
+ * \endcode
+ * @details This API is used to enable/disable the data synchronization
+ *  feature.
+ *
+ *  @param[in] sync_cfg : Configure sync feature
+ *  @param[in] dev : Structure instance of bmi08_dev.
+ *
+ *  @return Result of API execution status
+ *  @retval 0 -> Success
+ *  @retval < 0 -> Fail
+ *  @retval > 0 -> Warning
+ *
+ */
+int8_t bmi08xa_configure_data_synchronization(struct bmi08_data_sync_cfg sync_cfg, struct bmi08_dev *dev);
+
 #ifdef __cplusplus
 }
 #endif

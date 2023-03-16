@@ -949,6 +949,70 @@ int8_t bmi088_mma_get_remap_axes(struct bmi088_mm_remap *remapped_axis, struct b
  */
 int8_t bmi088_mma_get_version_config(uint16_t *config_major, uint16_t *config_minor, struct bmi08_dev *dev);
 
+/**
+ * \ingroup bmi088_mm
+ * \defgroup bmi088_mmApiConf Read accel configurations
+ * @brief Read / Write configurations of accel sensor
+ */
+
+/*!
+ * \ingroup bmi088_mmApiConf
+ * \page bmi088_mm_api_bmi088_mm_set_meas_conf bmi088_mm_set_meas_conf
+ * \code
+ * int8_t bmi088_mm_set_meas_conf(const struct bmi08_dev *dev);
+ * \endcode
+ * @details This API sets the Output data rate, range and bandwidth
+ *  of accel sensor.
+ *  @param[in] dev  : Structure instance of bmi08_dev.
+ *
+ *  @note : The user must select one among the following macros to
+ *  select range value for BMI088_MM accel
+ *
+ *@verbatim
+ *      config                         |   value
+ *      -------------------------------|---------------------------
+ *      BMI088_MM_ACCEL_RANGE_3G       |   0x00
+ *      BMI088_MM_ACCEL_RANGE_6G       |   0x01
+ *      BMI088_MM_ACCEL_RANGE_12G      |   0x02
+ *      BMI088_MM_ACCEL_RANGE_24G      |   0x03
+ *@endverbatim
+ *
+ *  @note : Refer user guide for detailed info.
+ *
+ * @return Result of API execution status
+ * @retval 0 -> Success
+ * @retval < 0 -> Fail
+ * @retval > 0 -> Warning
+ *
+ */
+int8_t bmi088_mm_set_meas_conf(struct bmi08_dev *dev);
+
+/**
+ * \ingroup bmi088_mm
+ * \defgroup bmi088_mmApiSync Data Synchronization
+ * @brief Enable / Disable data synchronization
+ */
+
+/*!
+ * \ingroup bmi088_mmApiSync
+ * \page bmi088_mm_api_bmi088_mm_configure_data_synchronization bmi088_mm_configure_data_synchronization
+ * \code
+ * int8_t bmi088_mm_configure_data_synchronization(struct bmi08_data_sync_cfg sync_cfg, struct bmi08_dev *dev);
+ * \endcode
+ * @details This API is used to enable/disable the data synchronization
+ *  feature.
+ *
+ *  @param[in] sync_cfg : Configure sync feature
+ *  @param[in] dev : Structure instance of bmi08_dev.
+ *
+ *  @return Result of API execution status
+ *  @retval 0 -> Success
+ *  @retval < 0 -> Fail
+ *  @retval > 0 -> Warning
+ *
+ */
+int8_t bmi088_mm_configure_data_synchronization(struct bmi08_data_sync_cfg sync_cfg, struct bmi08_dev *dev);
+
 #ifdef __cplusplus
 }
 #endif

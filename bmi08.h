@@ -501,10 +501,10 @@ int8_t bmi08a_get_sensor_time(struct bmi08_dev *dev, uint32_t *sensor_time);
  */
 
 /*!
- * \ingroup bmi08aApiSync
- * \page bmi08a_api_bmi08a_configure_data_synchronization bmi08a_configure_data_synchronization
+ * \ingroup bmi08gApiSync
+ * \page bmi08g_api_bmi08g_configure_data_synchronization bmi08g_configure_data_synchronization
  * \code
- * int8_t bmi08a_configure_data_synchronization(struct bmi08_data_sync_cfg sync_cfg, struct bmi08_dev *dev);
+ * int8_t bmi08g_configure_data_synchronization(struct bmi08_data_sync_cfg sync_cfg, struct bmi08_dev *dev);
  * \endcode
  * @details This API is used to enable/disable the data synchronization
  *  feature.
@@ -517,7 +517,7 @@ int8_t bmi08a_get_sensor_time(struct bmi08_dev *dev, uint32_t *sensor_time);
  * @retval < 0 -> Fail
  *
  */
-int8_t bmi08a_configure_data_synchronization(struct bmi08_data_sync_cfg sync_cfg, struct bmi08_dev *dev);
+int8_t bmi08g_configure_data_synchronization(struct bmi08_data_sync_cfg sync_cfg, struct bmi08_dev *dev);
 
 /**
  * \ingroup bmi08ag

@@ -2324,6 +2324,99 @@ static void convert_lsb_g(const struct bmi088_mm_selftest_delta_limit *accel_dat
     accel_data_diff_mg->z = (int16_t) ((accel_data_diff->z / (int32_t)LSB_PER_G) * 1000);
 }
 
+/*!
+ * @brief This API sets the output data rate, range and bandwidth
+ * of accel sensor.
+ */
+int8_t bmi088_mm_set_meas_conf(struct bmi08_dev *dev)
+{
+    int8_t rslt;
+    uint8_t data[2] = { 0 };
+    uint8_t range, bw, odr;
+    uint8_t is_range_invalid = FALSE;
+
+    /* Check validity of ODR and BW */
+    rslt = bmi08a_set_meas_conf(dev);
+
+    /* Proceed if ODR and BW are valid */
+    if (rslt == BMI08_OK)
+    {
+        odr = dev->accel_cfg.odr;
+        bw = dev->accel_cfg.bw;
+        range = dev->accel_cfg.range;
+
+        /* Check for valid Range */
+        if (range > BMI088_MM_ACCEL_RANGE_24G)
+        {
+            /* Updating the status */
+            is_range_invalid = TRUE;
+        }
+
+        /* If Range is valid, write it to accel config registers */
+        if (!is_range_invalid)
+        {
+            /* Read accel config. register */
+            rslt = bmi08a_get_regs(BMI08_REG_ACCEL_CONF, data, 2, dev);
+            if (rslt == BMI08_OK)
+            {
+                /* Update data with new odr and bw values */
+                data[0] = BMI08_SET_BITS_POS_0(data[0], BMI08_ACCEL_ODR, odr);
+                data[0] = BMI08_SET_BITS(data[0], BMI08_ACCEL_BW, bw);
+
+                /* Update data with current range values */
+                data[1] = BMI08_SET_BITS_POS_0(data[1], BMI08_ACCEL_RANGE, range);
+
+                /* write to range register */
+                rslt = bmi08a_set_regs(BMI08_REG_ACCEL_CONF, data, 2, dev);
+
+                if (rslt == BMI08_OK)
+                {
+                    /* Delay required to set accel configurations */
+                    dev->delay_us(BMI08_SET_ACCEL_CONF_DELAY * 1000, dev->intf_ptr_accel);
+                }
+            }
+        }
+        else
+        {
+            /* Invalid configuration present in ODR, BW, Range */
+            rslt = BMI08_E_INVALID_CONFIG;
+        }
+    }
+
+    return rslt;
+}
+
+/*!
+ *  @brief This API is used to enable/disable and configure the data synchronization
+ *  feature.
+ */
+int8_t bmi088_mm_configure_data_synchronization(struct bmi08_data_sync_cfg sync_cfg, struct bmi08_dev *dev) 
+{
+    int8_t rslt;
+    uint16_t data[BMI08_ACCEL_DATA_SYNC_LEN];
+
+    /* Set device configuration and gyro registers. */
+    rslt = bmi08g_configure_data_synchronization(sync_cfg, dev);
+
+    /* Proceed if gyro setting is fine */
+    if (rslt == BMI08_OK)
+    {
+        rslt = bmi088_mm_set_meas_conf(dev);
+
+        if (rslt == BMI08_OK)
+        {
+            /* Enable data synchronization */
+            data[0] = (sync_cfg.mode & BMI08_ACCEL_DATA_SYNC_MODE_MASK);
+            rslt = bmi08a_write_feature_config(BMI08_ACCEL_DATA_SYNC_ADR, &data[0], BMI08_ACCEL_DATA_SYNC_LEN, dev);
+        }
+
+        /* Delay of 100ms for data sync configurations to take effect */
+        dev->delay_us(100000, dev->intf_ptr_accel);
+    }
+
+    return rslt;
+}
+
 /*! @endcond */
 
 /** @}*/

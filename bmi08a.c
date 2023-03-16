@@ -1365,66 +1365,6 @@ int8_t bmi08a_set_fifo_down_sample(uint8_t fifo_downs, struct bmi08_dev *dev)
 }
 
 /*!
- *  @brief This API is used to enable/disable and configure the data synchronization
- *  feature.
- */
-int8_t bmi08a_configure_data_synchronization(struct bmi08_data_sync_cfg sync_cfg, struct bmi08_dev *dev)
-{
-    int8_t rslt;
-    uint16_t data[BMI08_ACCEL_DATA_SYNC_LEN];
-
-    /* Check for null pointer in the device structure */
-    rslt = null_ptr_check(dev);
-
-    /* Proceed if null check is fine */
-    if (rslt == BMI08_OK)
-    {
-        /* Change sensor meas config */
-        switch (sync_cfg.mode)
-        {
-            case BMI08_ACCEL_DATA_SYNC_MODE_2000HZ:
-                dev->accel_cfg.odr = BMI08_ACCEL_ODR_1600_HZ;
-                dev->accel_cfg.bw = BMI08_ACCEL_BW_NORMAL;
-                dev->gyro_cfg.odr = BMI08_GYRO_BW_230_ODR_2000_HZ;
-                dev->gyro_cfg.bw = BMI08_GYRO_BW_230_ODR_2000_HZ;
-                break;
-            case BMI08_ACCEL_DATA_SYNC_MODE_1000HZ:
-                dev->accel_cfg.odr = BMI08_ACCEL_ODR_800_HZ;
-                dev->accel_cfg.bw = BMI08_ACCEL_BW_NORMAL;
-                dev->gyro_cfg.odr = BMI08_GYRO_BW_116_ODR_1000_HZ;
-                dev->gyro_cfg.bw = BMI08_GYRO_BW_116_ODR_1000_HZ;
-                break;
-            case BMI08_ACCEL_DATA_SYNC_MODE_400HZ:
-                dev->accel_cfg.odr = BMI08_ACCEL_ODR_400_HZ;
-                dev->accel_cfg.bw = BMI08_ACCEL_BW_NORMAL;
-                dev->gyro_cfg.odr = BMI08_GYRO_BW_47_ODR_400_HZ;
-                dev->gyro_cfg.bw = BMI08_GYRO_BW_47_ODR_400_HZ;
-                break;
-            default:
-                break;
-        }
-
-        rslt = bmi08a_set_meas_conf(dev);
-
-        if (rslt == BMI08_OK)
-        {
-            rslt = bmi08g_set_meas_conf(dev);
-            if (rslt == BMI08_OK)
-            {
-                /* Enable data synchronization */
-                data[0] = (sync_cfg.mode & BMI08_ACCEL_DATA_SYNC_MODE_MASK);
-                rslt = bmi08a_write_feature_config(BMI08_ACCEL_DATA_SYNC_ADR, &data[0], BMI08_ACCEL_DATA_SYNC_LEN, dev);
-            }
-        }
-
-        /* Delay of 100ms for data sync configurations to take effect */
-        dev->delay_us(100000, dev->intf_ptr_accel);
-    }
-
-    return rslt;
-}
-
-/*!
  *  @brief This API reads the synchronized accel & gyro data from the sensor,
  *  store it in the bmi08_sensor_data structure instance
  *  passed by the user.

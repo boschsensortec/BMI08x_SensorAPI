@@ -158,8 +158,8 @@ static int8_t init_bmi08(void)
                 /* Mode (0 = off, 1 = 400Hz, 2 = 1kHz, 3 = 2kHz) */
                 sync_cfg.mode = BMI08_ACCEL_DATA_SYNC_MODE_400HZ;
 
-                rslt = bmi08a_configure_data_synchronization(sync_cfg, &bmi08dev);
-                bmi08_error_codes_print_result("bmi08a_configure_data_synchronization", rslt);
+                rslt = bmi08xa_configure_data_synchronization(sync_cfg, &bmi08dev);
+                bmi08_error_codes_print_result("bmi08xa_configure_data_synchronization", rslt);
             }
 
             if (rslt == BMI08_OK)
@@ -252,8 +252,8 @@ static int8_t disable_bmi08_data_synchronization_interrupt()
     /*turn off the sync feature*/
     sync_cfg.mode = BMI08_ACCEL_DATA_SYNC_MODE_OFF;
 
-    rslt = bmi08a_configure_data_synchronization(sync_cfg, &bmi08dev);
-    bmi08_error_codes_print_result("bmi08a_configure_data_synchronization", rslt);
+    rslt = bmi08xa_configure_data_synchronization(sync_cfg, &bmi08dev);
+    bmi08_error_codes_print_result("bmi08xa_configure_data_synchronization", rslt);
 
     /* Wait for 150ms to enable the data synchronization --delay taken care inside the function */
     /* configure synchronization interrupt pins */

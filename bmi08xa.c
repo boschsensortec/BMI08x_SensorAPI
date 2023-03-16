@@ -809,4 +809,35 @@ static int8_t validate_accel_self_test(const struct bmi08_sensor_data *accel_pos
     return rslt;
 }
 
+/*!
+ *  @brief This API is used to enable/disable and configure the data synchronization
+ *  feature.
+ */
+int8_t bmi08xa_configure_data_synchronization(struct bmi08_data_sync_cfg sync_cfg, struct bmi08_dev *dev) 
+{
+    int8_t rslt;
+    uint16_t data[BMI08_ACCEL_DATA_SYNC_LEN];
+
+    /* Set device configuration and gyro registers. */
+    rslt = bmi08g_configure_data_synchronization(sync_cfg, dev);
+
+    /* Proceed if gyro setting is fine */
+    if (rslt == BMI08_OK)
+    {
+        rslt = bmi08xa_set_meas_conf(dev);
+
+        if (rslt == BMI08_OK)
+        {
+            /* Enable data synchronization */
+            data[0] = (sync_cfg.mode & BMI08_ACCEL_DATA_SYNC_MODE_MASK);
+            rslt = bmi08a_write_feature_config(BMI08_ACCEL_DATA_SYNC_ADR, &data[0], BMI08_ACCEL_DATA_SYNC_LEN, dev);
+        }
+
+        /* Delay of 100ms for data sync configurations to take effect */
+        dev->delay_us(100000, dev->intf_ptr_accel);
+    }
+
+    return rslt;
+}
+
 /*! @endcond */

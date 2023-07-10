@@ -1,5 +1,5 @@
 /**
-* Copyright (c) 2022 Bosch Sensortec GmbH. All rights reserved.
+* Copyright (c) 2023 Bosch Sensortec GmbH. All rights reserved.
 *
 * BSD-3-Clause
 *
@@ -31,8 +31,8 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 * @file       bmi08_defs.h
-* @date       2022-04-10
-* @version    v1.6.0
+* @date       2023-03-27
+* @version    v1.7.1
 *
 */
 
@@ -196,6 +196,9 @@
 
 /**\name    Accel Self test register */
 #define BMI08_REG_ACCEL_SELF_TEST               UINT8_C(0x6D)
+
+/**\name    Accel watchdog register */
+#define BMI08_REG_ACCEL_WDT                     UINT8_C(0x70)
 
 /**\name    Accel Power mode configuration register */
 #define BMI08_REG_ACCEL_PWR_CONF                UINT8_C(0x7C)
@@ -370,6 +373,9 @@
 
 /**\name    Gyro FIFO watermark enable register */
 #define BMI08_REG_GYRO_FIFO_WM_ENABLE           UINT8_C(0x1E)
+
+/**\name    Gyro watchdog register */
+#define BMI08_REG_GYRO_WDT                      UINT8_C(0x34)
 
 /**\name    Gyro Self test register */
 #define BMI08_REG_GYRO_SELF_TEST                UINT8_C(0x3C)
@@ -654,6 +660,12 @@
 
 /*! @name FIFO down sampling bit positions */
 #define BMI08_ACC_FIFO_DOWNS_POS                UINT8_C(0x04)
+
+/*! @name Watch-dog bit positions */
+#define BMI08_I2C_WDT_SEL_MASK                  UINT8_C(0x02)
+#define BMI08_I2C_WDT_SEL_POS                   UINT8_C(1)
+#define BMI08_I2C_WDT_EN_MASK                   UINT8_C(0x04)
+#define BMI08_I2C_WDT_EN_POS                    UINT8_C(2)
 
 /*! @name FIFO down sampling user macros */
 #define BMI08_ACC_FIFO_DOWN_SAMPLE_0            UINT8_C(0)
@@ -1126,7 +1138,7 @@ struct bmi08_dev
 
     /*! Max read/write length
      * To be set by the user */
-    uint8_t read_write_len;
+    uint16_t read_write_len;
 
     /*! Read function pointer */
     bmi08_read_fptr_t read;

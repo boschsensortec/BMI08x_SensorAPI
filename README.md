@@ -1,8 +1,8 @@
-# BMI08X Sensor API
+# BMI08X SensorAPI
 
 > This package contains SensorAPIs for BMI08X Sensor
 
-# BMI085/BMI088 Sensor API
+# BMI085/BMI088 SensorAPI
 
 ### Sensor Overview
 
@@ -15,7 +15,7 @@ BMI085/BMI088 is an inertial measurement unit(IMU) for the detection of movement
 - Data synchronization
 
 
-# BMI088_MM Sensor API
+# BMI088_MM SensorAPI
 
 ### Sensor overview
 
@@ -36,3 +36,12 @@ BMI088_MM is a high-performance longevity Inertial Measurement. Unit (IMU) with 
 - No motion
 - Orientation
 - Data synchronization
+
+# BMI088_ANYMOTION SensorAPI
+
+### Sensor overview
+
+BMI088 is an inertial measurement unit(IMU) for the detection of movements and rotations in 6 degrees of freedom (6-DoF). It includes the functionality of two inertial sensors in one device: an advanced triaxial 16-bit gyroscope and a versatile, leading edge triaxial 16-bit accelerometer.
+
+### Features
+- Any motion

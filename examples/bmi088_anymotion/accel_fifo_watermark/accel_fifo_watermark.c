@@ -7,7 +7,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "bmi088_mm.h"
+#include "bmi088_anymotion.h"
 #include "common.h"
 
 /*********************************************************************/
@@ -54,12 +54,11 @@ static void init_bmi08(struct bmi08_dev *bmi08dev)
 {
     int8_t rslt;
 
-    /* Initialize bmi08 sensors (accel & gyro) */
-    if (bmi088_mma_init(bmi08dev) == BMI08_OK && bmi08g_init(bmi08dev) == BMI08_OK)
+    /* Initialize bmi08 sensors (accel)) */
+    if (bmi088_anymotion_init(bmi08dev) == BMI08_OK)
     {
         printf("BMI08 initialization success!\n");
         printf("Accel chip ID - 0x%x\n", bmi08dev->accel_chip_id);
-        printf("Gyro chip ID - 0x%x\n", bmi08dev->gyro_chip_id);
 
         /* Reset the accelerometer */
         rslt = bmi08a_soft_reset(bmi08dev);
@@ -75,21 +74,16 @@ static void init_bmi08(struct bmi08_dev *bmi08dev)
         /* Set accel power mode */
         bmi08dev->accel_cfg.power = BMI08_ACCEL_PM_ACTIVE;
         rslt = bmi08a_set_power_mode(bmi08dev);
-    }
-
-    if (rslt == BMI08_OK)
-    {
-        bmi08dev->gyro_cfg.power = BMI08_GYRO_PM_NORMAL;
-        rslt = bmi08g_set_power_mode(bmi08dev);
+        bmi08_check_rslt("bmi08a_set_power_mode", rslt);
     }
 
     if (rslt == BMI08_OK)
     {
         bmi08dev->accel_cfg.bw = BMI08_ACCEL_BW_NORMAL;
         bmi08dev->accel_cfg.odr = BMI08_ACCEL_ODR_200_HZ;
-        bmi08dev->accel_cfg.range = BMI088_MM_ACCEL_RANGE_6G;
-        rslt = bmi088_mma_set_meas_conf(bmi08dev);
-        bmi08_check_rslt("bmi088_mma_set_meas_conf", rslt);
+        bmi08dev->accel_cfg.range = BMI088_ANYMOTION_ACCEL_RANGE_6G;
+        rslt = bmi088_anymotion_set_meas_conf(bmi08dev);
+        bmi08_check_rslt("bmi088_anymotion_set_meas_conf", rslt);
     }
 }
 
@@ -101,14 +95,13 @@ static void configure_bmi08_fifo_wm_interrupt(struct bmi08_dev *bmi08dev)
 
     /* Configure the Interrupt configurations */
     int_config.int_channel = BMI08_INT_CHANNEL_1;
-    int_config.int_type = BMI08_ACCEL_INT_FIFO_WM;
     int_config.int_pin_cfg.lvl = BMI08_INT_ACTIVE_HIGH;
     int_config.int_pin_cfg.output_mode = BMI08_INT_MODE_PUSH_PULL;
     int_config.int_pin_cfg.enable_int_pin = BMI08_ENABLE;
 
     /* Set the interrupt configuration */
-    rslt = bmi088_mma_set_int_config(&int_config, BMI088_MM_ACCEL_INT_FIFO_WM, bmi08dev);
-    bmi08_check_rslt("bmi088_mma_set_int_config", rslt);
+    rslt = bmi088_anymotion_set_int_config(&int_config, BMI088_ANYMOTION_ACCEL_INT_FIFO_WM, bmi08dev);
+    bmi08_check_rslt("bmi088_anymotion_set_int_config", rslt);
 
     config.accel_en = BMI08_ENABLE;
     config.int1_en = BMI08_ENABLE;
@@ -145,7 +138,7 @@ int main(void)
      *         For I2C : BMI08_I2C_INTF
      *         For SPI : BMI08_SPI_INTF
      */
-    rslt = bmi08_interface_init(&bmi08, BMI08_SPI_INTF);
+    rslt = bmi08_interface_init(&bmi08, BMI08_I2C_INTF);
     bmi08_check_rslt("bmi08_interface_init", rslt);
 
     /* Initialize the sensors */

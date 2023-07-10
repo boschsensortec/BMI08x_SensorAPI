@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2022 Bosch Sensortec GmbH
+ * Copyright (C) 2023 Bosch Sensortec GmbH
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -53,6 +53,7 @@ static void init_bmi08(struct bmi08_dev *bmi08dev)
 
         /* Reset the accelerometer */
         rslt = bmi08a_soft_reset(bmi08dev);
+        bmi08_check_rslt("bmi08a_soft_reset", rslt);
     }
     else
     {
@@ -62,12 +63,9 @@ static void init_bmi08(struct bmi08_dev *bmi08dev)
 
     if (rslt == BMI08_OK)
     {
-        /* Max read/write length (maximum supported length is 32).
-         * To be set by the user */
-        bmi08dev->read_write_len = 32;
-
         bmi08dev->gyro_cfg.power = BMI08_GYRO_PM_NORMAL;
         rslt = bmi08g_set_power_mode(bmi08dev);
+        bmi08_check_rslt("bmi08g_set_power_mode", rslt);
     }
 
     if (rslt == BMI08_OK)
@@ -185,7 +183,7 @@ int main(void)
      * For I2C : BMI08_I2C_INTF
      * For SPI : BMI08_SPI_INTF
      */
-    rslt = bmi08_interface_init(&bmi08, BMI08_I2C_INTF);
+    rslt = bmi08_interface_init(&bmi08, BMI08_SPI_INTF);
     bmi08_check_rslt("bmi08_interface_init", rslt);
 
     init_bmi08(&bmi08);

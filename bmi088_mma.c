@@ -1,5 +1,5 @@
 /**
-* Copyright (c) 2022 Bosch Sensortec GmbH. All rights reserved.
+* Copyright (c) 2023 Bosch Sensortec GmbH. All rights reserved.
 *
 * BSD-3-Clause
 *
@@ -31,8 +31,8 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 * @file       bmi088_mma.c
-* @date       2022-04-10
-* @version    v1.6.0
+* @date       2023-03-27
+* @version    v1.7.1
 *
 */
 
@@ -653,6 +653,18 @@ static int8_t validate_accel_self_test(const struct bmi08_sensor_data *accel_pos
 static void convert_lsb_g(const struct bmi088_mm_selftest_delta_limit *accel_data_diff,
                           struct bmi088_mm_selftest_delta_limit *accel_data_diff_mg);
 
+/*!
+ * @brief This API sets range in register
+ *
+ * @param[in] dev   : Structure instance of bmi08_dev
+ *
+ * @return Result of API execution status
+ * @retval 0 -> Success
+ * @retval < 0 -> Fail
+ *
+ */
+static int8_t set_range(struct bmi08_dev *dev);
+
 /****************************************************************************/
 
 /**\name        Function definitions
@@ -704,9 +716,6 @@ int8_t bmi088_mma_init(struct bmi08_dev *dev)
 int8_t bmi088_mma_set_meas_conf(struct bmi08_dev *dev)
 {
     int8_t rslt;
-    uint8_t data[2] = { 0 };
-    uint8_t bw, odr, range;
-    uint8_t is_range_invalid = FALSE;
 
     /* Check validity of ODR and BW */
     rslt = bmi08a_set_meas_conf(dev);
@@ -714,45 +723,34 @@ int8_t bmi088_mma_set_meas_conf(struct bmi08_dev *dev)
     /* Proceed if null check is fine */
     if (rslt == BMI08_OK)
     {
-        odr = dev->accel_cfg.odr;
-        bw = dev->accel_cfg.bw;
-        range = dev->accel_cfg.range;
+        rslt = set_range(dev);
+    }
 
-        /* Check for valid Range */
-        if (range > BMI088_MM_ACCEL_RANGE_24G)
+    return rslt;
+}
+
+/*!
+ *  @brief This API is used to enable/disable and configure the data synchronization
+ *  feature.
+ */
+int8_t bmi088_mma_configure_data_synchronization(struct bmi08_data_sync_cfg sync_cfg, struct bmi08_dev *dev)
+{
+    int8_t rslt;
+
+    /* Check for null pointer in the device structure */
+    rslt = null_ptr_check(dev);
+
+    /* Proceed if null check is fine */
+    if (rslt == BMI08_OK)
+    {
+        rslt = bmi08a_configure_data_synchronization(sync_cfg, dev);
+
+        if (rslt == BMI08_OK)
         {
-            /* Updating the status */
-            is_range_invalid = TRUE;
-        }
+            rslt = set_range(dev);
 
-        /* If Range is valid, write it to accel config registers */
-        if (!is_range_invalid)
-        {
-            /* Read accel config. register */
-            rslt = bmi08a_get_regs(BMI08_REG_ACCEL_CONF, data, 2, dev);
-            if (rslt == BMI08_OK)
-            {
-                /* Update data with new odr and bw values */
-                data[0] = BMI08_SET_BITS_POS_0(data[0], BMI08_ACCEL_ODR, odr);
-                data[0] = BMI08_SET_BITS(data[0], BMI08_ACCEL_BW, bw);
-
-                /* Update data with current range values */
-                data[1] = BMI08_SET_BITS_POS_0(data[1], BMI08_ACCEL_RANGE, range);
-
-                /* Write accel range to register */
-                rslt = bmi08a_set_regs(BMI08_REG_ACCEL_CONF, data, 2, dev);
-
-                if (rslt == BMI08_OK)
-                {
-                    /* Delay required to set accel configurations */
-                    dev->delay_us(BMI08_SET_ACCEL_CONF_DELAY * 1000, dev->intf_ptr_accel);
-                }
-            }
-        }
-        else
-        {
-            /* Invalid configuration present in ODR, BW, Range */
-            rslt = BMI08_E_INVALID_CONFIG;
+            /* Delay of 100ms for data sync configurations to take effect */
+            dev->delay_us(100000, dev->intf_ptr_accel);
         }
     }
 
@@ -2322,6 +2320,48 @@ static void convert_lsb_g(const struct bmi088_mm_selftest_delta_limit *accel_dat
 
     /* Accel z value in mg */
     accel_data_diff_mg->z = (int16_t) ((accel_data_diff->z / (int32_t)LSB_PER_G) * 1000);
+}
+
+/*!
+ * @brief This API sets range in register
+ */
+static int8_t set_range(struct bmi08_dev *dev)
+{
+    int8_t rslt;
+    uint8_t data = { 0 };
+    uint8_t range;
+    uint8_t is_range_invalid = FALSE;
+
+    range = dev->accel_cfg.range;
+
+    /* Check for valid Range */
+    if (range > BMI088_MM_ACCEL_RANGE_24G)
+    {
+        /* Updating the status */
+        is_range_invalid = TRUE;
+    }
+
+    /* If Range is valid, write it to accel config registers */
+    if (!is_range_invalid)
+    {
+        /* Read accel config. register */
+        rslt = bmi08a_get_regs(BMI08_REG_ACCEL_RANGE, &data, 1, dev);
+        if (rslt == BMI08_OK)
+        {
+            /* Update data with current range values */
+            data = BMI08_SET_BITS_POS_0(data, BMI08_ACCEL_RANGE, range);
+
+            /* Write accel range to register */
+            rslt = bmi08a_set_regs(BMI08_REG_ACCEL_RANGE, &data, 1, dev);
+        }
+    }
+    else
+    {
+        /* Invalid configuration present in ODR, BW, Range */
+        rslt = BMI08_E_INVALID_CONFIG;
+    }
+
+    return rslt;
 }
 
 /*! @endcond */

@@ -7,7 +7,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "bmi088_mm.h"
+#include "bmi088_anymotion.h"
 #include "common.h"
 
 /*********************************************************************/
@@ -35,12 +35,13 @@ static void init_bmi08(struct bmi08_dev *bmi08dev)
 {
     int8_t rslt;
 
-    /* Initialize bmi08 sensors (accel & gyro) */
-    if (bmi088_mma_init(bmi08dev) == BMI08_OK && bmi08g_init(bmi08dev) == BMI08_OK)
+    rslt = bmi088_anymotion_init(bmi08dev);
+
+    /* Initialize bmi08 sensors (accel) */
+    if (rslt == BMI08_OK)
     {
         printf("BMI08 initialization success!\n");
         printf("Accel chip ID - 0x%x\n", bmi08dev->accel_chip_id);
-        printf("Gyro chip ID - 0x%x\n", bmi08dev->gyro_chip_id);
 
         /* Reset the accelerometer */
         rslt = bmi08a_soft_reset(bmi08dev);
@@ -60,59 +61,47 @@ static void init_bmi08(struct bmi08_dev *bmi08dev)
 
     if (rslt == BMI08_OK)
     {
-        bmi08dev->gyro_cfg.power = BMI08_GYRO_PM_NORMAL;
-        rslt = bmi08g_set_power_mode(bmi08dev);
-    }
-
-    if (rslt == BMI08_OK)
-    {
         printf("Uploading config file !\n");
-
-        /* API uploads the bmi08 config file onto the device */
         rslt = bmi08a_load_config_file(bmi08dev);
     }
 
+    /* API uploads the bmi08 config file onto the device */
     if (rslt == BMI08_OK)
     {
         printf("Upload done !\n");
 
         bmi08dev->accel_cfg.bw = BMI08_ACCEL_BW_NORMAL;
         bmi08dev->accel_cfg.odr = BMI08_ACCEL_ODR_200_HZ;
-        bmi08dev->accel_cfg.range = BMI088_MM_ACCEL_RANGE_6G;
-        rslt = bmi088_mma_set_meas_conf(bmi08dev);
-        bmi08_check_rslt("bmi088_mma_set_meas_conf", rslt);
+        bmi08dev->accel_cfg.range = BMI088_ANYMOTION_ACCEL_RANGE_6G;
+        rslt = bmi088_anymotion_set_meas_conf(bmi08dev);
+        bmi08_check_rslt("bmi088_anymotion_set_meas_conf", rslt);
     }
 }
 
-static void configure_bmi08_no_motion_interrupt(struct bmi08_dev *bmi08dev)
+static void configure_bmi088_any_motion_interrupt(struct bmi08_dev *bmi08dev)
 {
     int8_t rslt;
-    struct bmi088_mm_no_motion_cfg no_motion_cfg;
+    struct bmi088_anymotion_anymotion_cfg any_motion_cfg = { 0 };
     struct bmi08_accel_int_channel_cfg no_motion_int_cfg;
 
-    rslt = bmi088_mma_get_no_motion_config(&no_motion_cfg, bmi08dev);
+    /* Configure any-motion settings */
+    any_motion_cfg.threshold = 0xAA; /* (0.124g * 2^15)/24g = 0xAA */
+    any_motion_cfg.duration = 5; /* 100ms/20 = 5 */
+    any_motion_cfg.enable = 1;
+    any_motion_cfg.x_en = 1;
+    any_motion_cfg.y_en = 1;
+    any_motion_cfg.z_en = 1;
+    rslt = bmi088_anymotion_configure_anymotion(any_motion_cfg, bmi08dev);
 
     if (rslt == BMI08_OK)
     {
-        /* Configure no-motion settings */
-        no_motion_cfg.threshold = 0xAA; /* (0.124g * 2^15)/24g = 0xAA */
-        no_motion_cfg.duration = 5; /* 100ms/20 = 5 */
-        no_motion_cfg.enable = 1;
-        no_motion_cfg.select_x = 1;
-        no_motion_cfg.select_y = 1;
-        no_motion_cfg.select_z = 1;
-        rslt = bmi088_mma_set_no_motion_config(&no_motion_cfg, bmi08dev);
-    }
-
-    if (rslt == BMI08_OK)
-    {
-        /* Map high-g interrupt to INT1 */
+        /* Map any-motion interrupt to INT1 */
         no_motion_int_cfg.int_channel = BMI08_INT_CHANNEL_1;
         no_motion_int_cfg.int_pin_cfg.output_mode = BMI08_INT_MODE_PUSH_PULL;
         no_motion_int_cfg.int_pin_cfg.lvl = BMI08_INT_ACTIVE_HIGH;
         no_motion_int_cfg.int_pin_cfg.enable_int_pin = BMI08_ENABLE;
-        rslt = bmi088_mma_set_int_config(&no_motion_int_cfg, BMI088_MM_NO_MOTION_INT, bmi08dev);
-        bmi08_check_rslt("bmi088_mma_set_int_config", rslt);
+        rslt = bmi088_anymotion_set_int_config(&no_motion_int_cfg, BMI088_ANYMOTION_ANYMOTION_INT, bmi08dev);
+        bmi08_check_rslt("bmi088_anymotion_set_int_config", rslt);
     }
 }
 
@@ -132,28 +121,26 @@ int main(void)
      *         For I2C : BMI08_I2C_INTF
      *         For SPI : BMI08_SPI_INTF
      */
-    rslt = bmi08_interface_init(&bmi08, BMI08_SPI_INTF);
+    rslt = bmi08_interface_init(&bmi08, BMI08_I2C_INTF);
     bmi08_check_rslt("bmi08_interface_init", rslt);
 
     /* Initialize the sensors */
     init_bmi08(&bmi08);
 
-    configure_bmi08_no_motion_interrupt(&bmi08);
+    configure_bmi088_any_motion_interrupt(&bmi08);
 
-    printf("Do not move the board to detect no-motion\n");
+    printf("Move board to detect any-motion\n");
 
     for (;;)
     {
-        rslt = bmi088_mma_get_feat_int_status(&status, &bmi08);
-        bmi08_check_rslt("bmi08a_get_feat_int_status", rslt);
-
-        if (status & BMI088_MM_ACCEL_NO_MOT_INT)
+        rslt = bmi088_anymotion_get_feat_int_status(&status, &bmi08);
+        if (status & BMI088_ANYMOTION_ACCEL_ANY_MOT_INT)
         {
-            printf("No-motion detected %d\n", interrupt_count);
+            printf("Any-motion detected %d\n", interrupt_count);
             interrupt_count++;
             if (interrupt_count == 10)
             {
-                printf("No-motion testing done. Exiting! \n");
+                printf("Any-motion testing done. Exiting! \n");
                 break;
             }
         }

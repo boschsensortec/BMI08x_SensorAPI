@@ -18,7 +18,6 @@
 #define BMI08_SHUTTLE_ID_2  UINT16_C(0x66)
 
 uint8_t acc_dev_add;
-uint8_t gyro_dev_add;
 
 /*!
  * I2C read function map to COINES platform
@@ -162,7 +161,6 @@ int8_t bmi08_interface_init(struct bmi08_dev *bmi08dev, uint8_t intf)
             bmi08dev->read = bmi08_i2c_read;
 
             acc_dev_add = (unsigned char) BMI08_ACCEL_I2C_ADDR_PRIMARY;
-            gyro_dev_add = (unsigned char) BMI08_GYRO_I2C_ADDR_PRIMARY;
             bmi08dev->intf = BMI08_I2C_INTF;
 
             /* PS pin is made high for selecting I2C protocol*/
@@ -185,7 +183,6 @@ int8_t bmi08_interface_init(struct bmi08_dev *bmi08dev, uint8_t intf)
 
             bmi08dev->intf = BMI08_SPI_INTF;
             acc_dev_add = COINES_SHUTTLE_PIN_8;
-            gyro_dev_add = COINES_SHUTTLE_PIN_14;
 
             /* CS pin is made high for selecting SPI protocol*/
             (void)coines_set_pin_config(COINES_SHUTTLE_PIN_8, COINES_PIN_DIRECTION_OUT, COINES_PIN_VALUE_HIGH);
@@ -201,9 +198,8 @@ int8_t bmi08_interface_init(struct bmi08_dev *bmi08dev, uint8_t intf)
         }
 
         bmi08dev->intf_ptr_accel = &acc_dev_add;
-        bmi08dev->intf_ptr_gyro = &gyro_dev_add;
         bmi08dev->delay_us = bmi08_delay_us;
-        bmi08dev->read_write_len = 32;
+        bmi08dev->read_write_len = 1024;
 
         coines_delay_msec(200);
 

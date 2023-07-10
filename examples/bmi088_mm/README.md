@@ -56,25 +56,6 @@
   - Face down
 - Runs on PC, APP2.0 and APP3.0 microcontroller
 
-### interrupt_streaming
-- Configures sensor to use data ready and all features interrupt(except data_sync)
-- Runs on APP2.0 microcontroller
-- **TIP** : Linux users can easily filter out accel. data, gyro. data or feature interrupts
-
-```bash
-$ cat /dev/ttyACM0 | grep "ax"
-```
-
-```bash
-$ cat /dev/ttyACM0 | grep "gx"
-```
-
-```bash
-$ cat /dev/ttyACM0 | grep "INT"
-```
-
----
-
 Commands to run tests on MCU:
 
 To run in Command line :

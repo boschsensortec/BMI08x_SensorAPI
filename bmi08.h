@@ -1,5 +1,5 @@
 /**
-* Copyright (c) 2022 Bosch Sensortec GmbH. All rights reserved.
+* Copyright (c) 2023 Bosch Sensortec GmbH. All rights reserved.
 *
 * BSD-3-Clause
 *
@@ -31,8 +31,8 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 * @file       bmi08.h
-* @date       2022-04-10
-* @version    v1.6.0
+* @date       2023-03-27
+* @version    v1.7.1
 *
 */
 
@@ -179,6 +179,44 @@ int8_t bmi08a_get_regs(uint8_t reg_addr, uint8_t *reg_data, uint32_t len, struct
  */
 int8_t bmi08a_set_regs(uint8_t reg_addr, const uint8_t *reg_data, uint32_t len, struct bmi08_dev *dev);
 
+/*!
+ * \ingroup bmi08aApiRegs
+ * \page bmi08a_api_bmi08a_get_i2c_wdt bmi08a_get_i2c_wdt
+ * \code
+ * int8_t bmi08a_get_i2c_wdt(uint8_t *i2c_wdt_sel, uint8_t *i2c_wdt_en, struct bmi08_dev *dev);
+ * \endcode
+ * @details This API reads the watchdog related information
+ *
+ *  @param[out] i2c_wdt_sel  : Variable to hold i2c_wdt_sel
+ *  @param[out] i2c_wdt_en   : Variable to hold i2c_wdt_en
+ *  @param[in] dev           : Structure instance of bmi08_dev.
+ *
+ * @return Result of API execution status
+ * @retval 0 -> Success
+ * @retval < 0 -> Fail
+ *
+ */
+int8_t bmi08a_get_i2c_wdt(uint8_t *i2c_wdt_sel, uint8_t *i2c_wdt_en, struct bmi08_dev *dev);
+
+/*!
+ * \ingroup bmi08aApiRegs
+ * \page bmi08a_api_bmi08a_get_i2c_wdt bmi08a_set_i2c_wdt
+ * \code
+ * int8_t bmi08a_set_i2c_wdt(uint8_t i2c_wdt_sel, uint8_t i2c_wdt_en, struct bmi08_dev *dev);
+ * \endcode
+ * @details This API writes the watchdog related information
+ *
+ *  @param[in] i2c_wdt_sel  : Variable to hold i2c_wdt_sel
+ *  @param[in] i2c_wdt_en   : Variable to hold i2c_wdt_en
+ *  @param[in] dev          : Structure instance of bmi08_dev.
+ *
+ * @return Result of API execution status
+ * @retval 0 -> Success
+ * @retval < 0 -> Fail
+ *
+ */
+int8_t bmi08a_set_i2c_wdt(uint8_t i2c_wdt_sel, uint8_t i2c_wdt_en, struct bmi08_dev *dev);
+
 /**
  * \ingroup bmi08ag
  * \defgroup bmi08aApiErrorStatus Accel Error status
@@ -310,7 +348,7 @@ int8_t bmi08a_get_meas_conf(struct bmi08_dev *dev);
  * \code
  * int8_t bmi08a_set_meas_conf(const struct bmi08_dev *dev);
  * \endcode
- * @details This API sets the Output data rate, range and bandwidth
+ * @details This API sets the Output data rate and bandwidth
  *  of accel sensor.
  *  @param[in] dev  : Structure instance of bmi08_dev.
  *

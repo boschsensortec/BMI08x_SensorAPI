@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2022 Bosch Sensortec GmbH
+ * Copyright (C) 2023 Bosch Sensortec GmbH
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -118,9 +118,6 @@ static int8_t init_bmi08(void)
         rslt = bmi08a_soft_reset(&bmi08dev);
         bmi08_error_codes_print_result("bmi08a_soft_reset", rslt);
 
-        /* Read/write length */
-        bmi08dev.read_write_len = 32;
-
         printf("Uploading BMI08X data synchronization feature config !\n");
         rslt = bmi08a_load_config_file(&bmi08dev);
         bmi08_error_codes_print_result("bmi08a_load_config_file", rslt);
@@ -158,8 +155,8 @@ static int8_t init_bmi08(void)
                 /* Mode (0 = off, 1 = 400Hz, 2 = 1kHz, 3 = 2kHz) */
                 sync_cfg.mode = BMI08_ACCEL_DATA_SYNC_MODE_400HZ;
 
-                rslt = bmi08a_configure_data_synchronization(sync_cfg, &bmi08dev);
-                bmi08_error_codes_print_result("bmi08a_configure_data_synchronization", rslt);
+                rslt = bmi08xa_configure_data_synchronization(sync_cfg, &bmi08dev);
+                bmi08_error_codes_print_result("bmi08xa_configure_data_synchronization", rslt);
             }
 
             if (rslt == BMI08_OK)
@@ -252,8 +249,8 @@ static int8_t disable_bmi08_data_synchronization_interrupt()
     /*turn off the sync feature*/
     sync_cfg.mode = BMI08_ACCEL_DATA_SYNC_MODE_OFF;
 
-    rslt = bmi08a_configure_data_synchronization(sync_cfg, &bmi08dev);
-    bmi08_error_codes_print_result("bmi08a_configure_data_synchronization", rslt);
+    rslt = bmi08xa_configure_data_synchronization(sync_cfg, &bmi08dev);
+    bmi08_error_codes_print_result("bmi08xa_configure_data_synchronization", rslt);
 
     /* Wait for 150ms to enable the data synchronization --delay taken care inside the function */
     /* configure synchronization interrupt pins */
@@ -329,7 +326,7 @@ int main(void)
      *          For BMI085 : BMI085_VARIANT
      *          For BMI088 : BMI088_VARIANT
      */
-    rslt = bmi08_interface_init(&bmi08dev, BMI08_I2C_INTF, BMI088_VARIANT);
+    rslt = bmi08_interface_init(&bmi08dev, BMI08_I2C_INTF, BMI085_VARIANT);
     bmi08_error_codes_print_result("bmi08_interface_init", rslt);
 
     /* Initialize the sensors */

@@ -1,5 +1,5 @@
 /**
-* Copyright (c) 2022 Bosch Sensortec GmbH. All rights reserved.
+* Copyright (c) 2023 Bosch Sensortec GmbH. All rights reserved.
 *
 * BSD-3-Clause
 *
@@ -31,8 +31,8 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 * @file       bmi08x.h
-* @date       2022-04-10
-* @version    v1.6.0
+* @date       2023-03-27
+* @version    v1.7.1
 *
 */
 
@@ -179,6 +179,31 @@ int8_t bmi08xa_set_meas_conf(struct bmi08_dev *dev);
  *
  */
 int8_t bmi08xa_perform_selftest(struct bmi08_dev *dev);
+
+/**
+ * \ingroup bmi08xag
+ * \defgroup bmi08xaApiSync Data Synchronization
+ * @brief Enable / Disable data synchronization
+ */
+
+/*!
+ * \ingroup bmi08xaApiSync
+ * \page bmi08xa_api_bmi08xa_configure_data_synchronization bmi08xa_configure_data_synchronization
+ * \code
+ * int8_t bmi08xa_configure_data_synchronization(struct bmi08_data_sync_cfg sync_cfg, struct bmi08_dev *dev);
+ * \endcode
+ * @details This API is used to enable/disable the data synchronization
+ *  feature.
+ *
+ *  @param[in] sync_cfg : Configure sync feature
+ *  @param[in] dev : Structure instance of bmi08_dev.
+ *
+ * @return Result of API execution status
+ * @retval 0 -> Success
+ * @retval < 0 -> Fail
+ *
+ */
+int8_t bmi08xa_configure_data_synchronization(struct bmi08_data_sync_cfg sync_cfg, struct bmi08_dev *dev);
 
 #ifdef __cplusplus
 }

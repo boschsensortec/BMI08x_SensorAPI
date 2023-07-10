@@ -1,5 +1,5 @@
 /**
-* Copyright (c) 2022 Bosch Sensortec GmbH. All rights reserved.
+* Copyright (c) 2023 Bosch Sensortec GmbH. All rights reserved.
 *
 * BSD-3-Clause
 *
@@ -31,8 +31,8 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 * @file       bmi08a.c
-* @date       2022-04-10
-* @version    v1.6.0
+* @date       2023-03-27
+* @version    v1.7.1
 *
 */
 
@@ -699,13 +699,14 @@ int8_t bmi08a_get_meas_conf(struct bmi08_dev *dev)
 }
 
 /*!
- * @brief This API sets the output data rate, range and bandwidth
+ * @brief This API sets the output data rate and bandwidth
  * of accel sensor.
  */
 int8_t bmi08a_set_meas_conf(struct bmi08_dev *dev)
 {
     int8_t rslt;
     uint8_t bw, odr;
+    uint8_t data = { 0 };
     uint8_t is_odr_invalid = FALSE, is_bw_invalid = FALSE;
 
     /* Check for null pointer in the device structure*/
@@ -734,12 +735,28 @@ int8_t bmi08a_set_meas_conf(struct bmi08_dev *dev)
         /* Invalid configuration present in ODR and BW */
         if ((!is_odr_invalid) && (!is_bw_invalid))
         {
-            rslt = BMI08_OK;
-        }
-        else
-        {
-            /* Invalid configuration present in ODR and BW */
-            rslt = BMI08_E_INVALID_CONFIG;
+            /* Read accel config. register */
+            rslt = bmi08a_get_regs(BMI08_REG_ACCEL_CONF, &data, 1, dev);
+            if (rslt == BMI08_OK)
+            {
+                /* Update data with new odr and bw values */
+                data = BMI08_SET_BITS_POS_0(data, BMI08_ACCEL_ODR, odr);
+                data = BMI08_SET_BITS(data, BMI08_ACCEL_BW, bw);
+
+                /* Write accel range to register */
+                rslt = bmi08a_set_regs(BMI08_REG_ACCEL_CONF, &data, 1, dev);
+
+                if (rslt == BMI08_OK)
+                {
+                    /* Delay required to set accel configurations */
+                    dev->delay_us(BMI08_SET_ACCEL_CONF_DELAY * 1000, dev->intf_ptr_accel);
+                }
+            }
+            else
+            {
+                /* Invalid configuration present in ODR and BW */
+                rslt = BMI08_E_INVALID_CONFIG;
+            }
         }
     }
 
@@ -1365,6 +1382,66 @@ int8_t bmi08a_set_fifo_down_sample(uint8_t fifo_downs, struct bmi08_dev *dev)
 }
 
 /*!
+ * @brief This API reads the i2c_wdt_sel and i2c_wdt_en information
+ */
+int8_t bmi08a_get_i2c_wdt(uint8_t *i2c_wdt_sel, uint8_t *i2c_wdt_en, struct bmi08_dev *dev)
+{
+    /* Variable to define error */
+    int8_t rslt;
+
+    /* Variable to store wdt information */
+    uint8_t data = 0;
+
+    /* Check for null pointer in the device structure */
+    rslt = null_ptr_check(dev);
+    if ((rslt == BMI08_OK) && (i2c_wdt_sel != NULL) && (i2c_wdt_en != NULL))
+    {
+        /* Read the watchdog information */
+        rslt = bmi08a_get_regs(BMI08_REG_ACCEL_WDT, &data, 1, dev);
+        if (rslt == BMI08_OK)
+        {
+            (*i2c_wdt_sel) = BMI08_GET_BITS(data, BMI08_I2C_WDT_SEL);
+            (*i2c_wdt_en) = BMI08_GET_BITS(data, BMI08_I2C_WDT_EN);
+        }
+    }
+    else
+    {
+        rslt = BMI08_E_NULL_PTR;
+    }
+
+    return rslt;
+}
+
+/*!
+ * @brief This API sets the 2c_wdt_sel and i2c_wdt_en information
+ */
+int8_t bmi08a_set_i2c_wdt(uint8_t i2c_wdt_sel, uint8_t i2c_wdt_en, struct bmi08_dev *dev)
+{
+    /* Variable to define error */
+    int8_t rslt;
+
+    /* Variable to store wdt information */
+    uint8_t data = 0;
+
+    /* Check for null pointer in the device structure */
+    rslt = null_ptr_check(dev);
+    if (rslt == BMI08_OK)
+    {
+        /* Set the watchdog information */
+        rslt = bmi08a_get_regs(BMI08_REG_ACCEL_WDT, &data, 1, dev);
+        if (rslt == BMI08_OK)
+        {
+            data = BMI08_SET_BITS(data, BMI08_I2C_WDT_SEL, i2c_wdt_sel);
+            data = BMI08_SET_BITS(data, BMI08_I2C_WDT_EN, i2c_wdt_en);
+
+            rslt = bmi08a_set_regs(BMI08_REG_ACCEL_WDT, &data, 1, dev);
+        }
+    }
+
+    return rslt;
+}
+
+/*!
  *  @brief This API is used to enable/disable and configure the data synchronization
  *  feature.
  */
@@ -1416,9 +1493,6 @@ int8_t bmi08a_configure_data_synchronization(struct bmi08_data_sync_cfg sync_cfg
                 rslt = bmi08a_write_feature_config(BMI08_ACCEL_DATA_SYNC_ADR, &data[0], BMI08_ACCEL_DATA_SYNC_LEN, dev);
             }
         }
-
-        /* Delay of 100ms for data sync configurations to take effect */
-        dev->delay_us(100000, dev->intf_ptr_accel);
     }
 
     return rslt;

@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2022 Bosch Sensortec GmbH
+ * Copyright (C) 2023 Bosch Sensortec GmbH
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -53,10 +53,6 @@ static void init_bmi08(struct bmi08_dev *bmi08dev)
 
     if (rslt == BMI08_OK)
     {
-        /*! Max read/write length (maximum supported length is 32).
-         * To be set by the user */
-        bmi08dev->read_write_len = 32;
-
         /* Set accel power mode */
         bmi08dev->accel_cfg.power = BMI08_ACCEL_PM_ACTIVE;
         rslt = bmi08a_set_power_mode(bmi08dev);
@@ -109,7 +105,6 @@ static void configure_bmi08_low_g_interrupt(struct bmi08_dev *bmi08dev)
     {
         /* Map low-g interrupt to INT1 */
         low_g_int_cfg.int_channel = BMI08_INT_CHANNEL_1;
-        low_g_int_cfg.int_type = BMI088_MM_LOW_G_INT;
         low_g_int_cfg.int_pin_cfg.output_mode = BMI08_INT_MODE_PUSH_PULL;
         low_g_int_cfg.int_pin_cfg.lvl = BMI08_INT_ACTIVE_HIGH;
         low_g_int_cfg.int_pin_cfg.enable_int_pin = BMI08_ENABLE;

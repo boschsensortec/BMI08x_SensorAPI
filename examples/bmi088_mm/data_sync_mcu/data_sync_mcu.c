@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2022 Bosch Sensortec GmbH
+ * Copyright (C) 2023 Bosch Sensortec GmbH
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -74,10 +74,6 @@ static void init_bmi08(struct bmi08_dev *bmi08dev)
 
     if (rslt == BMI08_OK)
     {
-        /*! Max read/write length (maximum supported length is 32).
-         * To be set by the user */
-        bmi08dev->read_write_len = 32;
-
         /* Set accel power mode */
         bmi08dev->accel_cfg.power = BMI08_ACCEL_PM_ACTIVE;
         rslt = bmi08a_set_power_mode(bmi08dev);
@@ -112,7 +108,7 @@ static void init_bmi08(struct bmi08_dev *bmi08dev)
 
             /*! Mode (0 = off, 1 = 400Hz, 2 = 1kHz, 3 = 2kHz) */
             sync_cfg.mode = BMI08_ACCEL_DATA_SYNC_MODE_400HZ;
-            rslt = bmi08a_configure_data_synchronization(sync_cfg, bmi08dev);
+            rslt = bmi088_mma_configure_data_synchronization(sync_cfg, bmi08dev);
         }
     }
 
@@ -158,7 +154,7 @@ static void enable_bmi08_data_synchronization_interrupt(struct bmi08_dev *bmi08d
     #elif defined(MCU_APP30)
     int_config.accel_int_config_2.int_channel = BMI08_INT_CHANNEL_1;
     #endif
-    int_config.accel_int_config_2.int_type = BMI088_MM_ACCEL_SYNC_DATA_RDY_INT;
+    int_config.accel_int_config_2.int_type = BMI08_ACCEL_INT_SYNC_DATA_RDY;
     int_config.accel_int_config_2.int_pin_cfg.output_mode = BMI08_INT_MODE_PUSH_PULL;
     int_config.accel_int_config_2.int_pin_cfg.lvl = BMI08_INT_ACTIVE_HIGH;
     int_config.accel_int_config_2.int_pin_cfg.enable_int_pin = BMI08_ENABLE;
@@ -209,7 +205,7 @@ static void disable_bmi08_data_synchronization_interrupt(struct bmi08_dev *bmi08
 
     sync_cfg.mode = BMI08_ACCEL_DATA_SYNC_MODE_OFF; /*turn off the sync feature*/
 
-    rslt = bmi08a_configure_data_synchronization(sync_cfg, bmi08dev);
+    rslt = bmi088_mma_configure_data_synchronization(sync_cfg, bmi08dev);
 
     /* Wait for 150ms to enable the data synchronization --delay taken care inside the function */
     /* configure synchronization interrupt pins */
@@ -233,7 +229,7 @@ static void disable_bmi08_data_synchronization_interrupt(struct bmi08_dev *bmi08
     #elif defined(MCU_APP30)
         int_config.accel_int_config_2.int_channel = BMI08_INT_CHANNEL_1;
     #endif
-        int_config.accel_int_config_2.int_type = BMI088_MM_ACCEL_SYNC_DATA_RDY_INT;
+        int_config.accel_int_config_2.int_type = BMI08_ACCEL_INT_SYNC_DATA_RDY;
         int_config.accel_int_config_2.int_pin_cfg.output_mode = BMI08_INT_MODE_PUSH_PULL;
         int_config.accel_int_config_2.int_pin_cfg.lvl = BMI08_INT_ACTIVE_HIGH;
         int_config.accel_int_config_2.int_pin_cfg.enable_int_pin = BMI08_DISABLE;

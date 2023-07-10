@@ -1,5 +1,5 @@
 /**
-* Copyright (c) 2022 Bosch Sensortec GmbH. All rights reserved.
+* Copyright (c) 2023 Bosch Sensortec GmbH. All rights reserved.
 *
 * BSD-3-Clause
 *
@@ -31,8 +31,8 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 * @file       bmi088_mm.h
-* @date       2022-04-10
-* @version    v1.6.0
+* @date       2023-03-27
+* @version    v1.7.1
 *
 */
 
@@ -191,7 +191,7 @@ extern "C" {
 #define BMI088_MM_HIGH_G_AXIS_X_MASK                   UINT8_C(0x08)
 #define BMI088_MM_HIGH_G_AXIS_Y_MASK                   UINT8_C(0x10)
 #define BMI088_MM_HIGH_G_AXIS_Z_MASK                   UINT8_C(0x20)
-#define BMI088_MM_HIGH_G_AXIS_DIRECTION_MASK           UINT8_C(0x80)
+#define BMI088_MM_HIGH_G_AXIS_DIRECTION_MASK           UINT8_C(0x40)
 
 /**\name     Mask definitions for low-g feature configuration */
 #define BMI088_MM_LOW_G_THRES_MASK                     UINT16_C(0x7FFF)
@@ -948,6 +948,31 @@ int8_t bmi088_mma_get_remap_axes(struct bmi088_mm_remap *remapped_axis, struct b
  * @retval <0 -> Fail
  */
 int8_t bmi088_mma_get_version_config(uint16_t *config_major, uint16_t *config_minor, struct bmi08_dev *dev);
+
+/**
+ * \ingroup bmi088_mm
+ * \defgroup bmi088_mmaApiSync Data Synchronization
+ * @brief Enable / Disable data synchronization
+ */
+
+/*!
+ * \ingroup bmi088_mmaApiSync
+ * \page bmi088_mma_api_bmi088_mma_configure_data_synchronization bmi088_mma_configure_data_synchronization
+ * \code
+ * int8_t bmi088_mma_configure_data_synchronization(struct bmi08_data_sync_cfg sync_cfg, struct bmi08_dev *dev);
+ * \endcode
+ * @details This API is used to enable/disable the data synchronization
+ *  feature.
+ *
+ *  @param[in] sync_cfg : Configure sync feature
+ *  @param[in] dev : Structure instance of bmi08_dev.
+ *
+ * @return Result of API execution status
+ * @retval 0 -> Success
+ * @retval < 0 -> Fail
+ *
+ */
+int8_t bmi088_mma_configure_data_synchronization(struct bmi08_data_sync_cfg sync_cfg, struct bmi08_dev *dev);
 
 #ifdef __cplusplus
 }

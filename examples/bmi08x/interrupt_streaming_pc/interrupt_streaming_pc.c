@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2022 Bosch Sensortec GmbH
+ * Copyright (C) 2023 Bosch Sensortec GmbH
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -540,7 +540,7 @@ int main(void)
      *          For BMI085 : BMI085_VARIANT
      *          For BMI088 : BMI088_VARIANT
      */
-    rslt = bmi08_interface_init(&bmi08dev, BMI08_I2C_INTF, BMI085_VARIANT);
+    rslt = bmi08_interface_init(&bmi08dev, BMI08_SPI_INTF, BMI085_VARIANT);
     bmi08_error_codes_print_result("bmi08_interface_init", rslt);
 
     if (rslt == BMI08_OK)

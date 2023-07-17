@@ -1515,36 +1515,28 @@ int8_t bmi08a_get_synchronized_data(struct bmi08_sensor_data *accel,
     /* Proceed if pointers are not NULL */
     if ((accel != NULL) && (gyro != NULL))
     {
-        /* Read accel x,y sensor data */
-        reg_addr = BMI08_REG_ACCEL_GP_0;
-        rslt = bmi08a_get_regs(reg_addr, &data[0], 4, dev);
+        /* Read accel x,y, z sensor data */
+        rslt = bmi08a_get_regs(BMI08_REG_ACCEL_X_LSB, &data[0], 6, dev);
 
         if (rslt == BMI08_OK)
         {
-            /* Read accel sensor data */
-            reg_addr = BMI08_REG_ACCEL_GP_4;
-            rslt = bmi08a_get_regs(reg_addr, &data[4], 2, dev);
+            lsb = data[0];
+            msb = data[1];
+            msblsb = (msb << 8) | lsb;
+            accel->x = ((int16_t) msblsb); /* Data in X axis */
 
-            if (rslt == BMI08_OK)
-            {
-                lsb = data[0];
-                msb = data[1];
-                msblsb = (msb << 8) | lsb;
-                accel->x = ((int16_t) msblsb); /* Data in X axis */
+            lsb = data[2];
+            msb = data[3];
+            msblsb = (msb << 8) | lsb;
+            accel->y = ((int16_t) msblsb); /* Data in Y axis */
 
-                lsb = data[2];
-                msb = data[3];
-                msblsb = (msb << 8) | lsb;
-                accel->y = ((int16_t) msblsb); /* Data in Y axis */
+            lsb = data[4];
+            msb = data[5];
+            msblsb = (msb << 8) | lsb;
+            accel->z = ((int16_t) msblsb); /* Data in Z axis */
 
-                lsb = data[4];
-                msb = data[5];
-                msblsb = (msb << 8) | lsb;
-                accel->z = ((int16_t) msblsb); /* Data in Z axis */
-
-                /* Read gyro sensor data */
-                rslt = bmi08g_get_data(gyro, dev);
-            }
+            /* Read gyro sensor data */
+            rslt = bmi08g_get_data(gyro, dev);
         }
     }
     else

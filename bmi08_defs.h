@@ -282,7 +282,7 @@
 
 /**\name    Mask definitions for odr, bandwidth and range */
 #define BMI08_ACCEL_ODR_MASK                    UINT8_C(0x0F)
-#define BMI08_ACCEL_BW_MASK                     UINT8_C(0xF0)
+#define BMI08_ACCEL_BW_MASK                     UINT8_C(0x70)
 #define BMI08_ACCEL_RANGE_MASK                  UINT8_C(0x03)
 
 /**\name    Position definitions for odr, bandwidth and range */

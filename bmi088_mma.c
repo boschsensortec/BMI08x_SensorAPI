@@ -948,7 +948,7 @@ int8_t bmi088_mma_set_high_g_config(const struct bmi088_mm_high_g_cfg *config, s
         /* Set duration */
         feature_config[idx + 2] = BMI08_SET_BITS_POS_0(feature_config[idx + 2], BMI088_MM_HIGH_G_DUR, config->duration);
 
-        rslt = bmi08a_set_regs(BMI08_REG_ACCEL_FEATURE_CFG, (uint8_t*) feature_config, 32, dev);
+        rslt = bmi08a_set_regs(BMI08_REG_ACCEL_FEATURE_CFG, (uint8_t*) feature_config, sizeof(feature_config), dev); //corrected size from "32" to "sizeof(feature_config)" that is only 12byte 
     }
 
     return rslt;

@@ -1,8 +1,8 @@
-COINES_INSTALL_PATH ?= ../../../..
+COINES_INSTALL_PATH ?= ../../../../..
 
 EXAMPLE_FILE = any_motion.c
 
-API_LOCATION ?= ../..
+API_LOCATION ?= ../../..
 
 C_SRCS += \
 $(API_LOCATION)/bmi08a.c \

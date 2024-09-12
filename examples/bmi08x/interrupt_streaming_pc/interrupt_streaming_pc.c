@@ -557,13 +557,13 @@ int main(void)
 
         /* Wait for 10 ms */
         coines_delay_msec(10);
-
-        /* Start interrupt streaming */
-        (void)coines_start_stop_streaming(COINES_STREAMING_MODE_INTERRUPT, COINES_STREAMING_START);
-
+        
         /* Enable data ready interrupts */
         rslt = enable_bmi08_interrupt();
         bmi08_error_codes_print_result("enable_bmi08_interrupt", rslt);
+
+        /* Start interrupt streaming */
+        (void)coines_start_stop_streaming(COINES_STREAMING_MODE_INTERRUPT, COINES_STREAMING_START);
 
         if (rslt == BMI08_OK)
         {

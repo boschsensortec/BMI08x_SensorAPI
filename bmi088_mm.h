@@ -1,5 +1,5 @@
 /**
-* Copyright (c) 2023 Bosch Sensortec GmbH. All rights reserved.
+* Copyright (c) 2024 Bosch Sensortec GmbH. All rights reserved.
 *
 * BSD-3-Clause
 *
@@ -31,8 +31,8 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 * @file       bmi088_mm.h
-* @date       2023-03-27
-* @version    v1.7.1
+* @date       2024-07-29
+* @version    v1.9.0
 *
 */
 
@@ -65,6 +65,7 @@ extern "C" {
 
 /**\name    Orientation result register*/
 #define BMI088_MM_REG_ORIENT_HIGHG_OUT                 UINT8_C(0x29)
+#define BMI088_MM_REG_ORIENT_HIGHG_OUT_LENGTH          UINT8_C(1)
 
 #define BMI088_MM_ACCEL_DATA_SYNC_INT                  UINT8_C(0x01)
 #define BMI088_MM_ACCEL_ANY_MOT_INT                    UINT8_C(0x02)
@@ -74,7 +75,7 @@ extern "C" {
 #define BMI088_MM_ACCEL_NO_MOT_INT                     UINT8_C(0x20)
 #define BMI088_MM_ACCEL_ERR_INT                        UINT8_C(0x80)
 
-/**\name  BMI09 Accel Range */
+/**\name  BMI08 Accel Range */
 #define BMI088_MM_ACCEL_RANGE_3G                       UINT8_C(0x00)
 #define BMI088_MM_ACCEL_RANGE_6G                       UINT8_C(0x01)
 #define BMI088_MM_ACCEL_RANGE_12G                      UINT8_C(0x02)
@@ -92,6 +93,12 @@ extern "C" {
 #define BMI088_MM_ACCEL_NO_MOT_INT_ENABLE              UINT8_C(0x20)
 #define BMI088_MM_ACCEL_ERR_INT_DISABLE                UINT8_C(0x00)
 #define BMI088_MM_ACCEL_ERR_INT_ENABLE                 UINT8_C(0x80)
+
+/**\name  BMI08 Anymotion ODR */
+#define BMI088_MM_ACCEL_ANY_MOT_ODR_25HZ               UINT8_C(0x00)
+#define BMI088_MM_ACCEL_ANY_MOT_ODR_50HZ               UINT8_C(0x01)
+#define BMI088_MM_ACCEL_ANY_MOT_ODR_100HZ              UINT8_C(0x02)
+#define BMI088_MM_ACCEL_ANY_MOT_ODR_200HZ              UINT8_C(0x03)
 
 /**\name    Axis Remap Feature size */
 #define BMI088_MM_FEATURE_SIZE                         UINT8_C(0x1E)
@@ -145,6 +152,8 @@ extern "C" {
 #define BMI088_MM_ACCEL_ANYMOTION_THRESHOLD_SHIFT      UINT8_C(0x00)
 #define BMI088_MM_ACCEL_ANYMOTION_NOMOTION_SEL_MASK    UINT16_C(0x0800)
 #define BMI088_MM_ACCEL_ANYMOTION_NOMOTION_SEL_SHIFT   UINT8_C(0x0B)
+#define BMI088_MM_ACCEL_ANYMOTION_ODR_MASK             UINT8_C(0x3000)
+#define BMI088_MM_ACCEL_ANYMOTION_ODR_SHIFT            UINT8_C(0x0C)
 #define BMI088_MM_ACCEL_ANYMOTION_DURATION_MASK        UINT16_C(0x1FFF)
 #define BMI088_MM_ACCEL_ANYMOTION_DURATION_SHIFT       UINT8_C(0x00)
 #define BMI088_MM_ACCEL_ANYMOTION_X_EN_MASK            UINT16_C(0x2000)
@@ -334,6 +343,9 @@ struct bmi088_mm_anymotion_cfg
 
     /*! Enable any-motion feature */
     uint16_t enable;
+
+    /*Select ODR for anymotion feature */
+    uint16_t odr;
 
     /* 13 bit set the duration for any- and nomotion (time = duration * 20ms (@50Hz)) */
     uint16_t duration;

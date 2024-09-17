@@ -1,5 +1,5 @@
 /**
-* Copyright (c) 2023 Bosch Sensortec GmbH. All rights reserved.
+* Copyright (c) 2024 Bosch Sensortec GmbH. All rights reserved.
 *
 * BSD-3-Clause
 *
@@ -31,8 +31,8 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 * @file       bmi08x.h
-* @date       2023-03-27
-* @version    v1.7.1
+* @date       2024-07-29
+* @version    v1.9.0
 *
 */
 

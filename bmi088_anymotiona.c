@@ -1,5 +1,5 @@
 /**
-* Copyright (c) 2023 Bosch Sensortec GmbH. All rights reserved.
+* Copyright (c) 2024 Bosch Sensortec GmbH. All rights reserved.
 *
 * BSD-3-Clause
 *
@@ -31,8 +31,8 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 * @file       bmi088_anymotiona.c
-* @date       2023-03-27
-* @version    v1.7.1
+* @date       2024-07-29
+* @version    v1.9.0
 *
 */
 
@@ -448,14 +448,14 @@ int8_t bmi088_anymotion_set_meas_conf(struct bmi08_dev *dev)
         if (!is_range_invalid)
         {
             /* Read accel config. register */
-            rslt = bmi08a_get_regs(BMI08_REG_ACCEL_RANGE, &data, 1, dev);
+            rslt = bmi08a_get_set_regs(BMI08_REG_ACCEL_RANGE, &data, BMI08_REG_ACCEL_RANGE_LENGTH, dev, GET_FUNC);
             if (rslt == BMI08_OK)
             {
                 /* Update data with current range values */
                 data = BMI08_SET_BITS_POS_0(data, BMI08_ACCEL_RANGE, range);
 
                 /* Write accel range to register */
-                rslt = bmi08a_set_regs(BMI08_REG_ACCEL_RANGE, &data, 1, dev);
+                rslt = bmi08a_get_set_regs(BMI08_REG_ACCEL_RANGE, &data, BMI08_REG_ACCEL_RANGE_LENGTH, dev, SET_FUNC);
             }
         }
         else
@@ -484,7 +484,7 @@ int8_t bmi088_anymotion_get_data(struct bmi08_sensor_data *accel, struct bmi08_d
     if (accel != NULL)
     {
         /* Read accel sensor data */
-        rslt = bmi08a_get_regs(BMI08_REG_ACCEL_X_LSB, data, 6, dev);
+        rslt = bmi08a_get_set_regs(BMI08_REG_ACCEL_X_LSB, data, BMI08_REG_ACCEL_X_LSB_LENGHT, dev, GET_FUNC);
 
         if (rslt == BMI08_OK)
         {
@@ -707,10 +707,11 @@ int8_t bmi088_anymotion_get_version_config(uint16_t *config_major, uint16_t *con
     if ((config_major != NULL) && (config_minor != NULL))
     {
         /* Get config file identification from the sensor */
-        rslt = bmi08a_get_regs(BMI08_REG_ACCEL_FEATURE_CFG,
-                               (uint8_t *)feature_config,
-                               BMI088_ANYMOTION_FEATURE_SIZE,
-                               dev);
+        rslt = bmi08a_get_set_regs(BMI08_REG_ACCEL_FEATURE_CFG,
+                                   (uint8_t *)feature_config,
+                                   BMI088_ANYMOTION_FEATURE_SIZE,
+                                   dev,
+                                   GET_FUNC);
 
         if (rslt == BMI08_OK)
         {
@@ -795,7 +796,8 @@ int8_t bmi088_anymotion_get_feat_int_status(uint8_t *int_status, struct bmi08_de
 
     if (int_status != NULL)
     {
-        rslt = bmi08a_get_regs(BMI08_REG_ACCEL_INT_STAT_0, &status, 1, dev);
+        rslt =
+            bmi08a_get_set_regs(BMI08_REG_ACCEL_INT_STAT_0, &status, BMI08_REG_ACCEL_INT_STATUS_LENGTH, dev, GET_FUNC);
         if (rslt == BMI08_OK)
         {
             (*int_status) = status;
@@ -869,7 +871,7 @@ static int8_t set_int_pin_config(const struct bmi08_accel_int_channel_cfg *int_c
     if (!is_channel_invalid)
     {
         /* Read interrupt pin configuration register */
-        rslt = bmi08a_get_regs(reg_addr, &data, 1, dev);
+        rslt = bmi08a_get_set_regs(reg_addr, &data, BMI08_REG_INT_CFG_LENGTH, dev, GET_FUNC);
 
         if (rslt == BMI08_OK)
         {
@@ -881,7 +883,7 @@ static int8_t set_int_pin_config(const struct bmi08_accel_int_channel_cfg *int_c
             data = BMI08_SET_BIT_VAL_0(data, BMI08_ACCEL_INT_IN);
 
             /* Write to interrupt pin configuration register */
-            rslt = bmi08a_set_regs(reg_addr, &data, 1, dev);
+            rslt = bmi08a_get_set_regs(reg_addr, &data, BMI08_REG_INT_CFG_LENGTH, dev, SET_FUNC);
         }
     }
     else
@@ -923,7 +925,7 @@ static int8_t set_accel_anymotion_int(const struct bmi08_accel_int_channel_cfg *
 
         if (rslt == BMI08_OK)
         {
-            rslt = bmi08a_get_regs(reg_addr, &data, 1, dev);
+            rslt = bmi08a_get_set_regs(reg_addr, &data, BMI08_REG_ACCEL_INT_MAP_DATA_LENGTH, dev, GET_FUNC);
 
             if (int_config->int_pin_cfg.enable_int_pin == BMI08_ENABLE)
             {
@@ -938,7 +940,7 @@ static int8_t set_accel_anymotion_int(const struct bmi08_accel_int_channel_cfg *
             if (rslt == BMI08_OK)
             {
                 /* Write to interrupt map register */
-                rslt = bmi08a_set_regs(reg_addr, &data, 1, dev);
+                rslt = bmi08a_get_set_regs(reg_addr, &data, BMI08_REG_ACCEL_INT_MAP_DATA_LENGTH, dev, SET_FUNC);
             }
 
             if (rslt == BMI08_OK)
@@ -983,7 +985,7 @@ static int8_t set_accel_err_int(const struct bmi08_accel_int_channel_cfg *int_co
 
         if (rslt == BMI08_OK)
         {
-            rslt = bmi08a_get_regs(reg_addr, &data, 1, dev);
+            rslt = bmi08a_get_set_regs(reg_addr, &data, BMI08_REG_ACCEL_INT_MAP_DATA_LENGTH, dev, GET_FUNC);
 
             if (int_config->int_pin_cfg.enable_int_pin == BMI08_ENABLE)
             {
@@ -998,7 +1000,7 @@ static int8_t set_accel_err_int(const struct bmi08_accel_int_channel_cfg *int_co
             if (rslt == BMI08_OK)
             {
                 /* Write to interrupt map register */
-                rslt = bmi08a_set_regs(reg_addr, &data, 1, dev);
+                rslt = bmi08a_get_set_regs(reg_addr, &data, BMI08_REG_ACCEL_INT_MAP_DATA_LENGTH, dev, SET_FUNC);
             }
 
             if (rslt == BMI08_OK)
@@ -1047,7 +1049,11 @@ static int8_t set_remap_axes(const struct bmi08_axes_remap *remap_data, struct b
     if (remap_data != NULL)
     {
         /* Read the configuration file */
-        rslt = bmi08a_get_regs(BMI08_REG_ACCEL_FEATURE_CFG, feature_config, BMI088_ANYMOTION_FEATURE_SIZE, dev);
+        rslt = bmi08a_get_set_regs(BMI08_REG_ACCEL_FEATURE_CFG,
+                                   feature_config,
+                                   BMI088_ANYMOTION_FEATURE_SIZE,
+                                   dev,
+                                   GET_FUNC);
 
         if (rslt == BMI08_OK)
         {
@@ -1078,7 +1084,11 @@ static int8_t set_remap_axes(const struct bmi08_axes_remap *remap_data, struct b
             feature_config[index + 1] = z_axis_sign;
 
             /* Set the re-mapped axes */
-            rslt = bmi08a_set_regs(BMI08_REG_ACCEL_FEATURE_CFG, feature_config, BMI088_ANYMOTION_FEATURE_SIZE, dev);
+            rslt = bmi08a_get_set_regs(BMI08_REG_ACCEL_FEATURE_CFG,
+                                       feature_config,
+                                       BMI088_ANYMOTION_FEATURE_SIZE,
+                                       dev,
+                                       SET_FUNC);
         }
     }
     else
@@ -1106,7 +1116,11 @@ static int8_t get_remap_axes(struct bmi08_axes_remap *remap_data, struct bmi08_d
     if (remap_data != NULL)
     {
         /* Read the configuration file */
-        rslt = bmi08a_get_regs(BMI08_REG_ACCEL_FEATURE_CFG, feature_config, BMI088_ANYMOTION_FEATURE_SIZE, dev);
+        rslt = bmi08a_get_set_regs(BMI08_REG_ACCEL_FEATURE_CFG,
+                                   feature_config,
+                                   BMI088_ANYMOTION_FEATURE_SIZE,
+                                   dev,
+                                   GET_FUNC);
 
         if (rslt == BMI08_OK)
         {
@@ -1305,7 +1319,7 @@ static int8_t positive_excited_accel(struct bmi08_sensor_data *accel_pos, struct
     uint8_t reg_data = BMI08_ACCEL_POSITIVE_SELF_TEST;
 
     /* Enable positive excitation for all 3 axes */
-    rslt = bmi08a_set_regs(BMI08_REG_ACCEL_SELF_TEST, &reg_data, 1, dev);
+    rslt = bmi08a_get_set_regs(BMI08_REG_ACCEL_SELF_TEST, &reg_data, BMI08_REG_ACCEL_SELF_TEST_LENGTH, dev, SET_FUNC);
     if (rslt == BMI08_OK)
     {
         /* Read accel data after 50ms delay */
@@ -1325,7 +1339,7 @@ static int8_t negative_excited_accel(struct bmi08_sensor_data *accel_neg, struct
     uint8_t reg_data = BMI08_ACCEL_NEGATIVE_SELF_TEST;
 
     /* Enable negative excitation for all 3 axes */
-    rslt = bmi08a_set_regs(BMI08_REG_ACCEL_SELF_TEST, &reg_data, 1, dev);
+    rslt = bmi08a_get_set_regs(BMI08_REG_ACCEL_SELF_TEST, &reg_data, BMI08_REG_ACCEL_SELF_TEST_LENGTH, dev, SET_FUNC);
     if (rslt == BMI08_OK)
     {
         /* Read accel data after 50ms delay */
@@ -1336,7 +1350,11 @@ static int8_t negative_excited_accel(struct bmi08_sensor_data *accel_neg, struct
         {
             /* Disable self-test */
             reg_data = BMI08_ACCEL_SWITCH_OFF_SELF_TEST;
-            rslt = bmi08a_set_regs(BMI08_REG_ACCEL_SELF_TEST, &reg_data, 1, dev);
+            rslt = bmi08a_get_set_regs(BMI08_REG_ACCEL_SELF_TEST,
+                                       &reg_data,
+                                       BMI08_REG_ACCEL_SELF_TEST_LENGTH,
+                                       dev,
+                                       SET_FUNC);
         }
     }
 
@@ -1407,7 +1425,7 @@ static int8_t set_accel_data_ready_int(const struct bmi08_accel_int_channel_cfg 
     uint8_t data = 0, conf;
 
     /* Read interrupt map register */
-    rslt = get_regs(BMI08_REG_ACCEL_INT1_INT2_MAP_DATA, &data, 1, dev);
+    rslt = get_regs(BMI08_REG_ACCEL_INT1_INT2_MAP_DATA, &data, BMI08_REG_ACCEL_INT_MAP_DATA_LENGTH, dev);
 
     if (rslt == BMI08_OK)
     {
@@ -1440,7 +1458,11 @@ static int8_t set_accel_data_ready_int(const struct bmi08_accel_int_channel_cfg 
             if (rslt == BMI08_OK)
             {
                 /* Write to interrupt map register */
-                rslt = bmi08a_set_regs(BMI08_REG_ACCEL_INT1_INT2_MAP_DATA, &data, 1, dev);
+                rslt = bmi08a_get_set_regs(BMI08_REG_ACCEL_INT1_INT2_MAP_DATA,
+                                           &data,
+                                           BMI08_REG_ACCEL_INT_MAP_DATA_LENGTH,
+                                           dev,
+                                           SET_FUNC);
             }
         }
     }
@@ -1457,7 +1479,7 @@ static int8_t set_fifo_wm_int(const struct bmi08_accel_int_channel_cfg *int_conf
     uint8_t data = 0, conf;
 
     /* Read interrupt map register */
-    rslt = get_regs(BMI08_REG_ACCEL_INT1_INT2_MAP_DATA, &data, 1, dev);
+    rslt = get_regs(BMI08_REG_ACCEL_INT1_INT2_MAP_DATA, &data, BMI08_REG_ACCEL_INT_MAP_DATA_LENGTH, dev);
 
     if (rslt == BMI08_OK)
     {
@@ -1490,7 +1512,11 @@ static int8_t set_fifo_wm_int(const struct bmi08_accel_int_channel_cfg *int_conf
             if (rslt == BMI08_OK)
             {
                 /* Write to interrupt map register */
-                rslt = bmi08a_set_regs(BMI08_REG_ACCEL_INT1_INT2_MAP_DATA, &data, 1, dev);
+                rslt = bmi08a_get_set_regs(BMI08_REG_ACCEL_INT1_INT2_MAP_DATA,
+                                           &data,
+                                           BMI08_REG_ACCEL_INT_MAP_DATA_LENGTH,
+                                           dev,
+                                           SET_FUNC);
             }
         }
     }
@@ -1542,7 +1568,7 @@ static int8_t set_fifo_full_int(const struct bmi08_accel_int_channel_cfg *int_co
     uint8_t data = 0, conf;
 
     /* Read interrupt map register */
-    rslt = get_regs(BMI08_REG_ACCEL_INT1_INT2_MAP_DATA, &data, 1, dev);
+    rslt = get_regs(BMI08_REG_ACCEL_INT1_INT2_MAP_DATA, &data, BMI08_REG_ACCEL_INT_MAP_DATA_LENGTH, dev);
 
     if (rslt == BMI08_OK)
     {
@@ -1575,7 +1601,11 @@ static int8_t set_fifo_full_int(const struct bmi08_accel_int_channel_cfg *int_co
             if (rslt == BMI08_OK)
             {
                 /* Write to interrupt map register */
-                rslt = bmi08a_set_regs(BMI08_REG_ACCEL_INT1_INT2_MAP_DATA, &data, 1, dev);
+                rslt = bmi08a_get_set_regs(BMI08_REG_ACCEL_INT1_INT2_MAP_DATA,
+                                           &data,
+                                           BMI08_REG_ACCEL_INT_MAP_DATA_LENGTH,
+                                           dev,
+                                           SET_FUNC);
             }
         }
     }

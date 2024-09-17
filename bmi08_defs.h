@@ -1,5 +1,5 @@
 /**
-* Copyright (c) 2023 Bosch Sensortec GmbH. All rights reserved.
+* Copyright (c) 2024 Bosch Sensortec GmbH. All rights reserved.
 *
 * BSD-3-Clause
 *
@@ -31,8 +31,8 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 * @file       bmi08_defs.h
-* @date       2023-03-27
-* @version    v1.7.1
+* @date       2024-07-29
+* @version    v1.9.0
 *
 */
 
@@ -374,8 +374,8 @@
 /**\name    Gyro FIFO watermark enable register */
 #define BMI08_REG_GYRO_FIFO_WM_ENABLE           UINT8_C(0x1E)
 
-/**\name    Gyro watchdog register */
-#define BMI08_REG_GYRO_WDT                      UINT8_C(0x34)
+/**\name    Gyro FIFO INT Tag register */
+#define BMI08_REG_GYRO_FIFO_EXT_INT_S           UINT8_C(0x34)
 
 /**\name    Gyro Self test register */
 #define BMI08_REG_GYRO_SELF_TEST                UINT8_C(0x3C)
@@ -509,6 +509,10 @@
 #define BMI08_GYRO_FIFO_DATA_SELECT_MASK        UINT8_C(0x03)
 #define BMI08_GYRO_FIFO_FRAME_COUNT_MASK        UINT8_C(0x7F)
 #define BMI08_GYRO_FIFO_WM_LEVEL_MASK           UINT8_C(0x7F)
+#define BMI08_GYRO_FIFO_EXT_INT_EN_MASK         UINT8_C(0x20)
+#define BMI08_GYRO_FIFO_EXT_INT_EN_POS          UINT8_C(0x05)
+#define BMI08_GYRO_FIFO_EXT_INT_SYNC_MASK       UINT8_C(0x10)
+#define BMI08_GYRO_FIFO_EXT_INT_SYNC_POS        UINT8_C(0x04)
 
 /*! @name Gyro Fifo interrupt map */
 #define BMI08_GYRO_FIFO_INT3_MASK               UINT8_C(0x04)
@@ -629,6 +633,41 @@
 #define BMI08_SENSOR_TIME_LENGTH                UINT8_C(3)
 #define BMI08_FIFO_SKIP_FRM_LENGTH              UINT8_C(1)
 #define BMI08_FIFO_INPUT_CFG_LENGTH             UINT8_C(1)
+#define BMI08_FIFO_DOWNS_LENGTH                 UINT8_C(1)
+#define BMI08_FIFO_STATUS_LENGTH                UINT8_C(1)
+#define BMI08_REG_ACCEL_CHIP_ID_LENGTH          UINT8_C(1)
+#define BMI08_REG_ACCEL_PWR_CONF_LENGTH         UINT8_C(1)
+#define BMI08_REG_ACCEL_INIT_CTRL_LENGHT        UINT8_C(1)
+#define BMI08_REG_ACCEL_INTERNAL_STAT_LENGTH    UINT8_C(1)
+#define BMI08_REG_ACCEL_ERR_LENGTH              UINT8_C(1)
+#define BMI08_REG_ACCEL_STATUS_LENGTH           UINT8_C(1)
+#define BMI08_REG_ACCEL_SOFTRESET_LENGTH        UINT8_C(1)
+#define BMI08_REG_ACCEL_CONF_LENGTH             UINT8_C(2)
+#define BMI08_REG_ACCEL_PWR_CTRL_LENGTH         UINT8_C(1)
+#define BMI08_REG_ACCEL_X_LSB_LENGHT            UINT8_C(6)
+#define BMI08_REG_TEMP_MSB_LENGTH               UINT8_C(2)
+#define BMI08_REG_ACCEL_WDT_LENGTH              UINT8_C(1)
+#define BMI08_REG_READ_ACCEL_XY_LENGTH          UINT8_C(4)
+#define BMI08_REG_READ_ACCEL_LENGTH             UINT8_C(2)
+#define BMI08_REG_ACCEL_INT_STATUS_LENGTH       UINT8_C(1)
+#define BMI08_REG_INT_CFG_LENGTH                UINT8_C(1)
+#define BMI08_REG_ACCEL_INT_MAP_DATA_LENGTH     UINT8_C(1)
+#define BMI08_REG_FEATURE_CFG_LENGTH            UINT8_C(1)
+#define BMI08_REG_ACCEL_RANGE_LENGTH            UINT8_C(1)
+#define BMI08_REG_ACCEL_SELF_TEST_LENGTH        UINT8_C(1)
+#define BMI08_REG_GYRO_RANGE_LENGTH             UINT8_C(3)
+#define BMI08_REG_GYRO_INT_IO_CONF_LENGTH       UINT8_C(1)
+#define BMI08_REG_ACCEL_INT_IO_CONF_LENGTH      UINT8_C(1)
+#define BMI08_REG_ACCEL_INT_MAP_CFG_LENGTH      UINT8_C(1)
+#define BMI08_REG_GYRO_BANDWIDTH_LENGTH         UINT8_C(1)
+#define BMI08_REG_GYRO_CHIP_ID_LENGTH           UINT8_C(1)
+#define BMI08_REG_GYRO_SOFTRESET_LENGTH         UINT8_C(1)
+#define BMI08_REG_GYRO_LPM_LENGTH               UINT8_C(1)
+#define BMI08_REG_GYRO_X_LSB_LENGTH             UINT8_C(6)
+#define BMI08_REG_GYRO_SELF_TEST_LENGTH         UINT8_C(1)
+#define BMI08_REG_GYRO_INT_STAT_LENGTH          UINT8_C(1)
+#define BMI08_GYRO_DATA_LENGTH                  UINT8_C(1)
+#define BMI08_REG_GYRO_INT_CTRL_LENGTH          UINT8_C(1)
 
 /*! @name FIFO byte counter mask definition */
 #define BMI08_FIFO_BYTE_COUNTER_MSB_MASK        UINT8_C(0x3F)
@@ -699,6 +738,22 @@
 #define BMI08_ACCEL_DATA_SYNC_MODE_1000HZ       UINT8_C(0x02)
 #define BMI08_ACCEL_DATA_SYNC_MODE_2000HZ       UINT8_C(0x03)
 
+/* Any-no-motion duration values */
+#define BMI08_ANY_NO_MOT_DUR_100_MSEC           UINT8_C(0x05)
+#define BMI08_ANY_NO_MOT_DUR_80_MSEC            UINT8_C(0x04)
+#define BMI08_ANY_NO_MOT_DUR_20_MSEC            UINT8_C(0x01)
+
+/* Any-no-motion threshold values */
+#define BMI08_ANY_MOT_THRE_DEFAULT_124_MG       UINT8_C(0xAA)
+
+/* Source for external FIFO synchronization mode */
+#define BMI08G_FIFO_EXT_INT3_SYNC_SRC           UINT8_C(0x00)
+#define BMI08G_FIFO_EXT_INT4_SYNC_SRC           UINT8_C(0x01)
+
+/**\name    Macros to choose functionality of the apis*/
+#define SET_FUNC                                UINT8_C(1)
+#define GET_FUNC                                UINT8_C(0)
+
 /**\name    Absolute value */
 #ifndef BMI08_ABS
 #define BMI08_ABS(a)                            ((a) > 0 ? (a) : -(a))
@@ -735,24 +790,6 @@
 #define BMI08_GET_MSB(var)                      (uint8_t)((var & BMI08_SET_HIGH_BYTE) >> 8)
 
 /*************************************************************************/
-
-/*!
- * @brief Interface selection enums
- */
-enum bmi08_intf {
-    /*! I2C interface */
-    BMI08_I2C_INTF,
-    /*! SPI interface */
-    BMI08_SPI_INTF
-};
-
-/*!
- * @brief Enum to define variants
- */
-enum bmi08_variant {
-    BMI085_VARIANT = 0,
-    BMI088_VARIANT = 1
-};
 
 /*************************** Data structures *****************************/
 
@@ -805,6 +842,81 @@ typedef BMI08_INTF_RET_TYPE (*bmi08_write_fptr_t)(uint8_t reg_addr, const uint8_
 typedef void (*bmi08_delay_us_fptr_t)(uint32_t period, void *intf_ptr);
 
 /**\name    Structure Definitions */
+
+/*!
+ *  @brief Enum to select accelerometer Interrupt pins
+ */
+enum bmi08_accel_int_channel {
+    /* interrupt Channel 1 for accel sensor */
+    BMI08_INT_CHANNEL_1,
+    /* interrupt Channel 2 for accel sensor */
+    BMI08_INT_CHANNEL_2
+};
+
+/*!
+ *  @brief Enum to select gyroscope Interrupt pins
+ */
+enum bmi08_gyro_int_channel {
+    /* interrupt Channel 3 for gyro sensor */
+    BMI08_INT_CHANNEL_3,
+    /* interrupt Channel 4 for gyro sensor */
+    BMI08_INT_CHANNEL_4
+};
+
+/*!
+ *  @brief Enum to select accelerometer interrupts
+ */
+enum bmi08_accel_int_types {
+    BMI08_ACCEL_INT_DATA_RDY,
+    /* Accel data ready interrupt */
+    BMI08_ACCEL_INT_SYNC_DATA_RDY,
+    /* Accel synchronized data ready interrupt */
+    BMI08_ACCEL_SYNC_INPUT,
+    /* Accel FIFO watermark interrupt */
+    BMI08_ACCEL_INT_FIFO_WM,
+    /* Accel FIFO full interrupt */
+    BMI08_ACCEL_INT_FIFO_FULL
+};
+
+/*!
+ * @brief Interface selection enums
+ */
+enum bmi08_intf {
+    /*! I2C interface */
+    BMI08_I2C_INTF,
+    /*! SPI interface */
+    BMI08_SPI_INTF
+};
+
+/*!
+ * @brief Enum to define variants
+ */
+enum bmi08_variant {
+    BMI085_VARIANT = 0,
+    BMI088_VARIANT = 1
+};
+
+/*!
+ * @brief FIFO interrupt functionality selection enums
+ */
+enum fifo_int_select {
+    /* FIFO full interrupt */
+    FIFO_FULL_INT,
+    /* FIFO watermark interrupt */
+    FIFO_WM_INT
+};
+
+/*!
+ *  @brief Enum to select gyroscope interrupts
+ */
+enum bmi08_gyro_int_types {
+    /* Gyro data ready interrupt */
+    BMI08_GYRO_INT_DATA_RDY,
+    /* Gyro FIFO watermark interrupt */
+    BMI08_GYRO_INT_FIFO_WM,
+    /* Gyro FIFO full interrupt */
+    BMI08_GYRO_INT_FIFO_FULL
+};
 
 /*!
  *  @brief Sensor XYZ data structure
@@ -873,53 +985,6 @@ struct bmi08_data_sync_cfg
 {
     /*! Mode (0 = off, 1 = 400Hz, 2 = 1kHz, 3 = 2kHz) */
     uint8_t mode;
-};
-
-/*!
- *  @brief Enum to select accelerometer Interrupt pins
- */
-enum bmi08_accel_int_channel {
-    /* interrupt Channel 1 for accel sensor */
-    BMI08_INT_CHANNEL_1,
-    /* interrupt Channel 2 for accel sensor */
-    BMI08_INT_CHANNEL_2
-};
-
-/*!
- *  @brief Enum to select gyroscope Interrupt pins
- */
-enum bmi08_gyro_int_channel {
-    /* interrupt Channel 3 for gyro sensor */
-    BMI08_INT_CHANNEL_3,
-    /* interrupt Channel 4 for gyro sensor */
-    BMI08_INT_CHANNEL_4
-};
-
-/*!
- *  @brief Enum to select accelerometer interrupts
- */
-enum bmi08_accel_int_types {
-    BMI08_ACCEL_INT_DATA_RDY,
-    /* Accel data ready interrupt */
-    BMI08_ACCEL_INT_SYNC_DATA_RDY,
-    /* Accel synchronized data ready interrupt */
-    BMI08_ACCEL_SYNC_INPUT,
-    /* Accel FIFO watermark interrupt */
-    BMI08_ACCEL_INT_FIFO_WM,
-    /* Accel FIFO full interrupt */
-    BMI08_ACCEL_INT_FIFO_FULL
-};
-
-/*!
- *  @brief Enum to select gyroscope interrupts
- */
-enum bmi08_gyro_int_types {
-    /* Gyro data ready interrupt */
-    BMI08_GYRO_INT_DATA_RDY,
-    /* Gyro FIFO watermark interrupt */
-    BMI08_GYRO_INT_FIFO_WM,
-    /* Gyro FIFO full interrupt */
-    BMI08_GYRO_INT_FIFO_FULL
 };
 
 /*!
@@ -1034,6 +1099,17 @@ struct bmi08_gyr_fifo_config
 
     /*! Water-mark level for FIFO */
     uint16_t wm_level;
+};
+
+/*! @name Structure to define external FIFO syncronization mode */
+struct bmi08_gyro_fifo_ext_int
+{
+    /*sets enables external FIFO synchronization mode */
+    uint8_t ext_fifo_sync_en;
+
+    /*Selects source for external FIFO synchronization mode */
+    uint8_t ext_fifo_ext_int_sync_src;
+
 };
 
 /*! @name Structure to define FIFO frame configuration */

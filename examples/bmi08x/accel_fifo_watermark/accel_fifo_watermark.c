@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2023 Bosch Sensortec GmbH
+ * Copyright (C) 2024 Bosch Sensortec GmbH
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -194,7 +194,7 @@ int main(void)
     uint8_t status = 0;
 
     /* Variable to set water mark level */
-    uint16_t wml = 0;
+    uint16_t wml = 0, wm;
 
     /* Initialize FIFO frame structure */
     struct bmi08_fifo_frame fifo_frame = { 0 };
@@ -242,14 +242,15 @@ int main(void)
         if (rslt == BMI08_OK)
         {
             /* Set water mark level */
-            rslt = bmi08a_set_fifo_wm(BMI08_ACC_FIFO_WATERMARK_LEVEL, &bmi08dev);
-            bmi08_error_codes_print_result("bmi08a_set_fifo_wm", rslt);
+            wm = BMI08_ACC_FIFO_WATERMARK_LEVEL;
+            rslt = bmi08a_get_set_fifo_wm(&wm, &bmi08dev, SET_FUNC);
+            bmi08_error_codes_print_result("bmi08a_get_set_fifo_wm", rslt);
 
             config.accel_en = BMI08_ENABLE;
 
             /* Set FIFO configuration by enabling accelerometer */
-            rslt = bmi08a_set_fifo_config(&config, &bmi08dev);
-            bmi08_error_codes_print_result("bmi08a_set_fifo_config", rslt);
+            rslt = bmi08a_get_set_fifo_config(&config, &bmi08dev, SET_FUNC);
+            bmi08_error_codes_print_result("bmi08a_get_set_fifo_config", rslt);
 
             while (try <= 3)
             {
@@ -269,8 +270,8 @@ int main(void)
                     rslt = bmi08a_get_fifo_length(&fifo_length, &bmi08dev);
                     bmi08_error_codes_print_result("bmi08a_get_fifo_length", rslt);
 
-                    rslt = bmi08a_get_fifo_wm(&wml, &bmi08dev);
-                    bmi08_error_codes_print_result("bmi08a_get_fifo_length", rslt);
+                    rslt = bmi08a_get_set_fifo_wm(&wml, &bmi08dev, GET_FUNC);
+                    bmi08_error_codes_print_result("bmi08a_get_set_fifo_wm", rslt);
 
                     printf("Watermark level : %d\n", wml);
 

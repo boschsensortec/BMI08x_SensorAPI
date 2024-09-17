@@ -1,5 +1,5 @@
 /**
-* Copyright (c) 2023 Bosch Sensortec GmbH. All rights reserved.
+* Copyright (c) 2024 Bosch Sensortec GmbH. All rights reserved.
 *
 * BSD-3-Clause
 *
@@ -31,8 +31,8 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 * @file       bmi08g.c
-* @date       2023-03-27
-* @version    v1.7.1
+* @date       2024-07-29
+* @version    v1.9.0
 *
 */
 
@@ -234,7 +234,7 @@ int8_t bmi08g_init(struct bmi08_dev *dev)
         dev->gyro_chip_id = 0;
 
         /* Read gyro chip id */
-        rslt = get_regs(BMI08_REG_GYRO_CHIP_ID, &chip_id, 1, dev);
+        rslt = get_regs(BMI08_REG_GYRO_CHIP_ID, &chip_id, BMI08_REG_GYRO_CHIP_ID_LENGTH, dev);
 
         if (rslt == BMI08_OK)
         {
@@ -349,7 +349,7 @@ int8_t bmi08g_soft_reset(struct bmi08_dev *dev)
     {
         /* Reset gyro device */
         data = BMI08_SOFT_RESET_CMD;
-        rslt = bmi08g_set_regs(BMI08_REG_GYRO_SOFTRESET, &data, 1, dev);
+        rslt = bmi08g_set_regs(BMI08_REG_GYRO_SOFTRESET, &data, BMI08_REG_GYRO_SOFTRESET_LENGTH, dev);
 
         if (rslt == BMI08_OK)
         {
@@ -376,7 +376,7 @@ int8_t bmi08g_get_meas_conf(struct bmi08_dev *dev)
     /* Proceed if null check is fine */
     if (rslt == BMI08_OK)
     {
-        rslt = bmi08g_get_regs(BMI08_REG_GYRO_RANGE, data, 2, dev);
+        rslt = bmi08g_get_regs(BMI08_REG_GYRO_RANGE, data, (BMI08_REG_GYRO_RANGE_LENGTH - 1), dev);
 
         if (rslt == BMI08_OK)
         {
@@ -425,19 +425,19 @@ int8_t bmi08g_set_meas_conf(struct bmi08_dev *dev)
         if ((!is_odr_invalid) && (!is_range_invalid))
         {
             /* Read range value from the range register */
-            rslt = bmi08g_get_regs(BMI08_REG_GYRO_BANDWIDTH, &data, 1, dev);
+            rslt = bmi08g_get_regs(BMI08_REG_GYRO_BANDWIDTH, &data, BMI08_REG_GYRO_BANDWIDTH_LENGTH, dev);
 
             if (rslt == BMI08_OK)
             {
                 data = BMI08_SET_BITS_POS_0(data, BMI08_GYRO_BW, odr);
 
                 /* Write odr value to odr register */
-                rslt = bmi08g_set_regs(BMI08_REG_GYRO_BANDWIDTH, &data, 1, dev);
+                rslt = bmi08g_set_regs(BMI08_REG_GYRO_BANDWIDTH, &data, BMI08_REG_GYRO_BANDWIDTH_LENGTH, dev);
 
                 if (rslt == BMI08_OK)
                 {
                     /* Read range value from the range register */
-                    rslt = bmi08g_get_regs(BMI08_REG_GYRO_RANGE, &data, 1, dev);
+                    rslt = bmi08g_get_regs(BMI08_REG_GYRO_RANGE, &data, (BMI08_REG_GYRO_RANGE_LENGTH - 2), dev);
                 }
 
                 if (rslt == BMI08_OK)
@@ -445,7 +445,7 @@ int8_t bmi08g_set_meas_conf(struct bmi08_dev *dev)
                     data = BMI08_SET_BITS_POS_0(data, BMI08_GYRO_RANGE, range);
 
                     /* Write range value to range register */
-                    rslt = bmi08g_set_regs(BMI08_REG_GYRO_RANGE, &data, 1, dev);
+                    rslt = bmi08g_set_regs(BMI08_REG_GYRO_RANGE, &data, (BMI08_REG_GYRO_RANGE_LENGTH - 2), dev);
                 }
 
                 if (rslt == BMI08_OK)
@@ -482,7 +482,7 @@ int8_t bmi08g_get_power_mode(struct bmi08_dev *dev)
     /* Proceed if null check is fine */
     if (rslt == BMI08_OK)
     {
-        rslt = bmi08g_get_regs(BMI08_REG_GYRO_LPM1, &data, 1, dev);
+        rslt = bmi08g_get_regs(BMI08_REG_GYRO_LPM1, &data, BMI08_REG_GYRO_LPM_LENGTH, dev);
 
         if (rslt == BMI08_OK)
         {
@@ -510,7 +510,7 @@ int8_t bmi08g_set_power_mode(struct bmi08_dev *dev)
     if (rslt == BMI08_OK)
     {
         /*read the previous power state*/
-        rslt = bmi08g_get_regs(BMI08_REG_GYRO_LPM1, &data, 1, dev);
+        rslt = bmi08g_get_regs(BMI08_REG_GYRO_LPM1, &data, BMI08_REG_GYRO_LPM_LENGTH, dev);
 
         if (rslt == BMI08_OK)
         {
@@ -536,7 +536,7 @@ int8_t bmi08g_set_power_mode(struct bmi08_dev *dev)
             if (is_power_switching_mode_valid)
             {
                 /* Write power to power register */
-                rslt = bmi08g_set_regs(BMI08_REG_GYRO_LPM1, &power_mode, 1, dev);
+                rslt = bmi08g_set_regs(BMI08_REG_GYRO_LPM1, &power_mode, BMI08_REG_GYRO_LPM_LENGTH, dev);
 
                 if (rslt == BMI08_OK)
                 {
@@ -574,7 +574,7 @@ int8_t bmi08g_get_data(struct bmi08_sensor_data *gyro, struct bmi08_dev *dev)
     if ((rslt == BMI08_OK) && (gyro != NULL))
     {
         /* read gyro sensor data */
-        rslt = bmi08g_get_regs(BMI08_REG_GYRO_X_LSB, data, 6, dev);
+        rslt = bmi08g_get_regs(BMI08_REG_GYRO_X_LSB, data, BMI08_REG_GYRO_X_LSB_LENGTH, dev);
 
         if (rslt == BMI08_OK)
         {
@@ -669,7 +669,7 @@ int8_t bmi08g_perform_selftest(struct bmi08_dev *dev)
             while (loop_break)
             {
                 /* Read self-test register to check if self-test ready bit is set */
-                rslt = bmi08g_get_regs(BMI08_REG_GYRO_SELF_TEST, &data, 1, dev);
+                rslt = bmi08g_get_regs(BMI08_REG_GYRO_SELF_TEST, &data, BMI08_REG_GYRO_SELF_TEST_LENGTH, dev);
 
                 if (rslt == BMI08_OK)
                 {
@@ -691,7 +691,7 @@ int8_t bmi08g_perform_selftest(struct bmi08_dev *dev)
             if (rslt == BMI08_OK)
             {
                 /* Read self-test register to check for self-test Ok bit */
-                rslt = bmi08g_get_regs(BMI08_REG_GYRO_SELF_TEST, &data, 1, dev);
+                rslt = bmi08g_get_regs(BMI08_REG_GYRO_SELF_TEST, &data, BMI08_REG_GYRO_SELF_TEST_LENGTH, dev);
 
                 if (rslt == BMI08_OK)
                 {
@@ -722,7 +722,7 @@ int8_t bmi08g_get_data_int_status(uint8_t *int_status, struct bmi08_dev *dev)
 
     if (int_status != NULL)
     {
-        rslt = bmi08g_get_regs(BMI08_REG_GYRO_INT_STAT_1, &status, 1, dev);
+        rslt = bmi08g_get_regs(BMI08_REG_GYRO_INT_STAT_1, &status, BMI08_REG_GYRO_INT_STAT_LENGTH, dev);
         if (rslt == BMI08_OK)
         {
             (*int_status) = status;
@@ -746,7 +746,7 @@ int8_t bmi08g_get_fifo_overrun(uint8_t *fifo_overrun, struct bmi08_dev *dev)
 
     if (fifo_overrun != NULL)
     {
-        rslt = bmi08g_get_regs(BMI08_REG_GYRO_FIFO_STATUS, &reg_data, 1, dev);
+        rslt = bmi08g_get_regs(BMI08_REG_GYRO_FIFO_STATUS, &reg_data, BMI08_FIFO_STATUS_LENGTH, dev);
 
         if (rslt == BMI08_OK)
         {
@@ -772,11 +772,11 @@ int8_t bmi08g_get_fifo_config(struct bmi08_gyr_fifo_config *fifo_conf, struct bm
 
     if (fifo_conf != NULL)
     {
-        rslt = bmi08g_get_regs(BMI08_REG_GYRO_FIFO_CONFIG0, fifo_config, 2, dev);
+        rslt = bmi08g_get_regs(BMI08_REG_GYRO_FIFO_CONFIG0, fifo_config, BMI08_FIFO_CONFIG_LENGTH, dev);
 
         if (rslt == BMI08_OK)
         {
-            rslt = bmi08g_get_regs(BMI08_REG_GYRO_FIFO_STATUS, &reg_data, 1, dev);
+            rslt = bmi08g_get_regs(BMI08_REG_GYRO_FIFO_STATUS, &reg_data, BMI08_FIFO_STATUS_LENGTH, dev);
 
             if (rslt == BMI08_OK)
             {
@@ -801,6 +801,62 @@ int8_t bmi08g_get_fifo_config(struct bmi08_gyr_fifo_config *fifo_conf, struct bm
 }
 
 /*!
+ *  @brief This API is used to get external fifo synchronization of the sensor.
+ */
+int8_t bmi08g_get_fifo_ext_int_sync(struct bmi08_gyro_fifo_ext_int *fifo_config, struct bmi08_dev *dev)
+{
+    int8_t rslt;
+    uint8_t fifo_reg_data = 0;
+
+    if (fifo_config != NULL)
+    {
+        rslt = bmi08g_get_regs(BMI08_REG_GYRO_FIFO_EXT_INT_S, &fifo_reg_data, BMI08_FIFO_LENGTH_MSB_BYTE, dev);
+
+        if (rslt == BMI08_OK)
+        {
+            fifo_config->ext_fifo_sync_en = BMI08_GET_BITS(fifo_reg_data, BMI08_GYRO_FIFO_EXT_INT_EN);
+            fifo_config->ext_fifo_ext_int_sync_src = BMI08_GET_BITS(fifo_reg_data, BMI08_GYRO_FIFO_EXT_INT_SYNC);
+        }
+    }
+    else
+    {
+        rslt = BMI08_E_NULL_PTR;
+    }
+
+    return rslt;
+}
+
+/*!
+ *  @brief This API is used to set external fifo synchronization of the sensor.
+ */
+int8_t bmi08g_set_fifo_ext_int_sync(const struct bmi08_gyro_fifo_ext_int *fifo_config, struct bmi08_dev *dev)
+{
+    int8_t rslt;
+    uint8_t fifo_reg_data = 0;
+
+    if (fifo_config != NULL)
+    {
+        rslt = bmi08g_get_regs(BMI08_REG_GYRO_FIFO_EXT_INT_S, &fifo_reg_data, BMI08_FIFO_LENGTH_MSB_BYTE, dev);
+
+        if (rslt == BMI08_OK)
+        {
+            fifo_reg_data = BMI08_SET_BITS(fifo_reg_data, BMI08_GYRO_FIFO_EXT_INT_EN, fifo_config->ext_fifo_sync_en);
+            fifo_reg_data = BMI08_SET_BITS(fifo_reg_data,
+                                           BMI08_GYRO_FIFO_EXT_INT_SYNC,
+                                           fifo_config->ext_fifo_ext_int_sync_src);
+
+            rslt = bmi08g_set_regs(BMI08_REG_GYRO_FIFO_EXT_INT_S, &fifo_reg_data, 1, dev);
+        }
+    }
+    else
+    {
+        rslt = BMI08_E_NULL_PTR;
+    }
+
+    return rslt;
+}
+
+/*!
  *  @brief This API is used to get fifo configuration of the sensor.
  */
 int8_t bmi08g_set_fifo_config(const struct bmi08_gyr_fifo_config *fifo_conf, struct bmi08_dev *dev)
@@ -810,7 +866,7 @@ int8_t bmi08g_set_fifo_config(const struct bmi08_gyr_fifo_config *fifo_conf, str
 
     if (fifo_conf != NULL)
     {
-        rslt = bmi08g_get_regs(BMI08_REG_GYRO_FIFO_CONFIG0, fifo_config, 2, dev);
+        rslt = bmi08g_get_regs(BMI08_REG_GYRO_FIFO_CONFIG0, fifo_config, BMI08_FIFO_CONFIG_LENGTH, dev);
 
         if (rslt == BMI08_OK)
         {
@@ -822,7 +878,7 @@ int8_t bmi08g_set_fifo_config(const struct bmi08_gyr_fifo_config *fifo_conf, str
 
             fifo_config[1] = BMI08_SET_BITS(fifo_config[1], BMI08_GYRO_FIFO_MODE, fifo_conf->mode);
 
-            rslt = bmi08g_set_regs(BMI08_REG_GYRO_FIFO_CONFIG0, fifo_config, 2, dev);
+            rslt = bmi08g_set_regs(BMI08_REG_GYRO_FIFO_CONFIG0, fifo_config, BMI08_FIFO_CONFIG_LENGTH, dev);
         }
     }
     else
@@ -915,12 +971,12 @@ int8_t bmi08g_enable_watermark(uint8_t enable, struct bmi08_dev *dev)
     if (enable)
     {
         reg_data = BMI08_GYRO_FIFO_WM_ENABLE_VAL;
-        rslt = bmi08g_set_regs(BMI08_REG_GYRO_FIFO_WM_ENABLE, &reg_data, 1, dev);
+        rslt = bmi08g_set_regs(BMI08_REG_GYRO_FIFO_WM_ENABLE, &reg_data, (BMI08_FIFO_WTM_LENGTH - 1), dev);
     }
     else
     {
         reg_data = BMI08_GYRO_FIFO_WM_DISABLE_VAL;
-        rslt = bmi08g_set_regs(BMI08_REG_GYRO_FIFO_WM_ENABLE, &reg_data, 1, dev);
+        rslt = bmi08g_set_regs(BMI08_REG_GYRO_FIFO_WM_ENABLE, &reg_data, (BMI08_FIFO_WTM_LENGTH - 1), dev);
     }
 
     return rslt;
@@ -1017,7 +1073,7 @@ static int8_t set_regs(uint8_t reg_addr, const uint8_t *reg_data, uint32_t len, 
     {
         for (count = 0; count < len; count++)
         {
-            dev->intf_rslt = dev->write(reg_addr, &reg_data[count], 1, dev->intf_ptr_gyro);
+            dev->intf_rslt = dev->write(reg_addr, &reg_data[count], BMI08_GYRO_DATA_LENGTH, dev->intf_ptr_gyro);
 
             reg_addr++;
 
@@ -1042,7 +1098,7 @@ static int8_t set_gyro_data_ready_int(const struct bmi08_gyro_int_channel_cfg *i
     uint8_t conf, data[2] = { 0 };
 
     /* read interrupt map register */
-    rslt = get_regs(BMI08_REG_GYRO_INT3_INT4_IO_MAP, &data[0], 1, dev);
+    rslt = get_regs(BMI08_REG_GYRO_INT3_INT4_IO_MAP, &data[0], BMI08_REG_ACCEL_INT_MAP_CFG_LENGTH, dev);
 
     if (rslt == BMI08_OK)
     {
@@ -1083,7 +1139,7 @@ static int8_t set_gyro_data_ready_int(const struct bmi08_gyro_int_channel_cfg *i
             }
 
             /* write data to interrupt map register */
-            rslt = bmi08g_set_regs(BMI08_REG_GYRO_INT3_INT4_IO_MAP, &data[0], 1, dev);
+            rslt = bmi08g_set_regs(BMI08_REG_GYRO_INT3_INT4_IO_MAP, &data[0], BMI08_REG_ACCEL_INT_MAP_CFG_LENGTH, dev);
 
             if (rslt == BMI08_OK)
             {
@@ -1093,7 +1149,7 @@ static int8_t set_gyro_data_ready_int(const struct bmi08_gyro_int_channel_cfg *i
                 if (rslt == BMI08_OK)
                 {
                     /* Write data to interrupt control register */
-                    rslt = bmi08g_set_regs(BMI08_REG_GYRO_INT_CTRL, &data[1], 1, dev);
+                    rslt = bmi08g_set_regs(BMI08_REG_GYRO_INT_CTRL, &data[1], BMI08_REG_GYRO_INT_CTRL_LENGTH, dev);
                 }
             }
         }
@@ -1111,7 +1167,7 @@ static int8_t set_fifo_int(const struct bmi08_gyro_int_channel_cfg *int_config, 
     uint8_t conf, data[2] = { 0 };
 
     /* Read interrupt map register */
-    rslt = get_regs(BMI08_REG_GYRO_INT3_INT4_IO_MAP, &data[0], 1, dev);
+    rslt = get_regs(BMI08_REG_GYRO_INT3_INT4_IO_MAP, &data[0], BMI08_REG_ACCEL_INT_MAP_CFG_LENGTH, dev);
 
     if (rslt == BMI08_OK)
     {
@@ -1152,7 +1208,7 @@ static int8_t set_fifo_int(const struct bmi08_gyro_int_channel_cfg *int_config, 
             }
 
             /* write data to interrupt map register */
-            rslt = bmi08g_set_regs(BMI08_REG_GYRO_INT3_INT4_IO_MAP, &data[0], 1, dev);
+            rslt = bmi08g_set_regs(BMI08_REG_GYRO_INT3_INT4_IO_MAP, &data[0], BMI08_REG_ACCEL_INT_MAP_CFG_LENGTH, dev);
 
             if (rslt == BMI08_OK)
             {
@@ -1162,7 +1218,7 @@ static int8_t set_fifo_int(const struct bmi08_gyro_int_channel_cfg *int_config, 
                 if (rslt == BMI08_OK)
                 {
                     /* write data to interrupt control register */
-                    rslt = bmi08g_set_regs(BMI08_REG_GYRO_INT_CTRL, &data[1], 1, dev);
+                    rslt = bmi08g_set_regs(BMI08_REG_GYRO_INT_CTRL, &data[1], BMI08_REG_GYRO_INT_CTRL_LENGTH, dev);
                 }
             }
         }
@@ -1181,7 +1237,7 @@ static int8_t set_int_pin_config(const struct bmi08_gyro_int_channel_cfg *int_co
     uint8_t data;
 
     /* Read interrupt configuration register */
-    rslt = get_regs(BMI08_REG_GYRO_INT3_INT4_IO_CONF, &data, 1, dev);
+    rslt = get_regs(BMI08_REG_GYRO_INT3_INT4_IO_CONF, &data, BMI08_REG_GYRO_INT_IO_CONF_LENGTH, dev);
 
     if (rslt == BMI08_OK)
     {
@@ -1207,7 +1263,7 @@ static int8_t set_int_pin_config(const struct bmi08_gyro_int_channel_cfg *int_co
         }
 
         /* write to interrupt configuration register */
-        rslt = bmi08g_set_regs(BMI08_REG_GYRO_INT3_INT4_IO_CONF, &data, 1, dev);
+        rslt = bmi08g_set_regs(BMI08_REG_GYRO_INT3_INT4_IO_CONF, &data, BMI08_REG_GYRO_INT_IO_CONF_LENGTH, dev);
     }
 
     return rslt;
@@ -1226,7 +1282,7 @@ static int8_t set_gyro_selftest(uint8_t selftest, struct bmi08_dev *dev)
     if ((selftest == BMI08_ENABLE) || (selftest == BMI08_DISABLE))
     {
         /* Read self test register */
-        rslt = get_regs(BMI08_REG_GYRO_SELF_TEST, &data, 1, dev);
+        rslt = get_regs(BMI08_REG_GYRO_SELF_TEST, &data, BMI08_REG_GYRO_SELF_TEST_LENGTH, dev);
 
         if (rslt == BMI08_OK)
         {
@@ -1234,7 +1290,7 @@ static int8_t set_gyro_selftest(uint8_t selftest, struct bmi08_dev *dev)
             data = BMI08_SET_BITS_POS_0(data, BMI08_GYRO_SELF_TEST_EN, selftest);
 
             /* write self test input value to self-test register */
-            rslt = bmi08g_set_regs(BMI08_REG_GYRO_SELF_TEST, &data, 1, dev);
+            rslt = bmi08g_set_regs(BMI08_REG_GYRO_SELF_TEST, &data, BMI08_REG_GYRO_SELF_TEST_LENGTH, dev);
         }
     }
     else

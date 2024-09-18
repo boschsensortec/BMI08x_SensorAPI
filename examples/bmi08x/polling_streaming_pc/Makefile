@@ -14,4 +14,14 @@ INCLUDEPATHS += \
 $(API_LOCATION) \
 ../common
 
+ifndef TARGET
+    $(error TARGET is not defined; please specify a target)
+endif
+
+INVALID_TARGET = MCU
+INVALID_STR := $(findstring $(INVALID_TARGET), $(TARGET))
+ifeq ($(INVALID_STR),$(INVALID_TARGET))
+    $(error TARGET has an invalid value '$(TARGET)'; 'MCU' targets are not a valid. Please use PC as target.)
+endif
+
 include $(COINES_INSTALL_PATH)/coines.mk

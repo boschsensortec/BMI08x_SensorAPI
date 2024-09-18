@@ -14,6 +14,6 @@ INCLUDEPATHS += \
 $(API_LOCATION) \
 ../common
 
-TARGET ?= PC
+COINES_BACKEND ?= COINES_BRIDGE
 
 include $(COINES_INSTALL_PATH)/coines.mk

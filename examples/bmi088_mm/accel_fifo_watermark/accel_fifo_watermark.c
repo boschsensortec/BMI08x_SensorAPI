@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2023 Bosch Sensortec GmbH
+ * Copyright (C) 2024 Bosch Sensortec GmbH
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -114,8 +114,8 @@ static void configure_bmi08_fifo_wm_interrupt(struct bmi08_dev *bmi08dev)
     config.int1_en = BMI08_ENABLE;
 
     /* Set FIFO configuration by enabling accelerometer */
-    rslt = bmi08a_set_fifo_config(&config, bmi08dev);
-    bmi08_check_rslt("bmi08a_set_fifo_config", rslt);
+    rslt = bmi08a_get_set_fifo_config(&config, bmi08dev, SET_FUNC);
+    bmi08_check_rslt("bmi08a_get_set_fifo_config", rslt);
 }
 
 /*!
@@ -145,7 +145,7 @@ int main(void)
      *         For I2C : BMI08_I2C_INTF
      *         For SPI : BMI08_SPI_INTF
      */
-    rslt = bmi08_interface_init(&bmi08, BMI08_SPI_INTF);
+    rslt = bmi08_interface_init(&bmi08, BMI08_I2C_INTF);
     bmi08_check_rslt("bmi08_interface_init", rslt);
 
     /* Initialize the sensors */
@@ -156,8 +156,8 @@ int main(void)
     /* Set water mark(aka 6 frames, each 7 bytes: 1 byte header + 6 bytes accel data)
      * accel frames = 50. So, 50 * 7(frames) = 350 bytes */
     wm_lvl = BMI08_FIFO_WATERMARK_LEVEL;
-    rslt = bmi08a_set_fifo_wm(wm_lvl, &bmi08);
-    bmi08_check_rslt("bmi08a_set_fifo_wm", rslt);
+    rslt = bmi08a_get_set_fifo_wm(&wm_lvl, &bmi08, SET_FUNC);
+    bmi08_check_rslt("bmi08a_get_set_fifo_wm", rslt);
 
     /* Update FIFO structure */
     fifo_frame.data = fifo_data;
@@ -174,8 +174,8 @@ int main(void)
 
             accel_length = BMI08_FIFO_EXTRACTED_DATA_FRAME_COUNT;
 
-            rslt = bmi08a_get_fifo_wm(&wm_lvl, &bmi08);
-            bmi08_check_rslt("bmi08a_get_fifo_wm", rslt);
+            rslt = bmi08a_get_set_fifo_wm(&wm_lvl, &bmi08, GET_FUNC);
+            bmi08_check_rslt("bmi08a_get_set_fifo_wm", rslt);
 
             printf("Fifo watermark level : %d\n", wm_lvl);
 

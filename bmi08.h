@@ -1,40 +1,40 @@
 /**
-* Copyright (c) 2023 Bosch Sensortec GmbH. All rights reserved.
-*
-* BSD-3-Clause
-*
-* Redistribution and use in source and binary forms, with or without
-* modification, are permitted provided that the following conditions are met:
-*
-* 1. Redistributions of source code must retain the above copyright
-*    notice, this list of conditions and the following disclaimer.
-*
-* 2. Redistributions in binary form must reproduce the above copyright
-*    notice, this list of conditions and the following disclaimer in the
-*    documentation and/or other materials provided with the distribution.
-*
-* 3. Neither the name of the copyright holder nor the names of its
-*    contributors may be used to endorse or promote products derived from
-*    this software without specific prior written permission.
-*
-* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-* "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-* LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
-* FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-* COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
-* INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-* (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-* SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
-* HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
-* STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
-* IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-* POSSIBILITY OF SUCH DAMAGE.
-*
-* @file       bmi08.h
-* @date       2023-03-27
-* @version    v1.7.1
-*
-*/
+ * Copyright (c) 2024 Bosch Sensortec GmbH. All rights reserved.
+ *
+ * BSD-3-Clause
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ *
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ *
+ * 3. Neither the name of the copyright holder nor the names of its
+ *    contributors may be used to endorse or promote products derived from
+ *    this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+ * FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+ * COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+ * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+ * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
+ * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ *
+ * @file       bmi08.h
+ * @date       2024-07-29
+ * @version    v1.9.0
+ *
+ */
 
 /**
  * \ingroup bmi08
@@ -51,6 +51,10 @@ extern "C" {
 /*********************************************************************/
 /* header files */
 #include "bmi08_defs.h"
+
+/*********************************************************************/
+/*                     Macro Definitions                             */
+/*********************************************************************/
 
 /*********************** BMI08x Accelerometer function prototypes ************************/
 
@@ -139,9 +143,9 @@ int8_t bmi08a_write_feature_config(uint8_t reg_addr, const uint16_t *reg_data, u
 
 /*!
  * \ingroup bmi08aApiRegs
- * \page bmi08a_api_bmi08a_get_regs bmi08a_get_regs
+ * \page bmi08a_api_bmi08a_get_set_regs bmi08a_get_set_regs
  * \code
- * int8_t bmi08a_get_regs(uint8_t reg_addr, uint8_t *reg_data, uint16_t len, const struct bmi08_dev *dev);
+ * int8_t bmi08a_get_set_regs(uint8_t reg_addr, uint8_t *reg_data, uint16_t len, const struct bmi08_dev *dev, uint8_t select);
  * \endcode
  * @details This API reads the data from the given register address of accel sensor.
  *
@@ -149,73 +153,34 @@ int8_t bmi08a_write_feature_config(uint8_t reg_addr, const uint16_t *reg_data, u
  *  @param[out] reg_data : Pointer to data buffer to store the read data.
  *  @param[in] len       : No. of bytes of data to be read.
  *  @param[in] dev       : Structure instance of bmi08_dev.
+ *  @param[in] select    : Flag to select functionality between setting and getting
  *
  * @return Result of API execution status
  * @retval 0 -> Success
  * @retval < 0 -> Fail
  *
  */
-int8_t bmi08a_get_regs(uint8_t reg_addr, uint8_t *reg_data, uint32_t len, struct bmi08_dev *dev);
+int8_t bmi08a_get_set_regs(uint8_t reg_addr, uint8_t *reg_data, uint32_t len, struct bmi08_dev *dev, uint8_t select);
 
 /*!
  * \ingroup bmi08aApiRegs
- * \page bmi08a_api_bmi08a_set_regs bmi08a_set_regs
+ * \page bmi08a_api_bmi08a_get_set_i2c_wdt bmi08a_get_set_i2c_wdt
  * \code
- * int8_t bmi08a_set_regs(uint8_t reg_addr, uint8_t *reg_data, uint16_t len, const struct bmi08_dev *dev);
- * \endcode
- * @details This API writes the given data to the register address
- *  of accel sensor.
- *
- *  @param[in] reg_addr  : Register address to where the data to be written.
- *  @param[in] reg_data  : Pointer to data buffer which is to be written
- *  in the sensor.
- *  @param[in] len       : No. of bytes of data to write.
- *  @param[in] dev       : Structure instance of bmi08_dev.
- *
- * @return Result of API execution status
- * @retval 0 -> Success
- * @retval < 0 -> Fail
- *
- */
-int8_t bmi08a_set_regs(uint8_t reg_addr, const uint8_t *reg_data, uint32_t len, struct bmi08_dev *dev);
-
-/*!
- * \ingroup bmi08aApiRegs
- * \page bmi08a_api_bmi08a_get_i2c_wdt bmi08a_get_i2c_wdt
- * \code
- * int8_t bmi08a_get_i2c_wdt(uint8_t *i2c_wdt_sel, uint8_t *i2c_wdt_en, struct bmi08_dev *dev);
+ * int8_t bmi08a_get_set_i2c_wdt(uint8_t *i2c_wdt_sel, uint8_t *i2c_wdt_en, struct bmi08_dev *dev, uint8_t select);
  * \endcode
  * @details This API reads the watchdog related information
  *
  *  @param[out] i2c_wdt_sel  : Variable to hold i2c_wdt_sel
  *  @param[out] i2c_wdt_en   : Variable to hold i2c_wdt_en
  *  @param[in] dev           : Structure instance of bmi08_dev.
+ *  @param[in] select    : Flag to select functionality between getting and setting
  *
  * @return Result of API execution status
  * @retval 0 -> Success
  * @retval < 0 -> Fail
  *
  */
-int8_t bmi08a_get_i2c_wdt(uint8_t *i2c_wdt_sel, uint8_t *i2c_wdt_en, struct bmi08_dev *dev);
-
-/*!
- * \ingroup bmi08aApiRegs
- * \page bmi08a_api_bmi08a_get_i2c_wdt bmi08a_set_i2c_wdt
- * \code
- * int8_t bmi08a_set_i2c_wdt(uint8_t i2c_wdt_sel, uint8_t i2c_wdt_en, struct bmi08_dev *dev);
- * \endcode
- * @details This API writes the watchdog related information
- *
- *  @param[in] i2c_wdt_sel  : Variable to hold i2c_wdt_sel
- *  @param[in] i2c_wdt_en   : Variable to hold i2c_wdt_en
- *  @param[in] dev          : Structure instance of bmi08_dev.
- *
- * @return Result of API execution status
- * @retval 0 -> Success
- * @retval < 0 -> Fail
- *
- */
-int8_t bmi08a_set_i2c_wdt(uint8_t i2c_wdt_sel, uint8_t i2c_wdt_en, struct bmi08_dev *dev);
+int8_t bmi08a_get_set_i2c_wdt(uint8_t *i2c_wdt_sel, uint8_t *i2c_wdt_en, struct bmi08_dev *dev, uint8_t select);
 
 /**
  * \ingroup bmi08ag
@@ -964,6 +929,42 @@ int8_t bmi08g_get_fifo_config(struct bmi08_gyr_fifo_config *fifo_conf, struct bm
 
 /*!
  * \ingroup bmi08gApiFIFO
+ * \page bmi08g_api_bmi08g_get_fifo_ext_int_sync bmi08g_get_fifo_ext_int_sync
+ * \code
+ * int8_t bmi08g_get_fifo_ext_int_sync(struct bmi08_gyro_fifo_ext_int *fifo_config, struct bmi08_dev *dev);
+ * \endcode
+ * @details This API is used to get external FIFO synchronization mode
+ *
+ * @param[in] fifo_conf  : Structure instance to external FIFO synchronization mode
+ * @param[in] dev        : Structure instance of bmi08_dev.
+ *
+ * @return Result of API execution status
+ * @retval 0 -> Success
+ * @retval >0 -> Warning
+ * @retval <0 -> Fail
+ */
+int8_t bmi08g_get_fifo_ext_int_sync(struct bmi08_gyro_fifo_ext_int *fifo_config, struct bmi08_dev *dev);
+
+/*!
+ * \ingroup bmi08gApiFIFO
+ * \page bmi08g_api_bmi08g_set_fifo_ext_int_sync bmi08g_set_fifo_ext_int_sync
+ * \code
+ * int8_t bmi08g_set_fifo_ext_int_sync(const struct bmi08_gyro_fifo_ext_int *fifo_config, struct bmi08_dev *dev);
+ * \endcode
+ * @details This API is used to set and enable external FIFO synchronization mode
+ *
+ * @param[in] fifo_config  : Structure pointer to external FIFO synchronization mode
+ * @param[in] dev          : Structure instance of bmi08_dev.
+ *
+ * @return Result of API execution status
+ * @retval 0 -> Success
+ * @retval >0 -> Warning
+ * @retval <0 -> Fail
+ */
+int8_t bmi08g_set_fifo_ext_int_sync(const struct bmi08_gyro_fifo_ext_int *fifo_config, struct bmi08_dev *dev);
+
+/*!
+ * \ingroup bmi08gApiFIFO
  * \page bmi08g_api_bmi08g_set_fifo_config bmi08g_set_fifo_config
  * \code
  * int8_t bmi08g_set_fifo_config(const struct bmi08_gyr_fifo_config *fifo_conf, , struct bmi08_dev *dev);
@@ -1097,39 +1098,22 @@ int8_t bmi08g_enable_watermark(uint8_t enable, struct bmi08_dev *dev);
 
 /*!
  * \ingroup bmi08aApiFifo
- * \page bmi08a_api_bmi08a_set_fifo_config bmi08a_set_fifo_config
+ * \page bmi08a_api_bmi08a_get_set_fifo_config bmi08a_get_set_fifo_config
  * \code
- * int8_t bmi08a_set_fifo_config(const struct bmi08_accel_fifo_config *config, const struct bmi08_dev *dev);
+ * int8_t bmi08a_get_set_fifo_config(struct bmi08_accel_fifo_config *config, const struct bmi08_dev *dev, uint8_t select);
  * \endcode
- * @details This API sets the FIFO configuration in the sensor.
- *
- * @param[in] config        : Structure instance of FIFO configurations.
- * @param[in] dev           : Structure instance of bmi08_dev.
- *
- * @return Result of API execution status
- * @retval 0 -> Success
- * @retval < 0 -> Fail
- *
- */
-int8_t bmi08a_set_fifo_config(const struct bmi08_accel_fifo_config *config, struct bmi08_dev *dev);
-
-/*!
- * \ingroup bmi08aApiFifo
- * \page bmi08a_api_bmi08a_get_fifo_config bmi08a_get_fifo_config
- * \code
- * int8_t bmi08a_get_fifo_config(struct bmi08_accel_fifo_config *config, const struct bmi08_dev *dev);
- * \endcode
- * @details This API gets the FIFO configuration from the sensor.
+ * @details This API gets or sets the FIFO configuration of the sensor..
  *
  * @param[out] config   : Structure instance to get FIFO configuration value.
  * @param[in]  dev      : Structure instance of bmi08_dev.
+ * @param[in] select    : Flag to select functionality between getting and setting
  *
  * @return Result of API execution status
  * @retval 0 -> Success
  * @retval < 0 -> Fail
  *
  */
-int8_t bmi08a_get_fifo_config(struct bmi08_accel_fifo_config *config, struct bmi08_dev *dev);
+int8_t bmi08a_get_set_fifo_config(struct bmi08_accel_fifo_config *config, struct bmi08_dev *dev, uint8_t select);
 
 /*!
  * \ingroup bmi08aApiFifo
@@ -1176,39 +1160,22 @@ int8_t bmi08a_get_fifo_length(uint16_t *fifo_length, struct bmi08_dev *dev);
 
 /*!
  * \ingroup bmi08aApiFifo
- * \page bmi08a_api_bmi08a_get_fifo_wm bmi08a_get_fifo_wm
+ * \page bmi08a_api_bmi08a_get_set_fifo_wm bmi08a_get_set_fifo_wm
  * \code
  * int8_t bmi08a_get_fifo_wm(uint16_t *wm, const struct bmi08_dev *dev);
  * \endcode
  * @details This API gets the FIFO water mark level which is set in the sensor.
  *
  * @param[out] wm        : Pointer variable to store FIFO water-mark level.
- * @param[in]  dev            : Structure instance of bmi08_dev.
+ * @param[in]  dev       : Structure instance of bmi08_dev.
+ * @param[in] select     : Flag to select functionality between getting and setting
  *
  * @return Result of API execution status
  * @retval 0 -> Success
  * @retval < 0 -> Fail
  *
  */
-int8_t bmi08a_get_fifo_wm(uint16_t *wm, struct bmi08_dev *dev);
-
-/*!
- * \ingroup bmi08aApiFifo
- * \page bmi08a_api_bmi08a_set_fifo_wm bmi08a_set_fifo_wm
- * \code
- * int8_t bmi08a_set_fifo_wm(uint16_t wm, const struct bmi08_dev *dev);
- * \endcode
- * @details This API sets the FIFO water mark level which is set in the sensor.
- *
- * @param[out] wm        : Pointer variable to store FIFO water-mark level.
- * @param[in]  dev            : Structure instance of bmi08_dev.
- *
- * @return Result of API execution status
- * @retval 0 -> Success
- * @retval < 0 -> Fail
- *
- */
-int8_t bmi08a_set_fifo_wm(uint16_t wm, struct bmi08_dev *dev);
+int8_t bmi08a_get_set_fifo_wm(uint16_t *wm, struct bmi08_dev *dev, uint8_t select);
 
 /**
  * \ingroup bmi08ag
@@ -1254,15 +1221,16 @@ int8_t bmi08a_extract_accel(struct bmi08_sensor_data *accel_data,
 
 /*!
  * \ingroup bmi08aApiFIFODown
- * \page bmi08a_api_bmi08a_get_fifo_down_sample bmi08a_get_fifo_down_sample
+ * \page bmi08a_api_bmi08a_get_set_fifo_down_sample bmi08a_get_set_fifo_down_sample
  * \code
- * int8_t bmi08a_get_fifo_down_sample(uint8_t *fifo_downs, const struct bmi08_dev *dev);
+ * int8_t bmi08a_get_fifo_down_sample(uint8_t *fifo_downs, const struct bmi08_dev *dev, uint8_t select);
  * \endcode
  * @details This API gets the down sampling rate, configured for FIFO
  * accelerometer.
  *
  * @param[out] fifo_downs : Pointer variable to store the down sampling rate
- * @param[in]  dev            : Structure instance of bmi08_dev.
+ * @param[in]  dev        : Structure instance of bmi08_dev.
+ * @param[in] select      : Flag to select functionality between setting and getting
  *
  * @return Result of API execution status
  * @retval 0 -> Success
@@ -1270,26 +1238,7 @@ int8_t bmi08a_extract_accel(struct bmi08_sensor_data *accel_data,
  *
  */
 
-int8_t bmi08a_get_fifo_down_sample(uint8_t *fifo_downs, struct bmi08_dev *dev);
-
-/*!
- * \ingroup bmi08aApiFIFODown
- * \page bmi08a_api_bmi08a_set_fifo_down_sample bmi08a_set_fifo_down_sample
- * \code
- * int8_t bmi08a_set_fifo_down_sample(uint8_t fifo_downs, const struct bmi08_dev *dev);
- * \endcode
- * @details This API sets the down sampling rate for FIFO accelerometer FIFO data.
- *
- * @param[in] fifo_downs : Variable to set the down sampling rate.
- * @param[in] dev            : Structure instance of bmi08_dev.
- *
- * @return Result of API execution status
- * @retval 0 -> Success
- * @retval < 0 -> Fail
- * @retval > 0 -> Warning
- *
- */
-int8_t bmi08a_set_fifo_down_sample(uint8_t fifo_downs, struct bmi08_dev *dev);
+int8_t bmi08a_get_set_fifo_down_sample(uint8_t *fifo_downs, struct bmi08_dev *dev, uint8_t select);
 
 #ifdef __cplusplus
 }

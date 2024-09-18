@@ -1,8 +1,8 @@
-COINES_INSTALL_PATH ?= ../../../..
+COINES_INSTALL_PATH ?= ../../../../..
 
 EXAMPLE_FILE = accel_fifo_watermark.c
 
-API_LOCATION ?= ../..
+API_LOCATION ?= ../../..
 
 C_SRCS += \
 $(API_LOCATION)/bmi08a.c \

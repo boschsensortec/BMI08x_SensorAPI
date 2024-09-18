@@ -14,4 +14,6 @@ INCLUDEPATHS += \
 $(API_LOCATION) \
 ../common
 
+COINES_BACKEND ?= COINES_BRIDGE
+
 include $(COINES_INSTALL_PATH)/coines.mk

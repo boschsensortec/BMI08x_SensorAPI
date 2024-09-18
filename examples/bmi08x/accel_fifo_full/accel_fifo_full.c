@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2023 Bosch Sensortec GmbH
+ * Copyright (C) 2024 Bosch Sensortec GmbH
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -236,8 +236,8 @@ int main(void)
             config.accel_en = BMI08_ENABLE;
 
             /* Set FIFO configuration by enabling accelerometer */
-            rslt = bmi08a_set_fifo_config(&config, &bmi08dev);
-            bmi08_error_codes_print_result("bmi08a_set_fifo_config", rslt);
+            rslt = bmi08a_get_set_fifo_config(&config, &bmi08dev, SET_FUNC);
+            bmi08_error_codes_print_result("bmi08a_get_set_fifo_config", rslt);
 
             while (try <= 3)
             {

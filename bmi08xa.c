@@ -1,5 +1,5 @@
 /**
-* Copyright (c) 2023 Bosch Sensortec GmbH. All rights reserved.
+* Copyright (c) 2024 Bosch Sensortec GmbH. All rights reserved.
 *
 * BSD-3-Clause
 *
@@ -31,8 +31,8 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 * @file       bmi08xa.c
-* @date       2023-03-27
-* @version    v1.7.1
+* @date       2024-07-29
+* @version    v1.9.0
 *
 */
 
@@ -690,7 +690,7 @@ static int8_t positive_excited_accel(struct bmi08_sensor_data *accel_pos, struct
     uint8_t reg_data = BMI08_ACCEL_POSITIVE_SELF_TEST;
 
     /* Enable positive excitation for all 3 axes */
-    rslt = bmi08a_set_regs(BMI08_REG_ACCEL_SELF_TEST, &reg_data, 1, dev);
+    rslt = bmi08a_get_set_regs(BMI08_REG_ACCEL_SELF_TEST, &reg_data, BMI08_REG_ACCEL_SELF_TEST_LENGTH, dev, SET_FUNC);
     if (rslt == BMI08_OK)
     {
         /* Read accel data after 50ms delay */
@@ -710,7 +710,7 @@ static int8_t negative_excited_accel(struct bmi08_sensor_data *accel_neg, struct
     uint8_t reg_data = BMI08_ACCEL_NEGATIVE_SELF_TEST;
 
     /* Enable negative excitation for all 3 axes */
-    rslt = bmi08a_set_regs(BMI08_REG_ACCEL_SELF_TEST, &reg_data, 1, dev);
+    rslt = bmi08a_get_set_regs(BMI08_REG_ACCEL_SELF_TEST, &reg_data, BMI08_REG_ACCEL_SELF_TEST_LENGTH, dev, SET_FUNC);
     if (rslt == BMI08_OK)
     {
         /* Read accel data after 50ms delay */
@@ -721,7 +721,11 @@ static int8_t negative_excited_accel(struct bmi08_sensor_data *accel_neg, struct
         {
             /* Disable self test */
             reg_data = BMI08_ACCEL_SWITCH_OFF_SELF_TEST;
-            rslt = bmi08a_set_regs(BMI08_REG_ACCEL_SELF_TEST, &reg_data, 1, dev);
+            rslt = bmi08a_get_set_regs(BMI08_REG_ACCEL_SELF_TEST,
+                                       &reg_data,
+                                       BMI08_REG_ACCEL_SELF_TEST_LENGTH,
+                                       dev,
+                                       SET_FUNC);
         }
     }
 
@@ -830,14 +834,14 @@ static int8_t set_range(struct bmi08_dev *dev)
     if (!is_range_invalid)
     {
         /* Read accel config. register */
-        rslt = bmi08a_get_regs(BMI08_REG_ACCEL_RANGE, &data, 1, dev);
+        rslt = bmi08a_get_set_regs(BMI08_REG_ACCEL_RANGE, &data, BMI08_REG_ACCEL_RANGE_LENGTH, dev, GET_FUNC);
         if (rslt == BMI08_OK)
         {
             /* Update data with current range values */
             data = BMI08_SET_BITS_POS_0(data, BMI08_ACCEL_RANGE, range);
 
             /* Write accel range to register */
-            rslt = bmi08a_set_regs(BMI08_REG_ACCEL_RANGE, &data, 1, dev);
+            rslt = bmi08a_get_set_regs(BMI08_REG_ACCEL_RANGE, &data, BMI08_REG_ACCEL_RANGE_LENGTH, dev, SET_FUNC);
         }
     }
     else

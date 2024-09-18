@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2023 Bosch Sensortec GmbH
+ * Copyright (C) 2024 Bosch Sensortec GmbH
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -104,6 +104,15 @@ static void configure_bmi08_high_g_interrupt(struct bmi08_dev *bmi08dev)
         rslt = bmi088_mma_set_high_g_config(&high_g_cfg, bmi08dev);
     }
 
+    printf("High-g Configurations \n");
+    printf("Threshold : %d\n", high_g_cfg.threshold);
+    printf("Hysteresis : %d\n", high_g_cfg.hysteresis);
+    printf("Duration : %d\n", high_g_cfg.duration);
+    printf("Enable : %d\n", high_g_cfg.enable);
+    printf("Select X : %d\n", high_g_cfg.select_x);
+    printf("Select Y : %d\n", high_g_cfg.select_y);
+    printf("Select Z : %d\n", high_g_cfg.select_z);
+
     if (rslt == BMI08_OK)
     {
         /* Map high-g interrupt to INT1 */
@@ -133,7 +142,7 @@ int main(void)
      *         For I2C : BMI08_I2C_INTF
      *         For SPI : BMI08_SPI_INTF
      */
-    rslt = bmi08_interface_init(&bmi08, BMI08_I2C_INTF);
+    rslt = bmi08_interface_init(&bmi08, BMI08_SPI_INTF);
     bmi08_check_rslt("bmi08_interface_init", rslt);
 
     /* Initialize the sensors */

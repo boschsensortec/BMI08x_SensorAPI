@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2023 Bosch Sensortec GmbH
+ * Copyright (C) 2024 Bosch Sensortec GmbH
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -96,6 +96,7 @@ static void configure_bmi08_any_motion_interrupt(struct bmi08_dev *bmi08dev)
     any_motion_cfg.x_en = 1;
     any_motion_cfg.y_en = 1;
     any_motion_cfg.z_en = 1;
+    any_motion_cfg.odr = BMI088_MM_ACCEL_ANY_MOT_ODR_100HZ; /* 100Hz */
     rslt = bmi088_mma_configure_anymotion(any_motion_cfg, bmi08dev);
 
     if (rslt == BMI08_OK)
@@ -126,7 +127,7 @@ int main(void)
      *         For I2C : BMI08_I2C_INTF
      *         For SPI : BMI08_SPI_INTF
      */
-    rslt = bmi08_interface_init(&bmi08, BMI08_I2C_INTF);
+    rslt = bmi08_interface_init(&bmi08, BMI08_SPI_INTF);
     bmi08_check_rslt("bmi08_interface_init", rslt);
 
     /* Initialize the sensors */

@@ -295,9 +295,9 @@ int main(void)
                         else if (bmi08dev.variant == BMI088_VARIANT)
                         {
                             /* Converting lsb to meter per second squared for 16 bit accelerometer at 24G range. */
-                            x = lsb_to_mps2(bmi08_accel.x, 24, 16);
-                            y = lsb_to_mps2(bmi08_accel.y, 24, 16);
-                            z = lsb_to_mps2(bmi08_accel.z, 24, 16);
+                            x = lsb_to_mps2(bmi08_accel.x, (float)24, 16);
+                            y = lsb_to_mps2(bmi08_accel.y, (float)24, 16);
+                            z = lsb_to_mps2(bmi08_accel.z, (float)24, 16);
                         }
 
                         printf("%d, %5d, %5d, %5d, %4.2f, %4.2f, %4.2f\n",
@@ -368,7 +368,7 @@ int main(void)
  * @brief This function converts lsb to meter per second squared for 16 bit accelerometer at
  * range 2G, 4G, 8G or 16G.
  */
-static float lsb_to_mps2(int16_t val, int8_t g_range, uint8_t bit_width)
+static float lsb_to_mps2(int16_t val, float g_range, uint8_t bit_width)
 {
     double power = 2;
 

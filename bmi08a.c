@@ -693,15 +693,15 @@ int8_t bmi08a_get_meas_conf(struct bmi08_dev *dev)
 }
 
 /*!
- * @brief This API sets the output data rate and bandwidth
+ * @brief This API sets the output data rate, bandwidth and range
  * of accel sensor.
  */
 int8_t bmi08a_set_meas_conf(struct bmi08_dev *dev)
 {
     int8_t rslt;
-    uint8_t bw, odr;
+    uint8_t bw, odr, range;
     uint8_t data = { 0 };
-    uint8_t is_odr_invalid = FALSE, is_bw_invalid = FALSE;
+    uint8_t is_odr_invalid = FALSE, is_bw_invalid = FALSE, is_range_invalid = FALSE;
 
     /* Check for null pointer in the device structure*/
     rslt = dev_null_ptr_check(dev);
@@ -711,6 +711,7 @@ int8_t bmi08a_set_meas_conf(struct bmi08_dev *dev)
     {
         odr = dev->accel_cfg.odr;
         bw = dev->accel_cfg.bw;
+        range = dev->accel_cfg.range;
 
         /* Check for valid ODR */
         if ((odr < BMI08_ACCEL_ODR_12_5_HZ) || (odr > BMI08_ACCEL_ODR_1600_HZ))
@@ -726,8 +727,14 @@ int8_t bmi08a_set_meas_conf(struct bmi08_dev *dev)
             is_bw_invalid = TRUE;
         }
 
+        /* Check for valid range*/
+        if(range > BMI088_ACCEL_RANGE_24G){
+            /* Updating the status */
+            is_range_invalid = TRUE;
+        }
+
         /* Invalid configuration present in ODR and BW */
-        if ((!is_odr_invalid) && (!is_bw_invalid))
+        if ((!is_odr_invalid) && (!is_bw_invalid) && (!is_range_invalid))
         {
             /* Read accel config. register */
             rslt = bmi08a_get_set_regs(BMI08_REG_ACCEL_CONF, &data, (BMI08_REG_ACCEL_CONF_LENGTH - 1), dev, GET_FUNC);
@@ -737,24 +744,28 @@ int8_t bmi08a_set_meas_conf(struct bmi08_dev *dev)
                 data = BMI08_SET_BITS_POS_0(data, BMI08_ACCEL_ODR, odr);
                 data = BMI08_SET_BITS(data, BMI08_ACCEL_BW, bw);
 
-                /* Write accel range to register */
-                rslt =
-                    bmi08a_get_set_regs(BMI08_REG_ACCEL_CONF, &data, (BMI08_REG_ACCEL_CONF_LENGTH - 1), dev, SET_FUNC);
-
+                /* Write accel ODR and BW to register */
+                rslt = bmi08a_get_set_regs(BMI08_REG_ACCEL_CONF, &data, (BMI08_REG_ACCEL_CONF_LENGTH - 1), dev, SET_FUNC);
                 if (rslt == BMI08_OK)
                 {
                     /* Delay required to set accel configurations */
                     dev->delay_us(BMI08_SET_ACCEL_CONF_DELAY * 1000, dev->intf_ptr_accel);
+                    /* Write accel range to register, only if first write was successful, otherwise we overwrite possible non BMI08_OK result */
+                    rslt = bmi08a_get_set_regs(BMI08_REG_ACCEL_RANGE, &range, BMI08_REG_ACCEL_RANGE_LENGTH, dev, SET_FUNC);
+                    if (rslt == BMI08_OK)
+                    {
+                        /* Delay required to set accel configurations */
+                        dev->delay_us(BMI08_SET_ACCEL_CONF_DELAY * 1000, dev->intf_ptr_accel);
+                    }
                 }
             }
             else
             {
-                /* Invalid configuration present in ODR and BW */
+                /* Invalid configuration present in ODR or BW or RANGE */
                 rslt = BMI08_E_INVALID_CONFIG;
             }
         }
     }
-
     return rslt;
 }
 
